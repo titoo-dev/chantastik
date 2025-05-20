@@ -10,6 +10,7 @@ export function ExternalLyricsSection() {
 		setExternalLyrics,
 		addLinesFromExternal,
 		showExternalLyrics,
+		showPreview,
 	} = useAppContext();
 
 	const handleConvertToLines = () => {
@@ -22,7 +23,7 @@ export function ExternalLyricsSection() {
 		addLinesFromExternal(lines);
 	};
 
-	if (!showExternalLyrics) {
+	if (!showExternalLyrics || showPreview) {
 		return null; // Don't render if external lyrics are not shown
 	}
 

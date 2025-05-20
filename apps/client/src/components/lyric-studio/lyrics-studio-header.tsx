@@ -7,7 +7,7 @@ export const LyricStudioHeader = memo(() => {
 	const {
 		showPreview,
 		setShowPreview,
-		hasEmptyLyricLines,
+		isValidLyricLines,
 		lyricLines,
 		showExternalLyrics,
 		areLyricLinesWithoutTimestamps,
@@ -51,7 +51,7 @@ export const LyricStudioHeader = memo(() => {
 							title="Toggle lyrics preview"
 							disabled={
 								lyricLines.length === 0 ||
-								hasEmptyLyricLines() ||
+								!isValidLyricLines() ||
 								showExternalLyrics
 							}
 							aria-label="Toggle lyrics preview"
@@ -62,17 +62,17 @@ export const LyricStudioHeader = memo(() => {
 						<Button
 							onClick={handleDownload}
 							disabled={
-								hasEmptyLyricLines() ||
+								!isValidLyricLines() ||
 								lyricLines.length === 0 ||
 								areLyricLinesWithoutTimestamps()
 							}
 							variant={
-								hasEmptyLyricLines() || lyricLines.length === 0
+								!isValidLyricLines() || lyricLines.length === 0
 									? 'outline'
 									: 'default'
 							}
 							title={
-								hasEmptyLyricLines()
+								!isValidLyricLines()
 									? 'Fill in all lyric lines before downloading'
 									: 'Download lyrics in LRC format'
 							}

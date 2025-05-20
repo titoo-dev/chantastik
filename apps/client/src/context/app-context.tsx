@@ -28,7 +28,7 @@ type AppContextType = {
 	updateLyricLine: (id: number, data: Partial<LyricLine>) => void;
 	deleteLyricLine: (id: number) => void;
 	setCurrentTimeAsTimestamp: (id: number) => void;
-	hasEmptyLyricLines: () => boolean;
+	isValidLyricLines: () => boolean;
 	addLinesFromExternal: (externalLines: string[]) => void;
 	// Added from lyric-header
 	generateLRC: () => LRCData;
@@ -180,8 +180,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	};
 
 	// Check if any lyric line is empty
-	const hasEmptyLyricLines = (): boolean => {
-		return lyricLines.some((line) => line.text.trim() === '');
+	const isValidLyricLines = (): boolean => {
+		return lyricLines.some(
+			(line) => line.text.trim() !== '' && line.timestamp !== undefined
+		);
 	};
 
 	// Add multiple lines from external lyrics
@@ -271,7 +273,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				updateLyricLine,
 				deleteLyricLine,
 				setCurrentTimeAsTimestamp,
-				hasEmptyLyricLines,
+				isValidLyricLines,
 				addLinesFromExternal,
 				// Added from lyric-header
 				generateLRC,
