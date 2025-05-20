@@ -27,18 +27,20 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		(l) => frame >= l.startFrame && frame <= l.endFrame
 	);
 
-	const renderCurrentLyric = () => {
+	const renderLyrics = () => {
 		if (currentLyricIndex === -1) return null;
 
-		const lyric = lyrics[currentLyricIndex];
+		const currentLyric = lyrics[currentLyricIndex];
+		const nextLyric = lyrics[currentLyricIndex + 1];
 
 		// Calculate progress through current lyric
 		const progress =
-			(frame - lyric.startFrame) / (lyric.endFrame - lyric.startFrame);
+			(frame - currentLyric.startFrame) /
+			(currentLyric.endFrame - currentLyric.startFrame);
 
 		// Modern entrance animation with spring physics
 		const entrance = spring({
-			frame: frame - lyric.startFrame,
+			frame: frame - currentLyric.startFrame,
 			fps,
 			config: {
 				damping: 16,
@@ -62,37 +64,64 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		const scale = interpolate(entrance, [0, 1], [0.92, 1]);
 
 		return (
-			<p
-				style={{
-					position: 'absolute',
-					opacity,
-					bottom: '30%',
-					left: '50%',
-					transform: `translateX(-50%) translateY(${translateY}px) scale(${scale})`,
-					textAlign: 'center',
-					fontSize: '4rem',
-					fontWeight: 700,
-					lineHeight: 1.2,
-					color: textColor,
-					letterSpacing: '-0.02em',
-					width: '90%',
-					maxWidth: '1200px',
-					textShadow: `0 2px 8px rgba(0,0,0,0.15)`,
-					margin: 0,
-				}}
-			>
-				<span
+			<>
+				{/* Current lyric */}
+				<p
 					style={{
-						color: highlightColor,
-						fontWeight: 800,
-						position: 'relative',
-						display: 'inline-block',
-						zIndex: 1,
+						position: 'absolute',
+						opacity,
+						bottom: '30%',
+						left: '50%',
+						transform: `translateX(-50%) translateY(${translateY}px) scale(${scale})`,
+						textAlign: 'center',
+						fontSize: '4rem',
+						fontWeight: 700,
+						lineHeight: 1.2,
+						color: textColor,
+						letterSpacing: '-0.02em',
+						width: '90%',
+						maxWidth: '1200px',
+						textShadow: `0 2px 8px rgba(0,0,0,0.15)`,
+						margin: 0,
 					}}
 				>
-					{lyric.text}
-				</span>
-			</p>
+					<span
+						style={{
+							color: highlightColor,
+							fontWeight: 800,
+							position: 'relative',
+							display: 'inline-block',
+							zIndex: 1,
+						}}
+					>
+						{currentLyric.text}
+					</span>
+				</p>
+
+				{/* Next lyric with low opacity */}
+				{nextLyric && (
+					<p
+						style={{
+							position: 'absolute',
+							opacity: 0.3, // Low opacity for next line
+							bottom: '22%', // Below the current lyric
+							left: '50%',
+							transform: 'translateX(-50%)',
+							textAlign: 'center',
+							fontSize: '2.5rem', // Smaller than current lyric
+							fontWeight: 500,
+							lineHeight: 1.2,
+							color: textColor,
+							letterSpacing: '-0.02em',
+							width: '90%',
+							maxWidth: '1200px',
+							margin: 0,
+						}}
+					>
+						<span>{nextLyric.text}</span>
+					</p>
+				)}
+			</>
 		);
 	};
 
@@ -218,7 +247,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 				}}
 			/>
 
-			{renderCurrentLyric()}
+			{renderLyrics()}
 
 			{audioSrc && <Audio src={audioSrc} pauseWhenBuffering />}
 		</AbsoluteFill>
