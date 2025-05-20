@@ -1,5 +1,5 @@
 {
-  "name": "@repo/audio-upload-server",
+  "name": "@repo/server",
   "version": "1.0.0",
   "description": "Express server for handling audio file uploads",
   "main": "dist/server.js",
