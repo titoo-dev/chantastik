@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ComponentRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
@@ -16,13 +16,11 @@ import {
 import { useAppContext } from '@/hooks/use-app-context';
 
 interface TrackUploadWrapperProps {
-	audioRef: React.RefObject<ComponentRef<'audio'> | null>;
 	iconColor?: string;
 	showDownload?: boolean;
 }
 
 export function TrackUploadWrapper({
-	audioRef,
 	iconColor = 'text-primary',
 	showDownload = false,
 }: TrackUploadWrapperProps) {
@@ -32,7 +30,7 @@ export function TrackUploadWrapper({
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [isRetracted, setIsRetracted] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { setTrackLoaded } = useAppContext();
+	const { setTrackLoaded, audioRef } = useAppContext();
 
 	// Clean up object URL on unmount
 	useEffect(() => {

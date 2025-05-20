@@ -1,8 +1,15 @@
 import { Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
+import { useAppContext } from '@/hooks/use-app-context';
 
 export function LyricPreviewSection() {
+	const { showPreview, showExternalLyrics } = useAppContext();
+
+	if (!showPreview || showExternalLyrics) {
+		return null; // Don't render if preview is not shown or external lyrics are visible
+	}
+
 	return (
 		<Card className="pt-0 shadow-none overflow-hidden">
 			<CardHeader className="flex flex-row items-center border-b pt-6">

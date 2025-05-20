@@ -4,14 +4,14 @@ import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { useAppContext } from '@/hooks/use-app-context';
 
-interface ExternalLyricsSectionProps {
-	onConvertToLines: (lines: string[]) => void;
-}
+export function ExternalLyricsSection() {
+	const {
+		externalLyrics,
+		setExternalLyrics,
+		addLinesFromExternal,
+		showExternalLyrics,
+	} = useAppContext();
 
-export function ExternalLyricsSection({
-	onConvertToLines,
-}: ExternalLyricsSectionProps) {
-	const { externalLyrics, setExternalLyrics } = useAppContext();
 	const handleConvertToLines = () => {
 		// Split the text into lines and filter out empty lines
 		const lines = externalLyrics
@@ -19,8 +19,12 @@ export function ExternalLyricsSection({
 			.map((line) => line.trim())
 			.filter((line) => line.length > 0);
 
-		onConvertToLines(lines);
+		addLinesFromExternal(lines);
 	};
+
+	if (!showExternalLyrics) {
+		return null; // Don't render if external lyrics are not shown
+	}
 
 	return (
 		<Card className="pt-0 shadow-none overflow-hidden">

@@ -1,58 +1,39 @@
+import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent } from '../ui/card';
 import { EmptyLyrics } from './empty-lyrics';
 import { LyricHeader } from './lyric-header';
-import type { LyricLine } from './lyric-line-item';
 import { LyricList } from './lyric-list';
+import { memo } from 'react';
 
-export function LyricEditor({
-	lyricLines,
-	showPreview,
-	setShowPreview,
-	hasEmptyLyricLines,
-	onUpdateLine,
-	onDeleteLine,
-	onSetCurrentTime,
-	onAddLine,
-	showExternalLyrics,
-	setShowExternalLyrics,
-}: {
-	lyricLines: LyricLine[];
-	showPreview: boolean;
-	setShowPreview: (show: boolean) => void;
-	hasEmptyLyricLines: () => boolean;
-	onUpdateLine: (id: number, data: Partial<LyricLine>) => void;
-	onDeleteLine: (id: number) => void;
-	onSetCurrentTime: (id: number) => void;
-	onAddLine: (afterId?: number) => void;
-	showExternalLyrics: boolean;
-	setShowExternalLyrics: (show: boolean) => void;
-}) {
+export const LyricEditor = memo(function LyricEditor() {
+	const {
+		lyricLines,
+		updateLyricLine,
+		deleteLyricLine,
+		setCurrentTimeAsTimestamp,
+		addLyricLine,
+		showPreview,
+		showExternalLyrics,
+	} = useAppContext();
 	return (
-		<Card className="pt-0 shadow-none">
-			<LyricHeader
-				showPreview={showPreview}
-				setShowPreview={setShowPreview}
-				hasEmptyLyricLines={hasEmptyLyricLines}
-				lyricLines={lyricLines}
-				onShowExternalLyrics={() =>
-					setShowExternalLyrics(!showExternalLyrics)
-				}
-				showExternalLyrics={showExternalLyrics}
-			/>
+		<Card
+			className={`pt-0 shadow-none ${showPreview || showExternalLyrics ? 'col-span-1' : 'col-span-2'}`}
+		>
+			<LyricHeader />
 
 			<CardContent className="p-6">
 				{lyricLines.length === 0 ? (
-					<EmptyLyrics onAddLine={() => onAddLine()} />
+					<EmptyLyrics onAddLine={() => addLyricLine()} />
 				) : (
 					<LyricList
 						lyricLines={lyricLines}
-						onUpdateLine={onUpdateLine}
-						onDeleteLine={onDeleteLine}
-						onSetCurrentTime={onSetCurrentTime}
-						onAddLine={() => onAddLine()}
+						onUpdateLine={updateLyricLine}
+						onDeleteLine={deleteLyricLine}
+						onSetCurrentTime={setCurrentTimeAsTimestamp}
+						onAddLine={() => addLyricLine()}
 					/>
 				)}
 			</CardContent>
 		</Card>
 	);
-}
+});
