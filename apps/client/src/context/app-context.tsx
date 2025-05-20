@@ -34,6 +34,10 @@ type AppContextType = {
 	generateLRC: () => LRCData;
 	handleDownload: () => void;
 	toggleShowExternalLyrics: () => void;
+
+	showVideoPreview: boolean;
+	setShowVideoPreview: (show: boolean) => void;
+	toggleShowVideoPreview: () => void;
 };
 
 // Added from lyric-header
@@ -60,6 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	const [trackLoaded, setTrackLoaded] = useState(false);
 	const [showPreview, setShowPreview] = useState(false);
 	const [showExternalLyrics, setShowExternalLyrics] = useState(false);
+	const [showVideoPreview, setShowVideoPreview] = useState(false);
 
 	// check if all lyrics line timestamps are 0
 	const areLyricLinesWithoutTimestamps = () => {
@@ -88,6 +93,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	// toggle show external lyrics
 	const toggleShowExternalLyrics = () => {
 		setShowExternalLyrics((prev) => !prev);
+	};
+
+	// toggle show video preview
+	const toggleShowVideoPreview = () => {
+		setShowVideoPreview((prev) => !prev);
+		setShowPreview(false);
+		setShowExternalLyrics(false);
 	};
 
 	// Jump to timestamp of specific lyric line
@@ -279,6 +291,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				generateLRC,
 				handleDownload,
 				toggleShowExternalLyrics,
+				// Added from lyric-header
+				showVideoPreview,
+				setShowVideoPreview,
+				toggleShowVideoPreview,
 			}}
 		>
 			{children}

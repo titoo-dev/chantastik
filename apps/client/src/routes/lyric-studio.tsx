@@ -4,6 +4,7 @@ import { LyricEditor } from '@/components/lyric-studio/lyric-editor';
 import { LyricPreviewSection } from '@/components/lyric-studio/lyric-preview-section';
 import { ExternalLyricsSection } from '@/components/lyric-studio/external-lyrics-section';
 import { LyricStudioHeader } from '@/components/lyric-studio/lyrics-studio-header';
+import { LyricsPlayer } from '@/components/lyric-studio/lyrics-player';
 
 export const Route = createFileRoute('/lyric-studio')({
 	component: LyricStudioPage,
@@ -17,9 +18,8 @@ function LyricStudioPage() {
 			{/* Main content area */}
 			<div className="grid gap-6 grid-cols-2">
 				<LyricEditor />
-
+				<LyricsPlayer />
 				<LyricPreviewSection />
-
 				<ExternalLyricsSection />
 			</div>
 

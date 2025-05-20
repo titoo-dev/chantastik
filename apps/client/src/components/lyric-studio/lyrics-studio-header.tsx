@@ -14,6 +14,8 @@ export const LyricStudioHeader = memo(() => {
 		handleDownload,
 		trackLoaded,
 		toggleShowExternalLyrics,
+		showVideoPreview,
+		toggleShowVideoPreview,
 	} = useAppContext();
 
 	return (
@@ -32,6 +34,20 @@ export const LyricStudioHeader = memo(() => {
 
 				{trackLoaded && (
 					<div className="flex items-center gap-3">
+						<Button
+							onClick={toggleShowVideoPreview}
+							variant="outline"
+							className="gap-2"
+							title="Import lyrics from text"
+							disabled={
+								lyricLines.length === 0 || !isValidLyricLines()
+							}
+						>
+							<FileText className="h-4 w-4" />
+							{showVideoPreview
+								? 'Hide Video Preview'
+								: 'Video Preview'}
+						</Button>
 						<Button
 							onClick={toggleShowExternalLyrics}
 							variant="outline"
