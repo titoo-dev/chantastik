@@ -2,6 +2,7 @@ import './index.css';
 import { Composition } from 'remotion';
 import { MyComposition } from './Composition';
 import { type Lyrics, LyricsPropsSchema } from './schema';
+import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 
 export const RemotionRoot: React.FC = () => {
 	// Process lyrics from the text file
@@ -35,68 +36,9 @@ export const RemotionRoot: React.FC = () => {
 };
 
 // Function to parse the lyrics file into the required format
-export function parseLyrics(): Lyrics {
+export function parseLyrics(lyricLines?: LyricLine[]): Lyrics {
 	// FPS for conversion from time to frames
 	const fps = 30;
-
-	// Read the LRC file content
-	// In a real application, you would use fs.readFileSync or fetch
-	// Here we're using the content from friends.lrc that was provided
-	const lrcContent = `[ti:Untitled Song]
-[ar:Unknown Artist]
-[al:Unknown Album]
-
-[00:15.59]And I never thought I'd feel this way
-[00:21.12]And as far as I'm concerned
-[00:24.37]I'm glad I got the chance to say
-[00:29.35]That I do believe I love you
-[00:33.60]And if I should ever go away
-[00:39.39]Well, then close your eyes
-[00:43.12]And try to feel the way we do today
-[00:47.57]And then if you can remember
-[00:53.80]Keep smiling, keep shining
-[00:57.84]Knowing you can always count on me, for sure
-[01:05.57]That's what friends are for
-[01:10.14]For good times and bad times
-[01:13.86]I'll be on your side forever more
-[01:21.62]That's what friends are for
-[01:33.11]Well, you came and opened me
-[01:36.48]And now there's so much more I see
-[01:41.13]And so by the way I thank you
-[01:45.43]Whoa and then for the times when we're apart
-[01:51.24]Well then close your eyes
-[01:53.38]And know these words are comin' from my heart
-[01:59.29]And then if you can remember, oh
-[02:06.14]Keep smiling, keep shining
-[02:09.79]Knowing you can always count on me, for sure
-[02:17.47]That's what friends are for
-[02:21.72]In good times, in bad times
-[02:25.85]I'll be on your side forever more
-[02:33.25]Oh, that's what friends are for
-[02:37.71]Whoa oh-oh
-[02:40.19]Keep smiling, keep shining
-[02:43.71]Knowing you can always count on me, for sure
-[02:51.64]That's what friends are for
-[02:55.92]For good times and bad times
-[02:59.83]I'll be on your side forever more
-[03:07.89]That's what friends are for
-[03:12.68]Oh-oh
-[03:14.38]Keep smiling, keep shining
-[03:17.90]Knowing you can always count on me, that's for sure
-[03:24.72]'Cause I tell you that's what friends are for
-[03:29.99]For good times and for bad times
-[03:33.66]I'll be on your side forever more
-[03:41.72]That's what friends are for
-[03:44.43](That's what friends are for)
-[03:46.32](Ha-ha, yeah)
-[03:56.11]On me for sure
-[03:58.22]I don't need for sure
-[04:00.12]I don't need for sure
-[04:01.98]That's what friends are for
-[04:04.60]Keep smiling, keep shining`;
-
-	// Parse LRC format
-	const lines = lrcContent.split('\n');
 	const lyrics: {
 		text: string;
 		time: string;
@@ -104,34 +46,34 @@ export function parseLyrics(): Lyrics {
 		endFrame: number;
 	}[] = [];
 
-	// Regular expression to match timestamp and lyric text
-	const lrcLineRegex = /^\[(\d{2}:\d{2}\.\d{2})\](.*)$/;
+	// If no lyrics provided or empty array, return empty lyrics
+	if (!lyricLines || lyricLines.length === 0) {
+		return [];
+	}
 
-	// Function to convert LRC time format to frames
-	const timeToFrames = (timeStr: string): number => {
-		const [minutes, secondsMs] = timeStr.split(':');
-		const seconds = secondsMs.split('.')[0];
-		const milliseconds = secondsMs.split('.')[1];
+	// Sort lyrics by timestamp to ensure proper order
+	const sortedLyrics = [...lyricLines].sort(
+		(a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0)
+	);
 
-		const totalSeconds =
-			parseInt(minutes) * 60 +
-			parseInt(seconds) +
-			parseInt(milliseconds) / 100; // LRC format uses hundredths of seconds
+	// Function to convert seconds to LRC time format (MM:SS.XX)
+	const secondsToTimeStr = (seconds: number): string => {
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		const centisecs = Math.floor((seconds % 1) * 100);
 
-		return Math.floor(totalSeconds * fps);
+		return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${centisecs.toString().padStart(2, '0')}`;
 	};
 
-	// Extract all valid lyrics lines
-	lines.forEach((line) => {
-		const match = line.match(lrcLineRegex);
-		if (match) {
-			const time = match[1];
-			const text = match[2];
+	// Convert LyricLine objects to required format
+	sortedLyrics.forEach((line) => {
+		if (line.text && line.timestamp !== undefined) {
+			const timeStr = secondsToTimeStr(line.timestamp);
 
 			lyrics.push({
-				text,
-				time,
-				startFrame: timeToFrames(time),
+				text: line.text,
+				time: timeStr,
+				startFrame: Math.floor(line.timestamp * fps),
 				endFrame: 0, // Will be calculated in the next step
 			});
 		}

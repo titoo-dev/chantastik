@@ -1,21 +1,43 @@
-import { PlayCircle } from 'lucide-react';
+import { PlayCircle, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useAppContext } from '@/hooks/use-app-context';
 import { parseLyrics } from '@/remotion/Root';
 import { Player } from '@remotion/player';
 import { MyComposition } from '@/remotion/Composition';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
+import { Button } from '../ui/button';
+import { useCallback, useMemo, useState } from 'react';
+import type { LyricsProps } from '@/remotion/schema';
 
 export const LyricsPlayer = () => {
-	const lyricsData = parseLyrics();
-
 	// Calculate total duration based on lyrics
-	const { showVideoPreview } = useAppContext();
+	const { showVideoPreview, lyricLines } = useAppContext();
+	const [isLoading, setIsLoading] = useState(false);
 
-	const totalFrames =
-		lyricsData.length > 0
+	const lyricsData = useCallback(() => {
+		return parseLyrics(lyricLines);
+	}, [lyricLines])();
+
+	const totalFrames = useMemo(() => {
+		return lyricsData.length > 0
 			? lyricsData[lyricsData.length - 1].endFrame + 30
-			: 0; // Add a buffer of 1 second at the end
+			: 0;
+	}, [lyricsData]);
+
+	// extract inputProps from MyComposition
+	const inputProps = useMemo(() => {
+		return {
+			lyrics: lyricsData,
+		} as LyricsProps;
+	}, [lyricsData]);
+
+	const updateVideoPlayer = useCallback(() => {
+		setIsLoading(true);
+		// Simulate update process
+		setTimeout(() => {
+			setIsLoading(false);
+		}, 1500);
+	}, []);
 
 	if (!showVideoPreview) {
 		return null; // Don't render if video preview is not shown
@@ -28,29 +50,51 @@ export const LyricsPlayer = () => {
 					<PlayCircle className="h-5 w-5 text-primary" />
 					Lyric Player
 				</CardTitle>
+
+				<div className="flex items-center gap-3">
+					<Button
+						onClick={updateVideoPlayer}
+						variant="outline"
+						className="gap-2"
+						title="Update video player with current lyrics"
+						disabled={isLoading}
+					>
+						<RotateCcw
+							className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+						/>
+						Update Video Player
+					</Button>
+				</div>
 			</CardHeader>
 
 			<CardContent className="p-6">
-				<Player
-					component={MyComposition}
-					inputProps={{
-						lyrics: lyricsData,
-						fontFamily: 'Inter, system-ui, sans-serif',
-						backgroundColor: 'hsl(0 0% 20%)',
-						textColor: 'hsl(0 0% 98%)',
-						highlightColor: 'hsl(142.1 76.2% 36.3%)',
-					}}
-					durationInFrames={totalFrames}
-					fps={30}
-					compositionWidth={1280}
-					compositionHeight={720}
-					controls
-					logLevel="trace"
-					style={{
-						width: '100%',
-					}}
-				/>
-
+				{isLoading ? (
+					<div className="flex flex-col items-center justify-center h-[400px] bg-muted/20 rounded-lg border border-border">
+						<div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+						<p className="text-muted-foreground">
+							Updating video player...
+						</p>
+						<p className="text-sm text-muted-foreground mt-2">
+							This may take a moment
+						</p>
+					</div>
+				) : (
+					<Player
+						component={MyComposition}
+						inputProps={{
+							...inputProps,
+						}}
+						durationInFrames={totalFrames}
+						fps={30}
+						compositionWidth={1280}
+						compositionHeight={720}
+						controls
+						logLevel="trace"
+						style={{
+							width: '100%',
+						}}
+					/>
+				)}
 				<LyricsPreviewCard />
 			</CardContent>
 		</Card>

@@ -5,7 +5,6 @@ import {
 	interpolate,
 	spring,
 	useVideoConfig,
-	staticFile,
 	Audio,
 	Img,
 } from 'remotion';
@@ -14,13 +13,14 @@ import type { LyricsProps } from './schema';
 export const MyComposition: React.FC<LyricsProps> = ({
 	lyrics,
 	fontFamily = 'Inter, system-ui, sans-serif',
-	backgroundColor = 'hsl(0 0% 7%)',
-	textColor = 'hsl(0 0% 98%)',
-	highlightColor = 'hsl(252 100% 69%)',
-	backgroundImage = staticFile('assets/background.jpg'), // Default background image
+	backgroundColor = 'var(--background)',
+	textColor = 'var(--foreground)',
+	highlightColor = 'var(--primary)',
+	backgroundImage,
+	audioSrc,
 }) => {
 	const frame = useCurrentFrame();
-	const { fps, width } = useVideoConfig();
+	const { fps, width, height } = useVideoConfig();
 
 	// Find the current lyric
 	const currentLyricIndex = lyrics.findIndex(
@@ -32,64 +32,74 @@ export const MyComposition: React.FC<LyricsProps> = ({
 
 		const lyric = lyrics[currentLyricIndex];
 
-		// Calculate how far into the current lyric we are (0-1)
+		// Calculate progress through current lyric
 		const progress =
 			(frame - lyric.startFrame) / (lyric.endFrame - lyric.startFrame);
 
-		// Entrance animation
+		// Modern entrance animation with spring physics
 		const entrance = spring({
 			frame: frame - lyric.startFrame,
 			fps,
 			config: {
-				damping: 26,
+				damping: 16,
 				mass: 0.9,
-				stiffness: 170,
+				stiffness: 150,
 			},
 		});
 
-		// Exit animation - starts 80% through the lyric duration
-		const exitStart = 0.8;
+		// Smooth exit animation
+		const exitStart = 0.85;
 		const exitOpacity =
 			progress > exitStart
-				? interpolate(progress, [exitStart, 1], [1, 0], {
-						extrapolateRight: 'clamp',
-					})
+				? interpolate(progress, [exitStart, 1], [1, 0])
 				: 1;
 
 		// Combined opacity
-		const opacity =
-			interpolate(entrance, [0, 0.2], [0, 1], {
-				extrapolateRight: 'clamp',
-			}) * exitOpacity;
+		const opacity = entrance * exitOpacity;
+
+		// Subtle entrance transform
+		const translateY = interpolate(entrance, [0, 1], [25, 0]);
+		const scale = interpolate(entrance, [0, 1], [0.92, 1]);
 
 		return (
-			<div
-				className="current-lyric"
+			<p
 				style={{
 					position: 'absolute',
-					bottom: '5rem',
-					right: '5rem',
-					maxWidth: width * 0.5,
 					opacity,
-					padding: '1.5rem 2rem',
-					color: textColor,
-					fontSize: '2.8rem',
+					bottom: '30%',
+					left: '50%',
+					transform: `translateX(-50%) translateY(${translateY}px) scale(${scale})`,
+					textAlign: 'center',
+					fontSize: '4rem',
 					fontWeight: 700,
-					textAlign: 'right',
-					lineHeight: 1.3,
-					transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+					lineHeight: 1.2,
+					color: textColor,
+					letterSpacing: '-0.02em',
+					width: '90%',
+					maxWidth: '1200px',
+					textShadow: `0 2px 8px rgba(0,0,0,0.15)`,
+					margin: 0,
 				}}
 			>
-				{lyric.text}
-			</div>
+				<span
+					style={{
+						color: highlightColor,
+						fontWeight: 800,
+						position: 'relative',
+						display: 'inline-block',
+						zIndex: 1,
+					}}
+				>
+					{lyric.text}
+				</span>
+			</p>
 		);
 	};
 
-	// Subtle parallax effect for background image
-	const parallaxX = interpolate(frame, [0, 1000], [0, -50], {
-		extrapolateRight: 'clamp',
-	});
-	const parallaxY = interpolate(Math.sin(frame / 200), [-1, 1], [-20, 20]);
+	// Get accent colors from theme variables for decorative elements
+	const accentColor1 = 'var(--chart-1)'; // Purple
+	const accentColor2 = 'var(--chart-2)'; // Teal
+	const accentColor3 = 'var(--chart-4)'; // Gold/Yellow
 
 	return (
 		<AbsoluteFill
@@ -99,19 +109,8 @@ export const MyComposition: React.FC<LyricsProps> = ({
 				overflow: 'hidden',
 			}}
 		>
-			{/* Background image with parallax effect */}
-			<div
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
-					overflow: 'hidden',
-					transform: `translate(${parallaxX}px, ${parallaxY}px) scale(1.1)`,
-					transition: 'transform 0.5s ease-out',
-				}}
-			>
+			{/* Background image with minimal movement */}
+			{backgroundImage && (
 				<Img
 					src={backgroundImage}
 					alt="Background"
@@ -120,50 +119,108 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						height: '100%',
 						objectFit: 'cover',
 						objectPosition: 'center',
-						filter: 'brightness(0.4)',
+						filter: 'brightness(0.9)',
 					}}
 					pauseWhenLoading
 				/>
-			</div>
+			)}
 
-			{/* Overlay gradient */}
+			{/* Modern gradient overlay */}
 			<div
+				style={{
+					position: 'absolute',
+					inset: 0,
+					background: backgroundImage
+						? 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
+						: `linear-gradient(135deg, var(--background), var(--accent))`,
+					opacity: 0.8,
+				}}
+			/>
+
+			{/* Modern minimalist patterns */}
+			<svg
+				width={width}
+				height={height}
+				viewBox={`0 0 ${width} ${height}`}
 				style={{
 					position: 'absolute',
 					top: 0,
 					left: 0,
-					width: '100%',
-					height: '100%',
-					background: `radial-gradient(ellipse at bottom right, ${highlightColor}40 0%, ${backgroundColor}CC 70%)`,
-					opacity: 0.85,
+					opacity: 0.08,
+				}}
+			>
+				{/* Abstract shapes */}
+				<path
+					d={`M${width * 0.8},${height * 0.2} Q${width * 0.9},${height * 0.15} ${width * 0.85},${height * 0.3}`}
+					stroke={accentColor1}
+					strokeWidth="3"
+					fill="none"
+				/>
+				<path
+					d={`M${width * 0.2},${height * 0.7} Q${width * 0.3},${height * 0.85} ${width * 0.1},${height * 0.8}`}
+					stroke={accentColor2}
+					strokeWidth="3"
+					fill="none"
+				/>
+
+				{/* Floating circles */}
+				<circle
+					cx={width * 0.85}
+					cy={height * 0.15}
+					r={width * 0.02}
+					fill={accentColor1}
+					opacity="0.6"
+				/>
+				<circle
+					cx={width * 0.15}
+					cy={height * 0.85}
+					r={width * 0.015}
+					fill={accentColor2}
+					opacity="0.6"
+				/>
+				<circle
+					cx={width * 0.75}
+					cy={height * 0.7}
+					r={width * 0.01}
+					fill={accentColor3}
+					opacity="0.6"
+				/>
+			</svg>
+
+			{/* Animated gradient bar */}
+			<div
+				style={{
+					position: 'absolute',
+					bottom: '100px',
+					left: '50%',
+					transform: 'translateX(-50%)',
+					width: '40%',
+					height: '2px',
+					background: `linear-gradient(90deg, transparent, ${accentColor1}, ${accentColor2}, transparent)`,
+					opacity: interpolate(
+						Math.sin(frame / 30),
+						[-1, 1],
+						[0.3, 0.6]
+					),
+					borderRadius: '1px',
 				}}
 			/>
 
-			{/* Visual elements in background */}
+			{/* Subtle dot pattern */}
 			<div
 				style={{
 					position: 'absolute',
-					top: '5%',
-					left: '10%',
-					width: '40%',
-					height: '40%',
-					opacity: 0.6,
-				}}
-			/>
-			<div
-				style={{
-					position: 'absolute',
-					bottom: '15%',
-					right: '25%',
-					width: '30%',
-					height: '30%',
-					opacity: 0.7,
+					inset: 0,
+					backgroundImage: `radial-gradient(var(--chart-3) 1px, transparent 1px), radial-gradient(var(--chart-5) 1px, transparent 1px)`,
+					backgroundSize: '40px 40px, 30px 30px',
+					backgroundPosition: '0 0, 20px 20px',
+					opacity: 0.03,
 				}}
 			/>
 
 			{renderCurrentLyric()}
 
-			<Audio src={staticFile('assets/friends.mp3')} pauseWhenBuffering />
+			{audioSrc && <Audio src={audioSrc} pauseWhenBuffering />}
 		</AbsoluteFill>
 	);
 };
