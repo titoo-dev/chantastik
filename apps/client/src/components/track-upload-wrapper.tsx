@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type ComponentRef } from 'react';
-import { Music, Upload, X } from 'lucide-react';
+import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
 import { Button } from './ui/button';
@@ -117,40 +117,57 @@ export function TrackUploadWrapper({
 		setIsRetracted(!isRetracted);
 	};
 
-	// Retracted state for both the uploader and player
-	if (isRetracted) {
-		return (
+	return (
+		<>
+			{/* Retracted button - always rendered but only visible when retracted */}
 			<Button
-				size="icon"
-				variant="secondary"
+				variant="outline"
 				onClick={toggleRetracted}
-				className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:scale-105 transition-transform"
+				className={cn(
+					'fixed inset-x-0 bottom-6 mx-auto flex items-center gap-3 px-6 h-12 rounded-full',
+					'border-2 border-dotted border-primary/50 bg-background/80 backdrop-blur-sm',
+					'shadow-md hover:shadow-primary/20 hover:border-primary transition-all duration-300',
+					'group max-w-xs',
+					isRetracted
+						? 'opacity-100'
+						: 'opacity-0 pointer-events-none'
+				)}
 				title={
 					audioFile ? 'Expand audio player' : 'Expand audio uploader'
 				}
 			>
-				{audioFile ? (
-					<Music className="h-6 w-6 text-primary" />
-				) : (
-					<Upload className="h-6 w-6 text-primary" />
-				)}
+				<span className="relative flex items-center justify-center w-6 h-6">
+					{audioFile ? (
+						<Music className="h-5 w-5 text-primary" />
+					) : (
+						<MoveDiagonal className="h-5 w-5 text-primary" />
+					)}
+				</span>
+				<span className="font-medium text-sm">
+					{audioFile ? 'Show Player' : 'Upload Track'}
+				</span>
 			</Button>
-		);
-	}
 
-	// Upload state
-	if (!audioFile || !audioUrl) {
-		return (
-			<div className="relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
+			{/* Upload interface - only visible when not retracted and no file is uploaded */}
+			<div
+				className={cn(
+					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
+					(!audioFile || !audioUrl) && !isRetracted
+						? 'opacity-100'
+						: 'opacity-0 pointer-events-none hidden'
+				)}
+			>
 				<div className="absolute -right-2 -top-4 z-10">
 					<Button
 						size="icon"
 						variant="ghost"
-						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
+						className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm 
+							shadow-md hover:shadow-primary/20 hover:bg-primary/10 
+							transition-all duration-300 border border-muted/40"
 						onClick={toggleRetracted}
 						title="Retract uploader"
 					>
-						<Upload className="h-4 w-4 text-muted-foreground rotate-180" />
+						<MoveDiagonal className="h-4 w-4 text-primary/80 rotate-180 group-hover:scale-105 transition-transform" />
 					</Button>
 				</div>
 				<div
@@ -193,59 +210,66 @@ export function TrackUploadWrapper({
 					</p>
 				</div>
 			</div>
-		);
-	}
 
-	// Player state
-	return (
-		<div className="relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300">
-			<div className="absolute -right-2 -top-4 z-10 flex gap-2">
-				<Button
-					size="icon"
-					variant="ghost"
-					className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
-					onClick={toggleRetracted}
-					title="Retract player"
-				>
-					<Upload className="h-4 w-4 text-muted-foreground rotate-180" />
-				</Button>
-				<Button
-					size="icon"
-					variant="ghost"
-					className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive/10 focus-visible:outline-none"
-					onClick={() => setShowConfirmDialog(true)}
-					title="Remove audio"
-				>
-					<X className="h-4 w-4 text-muted-foreground" />
-				</Button>
-			</div>
-			<TrackPlayer
-				title={audioFile.name}
-				icon={Music}
-				iconColor={iconColor}
-				src={audioUrl}
-				showDownload={showDownload}
-			/>
-
-			<AlertDialog
-				open={showConfirmDialog}
-				onOpenChange={setShowConfirmDialog}
+			{/* Player interface - only visible when a file is uploaded and not retracted */}
+			<div
+				className={cn(
+					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
+					audioFile && audioUrl && !isRetracted
+						? 'opacity-100'
+						: 'opacity-0 pointer-events-none'
+				)}
 			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Remove track?</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action will remove the current audio track.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={handleRemoveAudio}>
-							Remove
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</div>
+				<div className="absolute -right-2 -top-4 z-10 flex gap-2">
+					<Button
+						size="icon"
+						variant="ghost"
+						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
+						onClick={toggleRetracted}
+						title="Retract player"
+					>
+						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
+					</Button>
+					<Button
+						size="icon"
+						variant="ghost"
+						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive/10 focus-visible:outline-none"
+						onClick={() => setShowConfirmDialog(true)}
+						title="Remove audio"
+					>
+						<X className="h-4 w-4 text-muted-foreground" />
+					</Button>
+				</div>
+				{audioFile && audioUrl && (
+					<TrackPlayer
+						title={audioFile.name}
+						icon={Music}
+						iconColor={iconColor}
+						src={audioUrl}
+						showDownload={showDownload}
+					/>
+				)}
+
+				<AlertDialog
+					open={showConfirmDialog}
+					onOpenChange={setShowConfirmDialog}
+				>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Remove track?</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action will remove the current audio track.
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Cancel</AlertDialogCancel>
+							<AlertDialogAction onClick={handleRemoveAudio}>
+								Remove
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</div>
+		</>
 	);
 }
