@@ -17,7 +17,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 	backgroundColor = 'hsl(0 0% 7%)',
 	textColor = 'hsl(0 0% 98%)',
 	highlightColor = 'hsl(252 100% 69%)',
-	backgroundImage = staticFile('background.jpg'), // Default background image
+	backgroundImage = staticFile('assets/background.jpg'), // Default background image
 }) => {
 	const frame = useCurrentFrame();
 	const { fps, width } = useVideoConfig();
@@ -122,6 +122,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						objectPosition: 'center',
 						filter: 'brightness(0.4)',
 					}}
+					pauseWhenLoading
 				/>
 			</div>
 
@@ -162,7 +163,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 
 			{renderCurrentLyric()}
 
-			<Audio src={staticFile('friends.mp3')} />
+			<Audio src={staticFile('assets/friends.mp3')} pauseWhenBuffering />
 		</AbsoluteFill>
 	);
 };

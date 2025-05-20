@@ -38,6 +38,9 @@ importers:
       '@remotion/cli':
         specifier: 4.0.305
         version: 4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/player':
+        specifier: 4.0.305
+        version: 4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@remotion/tailwind-v4':
         specifier: 4.0.305
         version: 4.0.305(@remotion/bundler@4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.2)(webpack@5.96.1(esbuild@0.25.0))

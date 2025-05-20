@@ -35,7 +35,7 @@ export const RemotionRoot: React.FC = () => {
 };
 
 // Function to parse the lyrics file into the required format
-function parseLyrics(): Lyrics {
+export function parseLyrics(): Lyrics {
 	// FPS for conversion from time to frames
 	const fps = 30;
 
