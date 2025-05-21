@@ -19,10 +19,12 @@ output/
 models/
 download/
 
+
 storage/input/
 storage/output/
 storage/models/
 storage/download/
+storage/covers/
 
 # Build files
 dist/
