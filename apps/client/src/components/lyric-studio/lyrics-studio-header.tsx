@@ -93,8 +93,8 @@ export const LyricStudioHeader = memo(() => {
 									: 'Download lyrics in LRC format'
 							}
 						>
-							<Download className="mr-2 h-4 w-4" />
-							Download
+							<Download className="h-4 w-4" />
+							Download LRC
 						</Button>
 					</div>
 				)}
