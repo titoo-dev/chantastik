@@ -2,16 +2,15 @@ import { PlayCircle, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useAppContext } from '@/hooks/use-app-context';
 import { parseLyrics } from '@/remotion/Root';
-import { Player } from '@remotion/player';
-import { MyComposition } from '@/remotion/Composition';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { Button } from '../ui/button';
 import { useCallback, useMemo, useState } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
+import { PlayerOnly } from './player';
 
 export const LyricsPlayer = () => {
 	// Calculate total duration based on lyrics
-	const { showVideoPreview, lyricLines } = useAppContext();
+	const { showVideoPreview, lyricLines, videoRef } = useAppContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const lyricsData = useCallback(() => {
@@ -79,20 +78,10 @@ export const LyricsPlayer = () => {
 						</p>
 					</div>
 				) : (
-					<Player
-						component={MyComposition}
-						inputProps={{
-							...inputProps,
-						}}
-						durationInFrames={totalFrames}
-						fps={30}
-						compositionWidth={1280}
-						compositionHeight={720}
-						controls
-						logLevel="trace"
-						style={{
-							width: '100%',
-						}}
+					<PlayerOnly
+						playerRef={videoRef}
+						inputProps={inputProps}
+						totalFrames={totalFrames}
 					/>
 				)}
 				<LyricsPreviewCard />

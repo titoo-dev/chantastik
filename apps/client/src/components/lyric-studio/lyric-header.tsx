@@ -8,7 +8,7 @@ import type { LyricLine } from './lyric-line-item';
 
 export const LyricHeader = memo(function LyricHeader() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { setLyricLines } = useAppContext();
+	const { setLyricLines, trackLoaded } = useAppContext();
 
 	const loadFromLrcFile = () => {
 		if (fileInputRef.current) {
@@ -82,6 +82,10 @@ export const LyricHeader = memo(function LyricHeader() {
 
 		reader.readAsText(file);
 	};
+
+	if (!trackLoaded) {
+		return null;
+	}
 
 	return (
 		<CardHeader className="flex flex-row items-center justify-between py-8 border-b">

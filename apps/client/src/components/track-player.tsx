@@ -26,7 +26,7 @@ export function TrackPlayer({
 	showWaveform?: boolean;
 	onTimeUpdate?: (time: number) => void;
 }) {
-	const { audioRef } = useAppContext();
+	const { audioRef, videoRef, setVideoTime } = useAppContext();
 	const playerRef = useRef<HTMLDivElement>(null);
 	const [waveBars] = useState(
 		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
@@ -96,10 +96,24 @@ export function TrackPlayer({
 		if (audioRef.current) {
 			if (audioState.isPlaying) {
 				audioRef.current.pause();
+				pauseVideo();
 			} else {
 				audioRef.current.play();
+				playVideo();
 			}
 			setAudioState((s) => ({ ...s, isPlaying: !s.isPlaying }));
+		}
+	};
+
+	const playVideo = () => {
+		if (videoRef.current) {
+			videoRef.current.play();
+		}
+	};
+
+	const pauseVideo = () => {
+		if (videoRef.current) {
+			videoRef.current.pause();
 		}
 	};
 
@@ -107,6 +121,7 @@ export function TrackPlayer({
 		const newTime = value[0];
 		if (audioRef.current) {
 			audioRef.current.currentTime = newTime;
+			setVideoTime(newTime);
 			setAudioState((s) => ({ ...s, currentTime: newTime }));
 			if (onTimeUpdate) {
 				onTimeUpdate(newTime);
