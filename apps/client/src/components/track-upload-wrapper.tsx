@@ -220,16 +220,7 @@ export function TrackUploadWrapper({
 						: 'opacity-0 pointer-events-none'
 				)}
 			>
-				<div className="absolute -right-2 -top-4 z-10 flex gap-2">
-					<Button
-						size="icon"
-						variant="ghost"
-						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
-						onClick={toggleRetracted}
-						title="Retract player"
-					>
-						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
-					</Button>
+				<div className="absolute -right-4 -top-4 z-10 flex gap-2">
 					<Button
 						size="icon"
 						variant="ghost"
@@ -238,6 +229,17 @@ export function TrackUploadWrapper({
 						title="Remove audio"
 					>
 						<X className="h-4 w-4 text-muted-foreground" />
+					</Button>
+				</div>
+				<div className="absolute -left-4 -bottom-4 z-10 flex gap-2">
+					<Button
+						size="icon"
+						variant="ghost"
+						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
+						onClick={toggleRetracted}
+						title="Retract player"
+					>
+						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
 					</Button>
 				</div>
 				{audioFile && audioUrl && (
