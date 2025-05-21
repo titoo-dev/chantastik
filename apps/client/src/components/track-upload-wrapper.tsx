@@ -30,7 +30,8 @@ export function TrackUploadWrapper({
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [isRetracted, setIsRetracted] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { setTrackLoaded, audioRef } = useAppContext();
+	const { setTrackLoaded, audioRef, resetAllStatesAndPlayers } =
+		useAppContext();
 
 	// Clean up object URL on unmount
 	useEffect(() => {
@@ -105,6 +106,7 @@ export function TrackUploadWrapper({
 
 		// Call the onAudioRemove callback if provided
 		setTrackLoaded(false);
+		resetAllStatesAndPlayers();
 	};
 
 	const handleBrowseClick = () => {
