@@ -94,6 +94,7 @@ export function TrackPlayer({
 				pauseVideo();
 			} else {
 				audioRef.current.play();
+				setVideoTime(audioState.currentTime);
 				playVideo();
 			}
 			setAudioState((s) => ({ ...s, isPlaying: !s.isPlaying }));
@@ -189,7 +190,15 @@ export function TrackPlayer({
 				</div>
 			</div>
 
-			<audio ref={audioRef} src={src} className="hidden" />
+			<audio
+				ref={audioRef}
+				src={src}
+				className="hidden"
+				onEnded={() => {
+					videoRef.current?.pause();
+					videoRef.current?.seekTo(0);
+				}}
+			/>
 
 			{showWaveform && isWaveformVisible && (
 				<Waveform
