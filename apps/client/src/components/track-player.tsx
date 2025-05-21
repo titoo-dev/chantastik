@@ -103,6 +103,7 @@ export function TrackPlayer({
 
 	const playVideo = () => {
 		if (videoRef.current) {
+			setVideoTime(audioRef.current?.currentTime || 0);
 			videoRef.current.play();
 		}
 	};
@@ -117,8 +118,10 @@ export function TrackPlayer({
 		const newTime = value[0];
 		if (audioRef.current) {
 			audioRef.current.currentTime = newTime;
-			setVideoTime(newTime);
-			videoRef.current?.play();
+			if (!audioState.isPlaying) {
+				audioRef.current.play();
+			}
+			playVideo();
 			setAudioState((s) => ({ ...s, currentTime: newTime }));
 		}
 	};
@@ -195,8 +198,13 @@ export function TrackPlayer({
 				src={src}
 				className="hidden"
 				onEnded={() => {
-					videoRef.current?.pause();
-					videoRef.current?.seekTo(0);
+					if (audioRef.current) {
+						audioRef.current.pause();
+						audioRef.current.currentTime = 0;
+						setAudioState((s) => ({ ...s, isPlaying: false }));
+						pauseVideo();
+						videoRef.current?.seekTo(0);
+					}
 				}}
 			/>
 
