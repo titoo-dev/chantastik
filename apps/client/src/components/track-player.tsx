@@ -21,10 +21,8 @@ export function TrackPlayer({
 	src,
 	showDownload = true,
 	showWaveform = true,
-	onTimeUpdate,
 }: TrackPlayerProps & {
 	showWaveform?: boolean;
-	onTimeUpdate?: (time: number) => void;
 }) {
 	const { audioRef, videoRef, setVideoTime } = useAppContext();
 	const playerRef = useRef<HTMLDivElement>(null);
@@ -55,9 +53,6 @@ export function TrackPlayer({
 					...oldState,
 					currentTime: audio.currentTime,
 				}));
-				if (onTimeUpdate) {
-					onTimeUpdate(audio.currentTime);
-				}
 			},
 			ended: () => setAudioState((s) => ({ ...s, isPlaying: false })),
 		};
@@ -71,7 +66,7 @@ export function TrackPlayer({
 				audio?.removeEventListener(event, handler);
 			});
 		};
-	}, [audioRef, onTimeUpdate]);
+	}, [audioRef]);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,10 +117,8 @@ export function TrackPlayer({
 		if (audioRef.current) {
 			audioRef.current.currentTime = newTime;
 			setVideoTime(newTime);
+			videoRef.current?.play();
 			setAudioState((s) => ({ ...s, currentTime: newTime }));
-			if (onTimeUpdate) {
-				onTimeUpdate(newTime);
-			}
 		}
 	};
 
