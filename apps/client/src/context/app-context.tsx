@@ -42,6 +42,7 @@ type AppContextType = {
 	toggleShowVideoPreview: () => void;
 
 	setVideoTime: (timestamp: number) => void;
+	resetAllStatesAndPlayers: () => void;
 };
 
 // Added from lyric-header
@@ -279,6 +280,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
 		URL.revokeObjectURL(url);
 	};
 
+	const resetAllStatesAndPlayers = () => {
+		setTrackLoaded(false);
+		setLyricLines([]);
+		setExternalLyrics('');
+		setShowPreview(false);
+		setShowExternalLyrics(false);
+		setShowVideoPreview(false);
+
+		// Dispose and reset audio player
+		if (audioRef.current) {
+			audioRef.current.pause();
+			audioRef.current.src = '';
+			audioRef.current.load();
+			audioRef.current.currentTime = 0;
+			audioRef.current = null;
+		}
+
+		// Dispose and reset video player
+		if (videoRef.current) {
+			videoRef.current.pause();
+			videoRef.current.seekTo(0);
+			videoRef.current = null;
+		}
+	};
+
 	return (
 		<AppContext.Provider
 			value={{
@@ -312,6 +338,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				setShowVideoPreview,
 				toggleShowVideoPreview,
 				setVideoTime,
+				resetAllStatesAndPlayers,
 			}}
 		>
 			{children}
