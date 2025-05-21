@@ -11,14 +11,14 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as LyricStudioImport } from './routes/lyric-studio'
+import { Route as AudioSeparatorImport } from './routes/audio-separator'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
-const LyricStudioRoute = LyricStudioImport.update({
-  id: '/lyric-studio',
-  path: '/lyric-studio',
+const AudioSeparatorRoute = AudioSeparatorImport.update({
+  id: '/audio-separator',
+  path: '/audio-separator',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/lyric-studio': {
-      id: '/lyric-studio'
-      path: '/lyric-studio'
-      fullPath: '/lyric-studio'
-      preLoaderRoute: typeof LyricStudioImport
+    '/audio-separator': {
+      id: '/audio-separator'
+      path: '/audio-separator'
+      fullPath: '/audio-separator'
+      preLoaderRoute: typeof AudioSeparatorImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/lyric-studio': typeof LyricStudioRoute
+  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/lyric-studio': typeof LyricStudioRoute
+  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/lyric-studio': typeof LyricStudioRoute
+  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lyric-studio'
+  fullPaths: '/' | '/audio-separator'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lyric-studio'
-  id: '__root__' | '/' | '/lyric-studio'
+  to: '/' | '/audio-separator'
+  id: '__root__' | '/' | '/audio-separator'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LyricStudioRoute: typeof LyricStudioRoute
+  AudioSeparatorRoute: typeof AudioSeparatorRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LyricStudioRoute: LyricStudioRoute,
+  AudioSeparatorRoute: AudioSeparatorRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/lyric-studio"
+        "/audio-separator"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/lyric-studio": {
-      "filePath": "lyric-studio.tsx"
+    "/audio-separator": {
+      "filePath": "audio-separator.tsx"
     }
   }
 }
