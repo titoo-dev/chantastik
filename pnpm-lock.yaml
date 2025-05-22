@@ -41,6 +41,9 @@ importers:
       '@remotion/player':
         specifier: 4.0.305
         version: 4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/preload':
+        specifier: ^4.0.306
+        version: 4.0.306
       '@remotion/tailwind-v4':
         specifier: 4.0.305
         version: 4.0.305(@remotion/bundler@4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.2)(webpack@5.96.1(esbuild@0.25.0))
@@ -1672,6 +1675,9 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
+
+  '@remotion/preload@4.0.306':
+    resolution: {integrity: sha512-KYM8XzyWeoMJGoL1q1IfMrdWgvQGl0+lPfsuQYT9w2zT2Uc4+4Enf3t8Qt4QwUksUu0weq6nsGgXgpTmYmyX3A==}
 
   '@remotion/renderer@4.0.305':
     resolution: {integrity: sha512-DCVzFCnktm1hh/Hb70g+jadHcftzRScjeN8iJzUkyCOacmrKpTckbM73qhgUaGwEnh0ln3xBCNKMHKfjhiwBlA==}
@@ -7144,6 +7150,8 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       remotion: 4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
+  '@remotion/preload@4.0.306': {}
 
   '@remotion/renderer@4.0.305(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:

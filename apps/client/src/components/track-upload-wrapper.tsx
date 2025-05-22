@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
@@ -21,6 +21,7 @@ import {
 	uploadAudioFile,
 } from '@/data/api';
 import { useMutation } from '@tanstack/react-query';
+import { preloadImage } from '@remotion/preload';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -43,6 +44,12 @@ export function TrackUploadWrapper({
 		audioId,
 		updateAudioId,
 	} = useAppContext();
+
+	useEffect(() => {
+		if (audioId) {
+			preloadImage(getCoverArtUrl(audioId));
+		}
+	}, [audioId]);
 
 	// File upload mutation
 	const uploadMutation = useMutation({

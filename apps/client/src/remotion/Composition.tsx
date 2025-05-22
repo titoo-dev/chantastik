@@ -214,6 +214,12 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						filter: 'brightness(0.9)',
 					}}
 					pauseWhenLoading
+					onError={(e) => {
+						console.error('Error loading image:', e);
+						// Fallback to a default image or color
+						e.currentTarget.src =
+							'https://example.com/default-image.jpg'; // Replace with your default image URL
+					}}
 				/>
 			)}
 			{/* Modern gradient overlay with dynamic colors */}
