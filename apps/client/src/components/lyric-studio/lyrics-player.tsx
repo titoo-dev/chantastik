@@ -4,14 +4,24 @@ import { useAppContext } from '@/hooks/use-app-context';
 import { parseLyrics } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { Button } from '../ui/button';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
 
 export const LyricsPlayer = () => {
 	// Calculate total duration based on lyrics
-	const { showVideoPreview, lyricLines, videoRef } = useAppContext();
+	const { showVideoPreview, lyricLines, videoRef, audioRef, setVideoTime } =
+		useAppContext();
 	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		if (audioRef.current) {
+			setVideoTime(audioRef.current.currentTime);
+			if (audioRef.current.played) {
+				videoRef.current?.play();
+			}
+		}
+	}, [showVideoPreview]);
 
 	const lyricsData = useCallback(() => {
 		return parseLyrics(lyricLines);
