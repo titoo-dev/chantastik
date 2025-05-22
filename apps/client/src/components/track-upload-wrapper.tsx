@@ -207,13 +207,11 @@ export function TrackUploadWrapper({
 						: 'opacity-0 pointer-events-none hidden'
 				)}
 			>
-				<div className="absolute -right-2 -top-4 z-10">
+				<div className="absolute right-4 top-4 z-10">
 					<Button
 						size="icon"
 						variant="ghost"
-						className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm 
-							shadow-md hover:shadow-primary/20 hover:bg-primary/10 
-							transition-all duration-300 border border-muted/40"
+						className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 border border-muted/40"
 						onClick={toggleRetracted}
 						title="Retract uploader"
 					>
@@ -224,9 +222,9 @@ export function TrackUploadWrapper({
 					className={cn(
 						'w-full max-w-xl mx-auto p-6 rounded-xl transition-all duration-200',
 						'border-2 border-dashed flex flex-col items-center justify-center',
-						'bg-card hover:bg-muted/30',
+						'bg-card',
 						isDragging
-							? 'border-primary border-opacity-70 bg-primary/5'
+							? 'border-primary border-opacity-70 bg-muted/30'
 							: 'border-muted-foreground/20'
 					)}
 					onDragEnter={handleDragEnter}
