@@ -32,13 +32,17 @@ export function TrackUploadWrapper({
 	showDownload = false,
 }: TrackUploadWrapperProps) {
 	const [audioFile, setAudioFile] = useState<File | null>(null);
-	const [audioId, setAudioId] = useState<string | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [isRetracted, setIsRetracted] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { setTrackLoaded, audioRef, resetAllStatesAndPlayers } =
-		useAppContext();
+	const {
+		setTrackLoaded,
+		audioRef,
+		resetAllStatesAndPlayers,
+		audioId,
+		updateAudioId,
+	} = useAppContext();
 
 	// File upload mutation
 	const uploadMutation = useMutation({
@@ -46,7 +50,7 @@ export function TrackUploadWrapper({
 		onSuccess: (data) => {
 			console.log('Upload successful:', data);
 			notifications.uploadSuccess(data.message);
-			setAudioId(data.id);
+			updateAudioId(data.id);
 		},
 		onError: (error) => {
 			console.error('Upload failed:', error);
@@ -101,7 +105,7 @@ export function TrackUploadWrapper({
 
 	const handleRemoveAudio = () => {
 		setAudioFile(null);
-		setAudioId(null);
+		updateAudioId(undefined);
 		if (audioRef.current) {
 			audioRef.current.pause();
 			audioRef.current.src = '';

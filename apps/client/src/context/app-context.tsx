@@ -15,6 +15,8 @@ type AppContextType = {
 	setTrackLoaded: (loaded: boolean) => void;
 	audioRef: RefObject<ComponentRef<'audio'> | null>;
 	videoRef: RefObject<PlayerRef | null>;
+	audioId?: string;
+	updateAudioId: (id?: string) => void;
 	jumpToLyricLine: (id: number) => void;
 	lyricLines: LyricLine[];
 	setLyricLines: (lines: LyricLine[]) => void;
@@ -66,6 +68,7 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
 	const audioRef = useRef<ComponentRef<'audio'>>(null);
 	const videoRef = useRef<PlayerRef>(null);
+	const [audioId, setAudioId] = useState<string>();
 	const [externalLyrics, setExternalLyrics] = useState<string>('');
 	const [lyricLines, setLyricLines] = useState<LyricLine[]>([]);
 	const [trackLoaded, setTrackLoaded] = useState(false);
@@ -76,6 +79,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	// check if all lyrics line timestamps are 0
 	const areLyricLinesWithoutTimestamps = () => {
 		return lyricLines.every((line) => line.timestamp === 0);
+	};
+
+	const updateAudioId = (id?: string) => {
+		setAudioId(id);
 	};
 
 	// check if all lyrics line timestamps are ascending order
@@ -350,6 +357,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				setVideoTime,
 				resetAllStatesAndPlayers,
 				toggleShowPreview,
+				audioId,
+				updateAudioId,
 			}}
 		>
 			{children}
