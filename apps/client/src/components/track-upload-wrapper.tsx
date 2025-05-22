@@ -116,6 +116,48 @@ export function TrackUploadWrapper({
 		setIsRetracted(!isRetracted);
 	};
 
+	if (uploadMutation.isPending) {
+		return (
+			<div className="flex flex-col items-center justify-center w-full max-w-xl mx-auto p-6 rounded-xl border-2 border-dashed border-primary/30 bg-background/95 backdrop-blur-md shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
+				<div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+					<Upload className="h-8 w-8 text-primary animate-pulse" />
+				</div>
+				<h3 className="text-lg font-semibold mb-2">Uploading Track</h3>
+				<div className="w-full max-w-md mx-auto mt-2 mb-4">
+					<div className="flex items-center justify-between mb-2">
+						<span className="text-sm font-medium text-muted-foreground">
+							Processing
+						</span>
+						<span className="text-xs font-medium text-primary">
+							{audioFile?.name}
+						</span>
+					</div>
+					<div className="relative h-3 w-full overflow-hidden rounded-full bg-secondary/30">
+						{/* Animated gradient background */}
+						<div
+							className="absolute inset-0 bg-gradient-to-r from-primary/60 via-primary to-primary/60 rounded-full w-full"
+							style={{
+								backgroundSize: '200% 100%',
+								animation: 'shimmer 2s infinite linear',
+							}}
+						/>
+
+						{/* Glow effect */}
+						<div
+							className="absolute inset-0 w-full rounded-full bg-primary/20 blur-[3px]"
+							style={{
+								animation: 'pulse 1.5s infinite ease-in-out',
+							}}
+						/>
+					</div>
+				</div>
+				<p className="text-xs text-muted-foreground mt-1 text-center">
+					This may take a moment depending on file size
+				</p>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			{/* Retracted button - always rendered but only visible when retracted */}
@@ -244,28 +286,6 @@ export function TrackUploadWrapper({
 						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
 					</Button>
 				</div>
-
-				{/* Upload Progress Overlay */}
-				{uploadMutation.isPending && (
-					<div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
-						<div className="w-full max-w-xs">
-							<div className="flex items-center justify-between mb-2">
-								<span className="text-sm font-medium">
-									Uploading...
-								</span>
-								<span className="text-sm font-medium">
-									Processing
-								</span>
-							</div>
-							<div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-								<div className="h-full bg-primary animate-pulse rounded-full" />
-							</div>
-							<p className="text-xs text-muted-foreground mt-2">
-								Uploading {audioFile?.name}
-							</p>
-						</div>
-					</div>
-				)}
 
 				{audioFile && audioUrl && (
 					<TrackPlayer
