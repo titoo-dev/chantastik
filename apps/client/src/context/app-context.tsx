@@ -43,6 +43,7 @@ type AppContextType = {
 
 	setVideoTime: (timestamp: number) => void;
 	resetAllStatesAndPlayers: () => void;
+	toggleShowPreview: () => void;
 };
 
 // Added from lyric-header
@@ -99,6 +100,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	// toggle show external lyrics
 	const toggleShowExternalLyrics = () => {
 		setShowExternalLyrics((prev) => !prev);
+		setShowPreview(false);
+		setShowVideoPreview(false);
 	};
 
 	// toggle show video preview
@@ -106,6 +109,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 		setShowVideoPreview((prev) => !prev);
 		setShowPreview(false);
 		setShowExternalLyrics(false);
+	};
+
+	// toggle show preview
+	const toggleShowPreview = () => {
+		setShowPreview((prev) => !prev);
+		setShowExternalLyrics(false);
+		setShowVideoPreview(false);
 	};
 
 	// Jump to timestamp of specific lyric line
@@ -339,6 +349,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				toggleShowVideoPreview,
 				setVideoTime,
 				resetAllStatesAndPlayers,
+				toggleShowPreview,
 			}}
 		>
 			{children}

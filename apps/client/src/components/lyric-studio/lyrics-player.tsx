@@ -10,8 +10,15 @@ import { PlayerOnly } from './player';
 
 export const LyricsPlayer = () => {
 	// Calculate total duration based on lyrics
-	const { showVideoPreview, lyricLines, videoRef, audioRef, setVideoTime } =
-		useAppContext();
+	const {
+		showVideoPreview,
+		lyricLines,
+		videoRef,
+		audioRef,
+		setVideoTime,
+		showPreview,
+		showExternalLyrics,
+	} = useAppContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
@@ -48,7 +55,7 @@ export const LyricsPlayer = () => {
 		}, 1500);
 	}, []);
 
-	if (!showVideoPreview) {
+	if (!showVideoPreview || showExternalLyrics || showPreview) {
 		return null; // Don't render if video preview is not shown
 	}
 
