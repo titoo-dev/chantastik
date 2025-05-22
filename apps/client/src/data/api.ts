@@ -15,6 +15,11 @@ export function getAudioUrl(id: string): string {
 	return `${BASE_URL}/audio/${id}`;
 }
 
+// get cover art url function
+export function getCoverArtUrl(id: string): string {
+	return `${BASE_URL}/audio/${id}/cover`;
+}
+
 /**
  * Uploads an audio file to the server
  */

@@ -14,7 +14,12 @@ import {
 	AlertDialogTitle,
 } from './ui/alert-dialog';
 import { useAppContext } from '@/hooks/use-app-context';
-import { getAudioUrl, notifications, uploadAudioFile } from '@/data/api';
+import {
+	getAudioUrl,
+	getCoverArtUrl,
+	notifications,
+	uploadAudioFile,
+} from '@/data/api';
 import { useMutation } from '@tanstack/react-query';
 
 interface TrackUploadWrapperProps {
@@ -27,7 +32,7 @@ export function TrackUploadWrapper({
 	showDownload = false,
 }: TrackUploadWrapperProps) {
 	const [audioFile, setAudioFile] = useState<File | null>(null);
-	const [audioUrl, setAudioUrl] = useState<string | null>(null);
+	const [audioId, setAudioId] = useState<string | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [isRetracted, setIsRetracted] = useState(false);
@@ -41,7 +46,7 @@ export function TrackUploadWrapper({
 		onSuccess: (data) => {
 			console.log('Upload successful:', data);
 			notifications.uploadSuccess(data.message);
-			setAudioUrl(getAudioUrl(data.id));
+			setAudioId(data.id);
 		},
 		onError: (error) => {
 			console.error('Upload failed:', error);
@@ -96,7 +101,7 @@ export function TrackUploadWrapper({
 
 	const handleRemoveAudio = () => {
 		setAudioFile(null);
-		setAudioUrl(null);
+		setAudioId(null);
 		if (audioRef.current) {
 			audioRef.current.pause();
 			audioRef.current.src = '';
@@ -193,7 +198,7 @@ export function TrackUploadWrapper({
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					(!audioFile || !audioUrl) && !isRetracted
+					(!audioFile || !audioId) && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none hidden'
 				)}
@@ -258,7 +263,7 @@ export function TrackUploadWrapper({
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					audioFile && audioUrl && !isRetracted
+					audioFile && audioId && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none'
 				)}
@@ -287,16 +292,17 @@ export function TrackUploadWrapper({
 					</Button>
 				</div>
 
-				{audioFile && audioUrl && (
+				{audioFile && audioId && (
 					<TrackPlayer
 						title={audioFile.name}
 						icon={Music}
 						iconColor={iconColor}
-						src={audioUrl}
+						src={getAudioUrl(audioId)}
 						showDownload={showDownload}
 						onLoadedMetadata={() => {
 							setTrackLoaded(true);
 						}}
+						coverArt={getCoverArtUrl(audioId)}
 					/>
 				)}
 

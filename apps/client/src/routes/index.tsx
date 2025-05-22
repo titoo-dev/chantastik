@@ -13,7 +13,7 @@ export const Route = createFileRoute('/')({
 
 function App() {
 	return (
-		<main className="container relative min-h-screen py-6">
+		<main className="container relative min-h-screen py-6 px-4 md:px-0">
 			<LyricStudioHeader />
 
 			{/* Main content area */}

@@ -1,7 +1,7 @@
 import { downloadAudioFile } from '@/data/api';
 import { Button } from './ui/button';
 import { useRef, useState, useEffect } from 'react';
-import { Download, AudioLines } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Controls, type AudioPlayerState } from './track-player/controls';
 import { Waveform } from './track-player/wave-form';
 import { useAppContext } from '@/hooks/use-app-context';
@@ -21,17 +21,16 @@ export function TrackPlayer({
 	iconColor,
 	src,
 	showDownload = true,
-	showWaveform = true,
 	onLoadedMetadata,
+	coverArt = '/default-cover-art.jpg', // Add default cover art path
 }: TrackPlayerProps & {
-	showWaveform?: boolean;
+	coverArt?: string; // Add optional cover art prop
 }) {
 	const { audioRef, videoRef, setVideoTime } = useAppContext();
 	const playerRef = useRef<HTMLDivElement>(null);
 	const [waveBars] = useState(
 		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
 	);
-	const [isWaveformVisible, setIsWaveformVisible] = useState(showWaveform);
 	const [audioState, setAudioState] = useState<AudioPlayerState>({
 		isPlaying: false,
 		duration: 0,
@@ -117,6 +116,7 @@ export function TrackPlayer({
 	};
 
 	const handleTimeChange = (value: number[]) => {
+		console.log('Time changed:', value);
 		const newTime = value[0];
 		if (audioRef.current) {
 			audioRef.current.currentTime = newTime;
@@ -150,48 +150,83 @@ export function TrackPlayer({
 		}
 	};
 
-	const toggleWaveform = () => {
-		setIsWaveformVisible(!isWaveformVisible);
-	};
-
 	return (
 		<div
-			className="rounded-lg border bg-card p-5"
+			className="rounded-xl border bg-card p-6 shadow-sm dark:bg-card/95"
 			ref={playerRef}
 			tabIndex={0}
 		>
-			<div className="mb-4 flex items-center justify-between">
-				<h3 className="flex items-center gap-2 font-semibold">
-					<Icon className={`h-5 w-5 ${iconColor}`} />
-					{title}
-				</h3>
-				<div className="flex items-center gap-2">
-					{showWaveform && (
-						<Button
-							variant={isWaveformVisible ? 'default' : 'ghost'}
-							size="icon"
-							className="h-8 w-8 rounded-full"
-							onClick={toggleWaveform}
-							title={
-								isWaveformVisible
-									? 'Hide waveform'
-									: 'Show waveform'
-							}
-						>
-							<AudioLines className="h-4 w-4" />
-						</Button>
-					)}
-					{showDownload && (
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-8 w-8 rounded-full"
-							onClick={() => downloadAudioFile(src)}
-							title="Download track"
-						>
-							<Download className="h-4 w-4" />
-						</Button>
-					)}
+			<div className="flex flex-col gap-6">
+				{/* Track Header */}
+				<div className="flex items-center justify-between">
+					<h3 className="flex items-center gap-2 font-medium">
+						<Icon className={`h-4 w-4 ${iconColor}`} />
+						<span className="text-sm">{title}</span>
+					</h3>
+					<div className="flex items-center gap-1">
+						{showDownload && (
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-7 w-7 rounded-full"
+								onClick={() => downloadAudioFile(src)}
+								title="Download track"
+							>
+								<Download className="h-3.5 w-3.5" />
+							</Button>
+						)}
+					</div>
+				</div>
+
+				{/* Player Content */}
+				<div className="flex items-center gap-5">
+					{/* Cover Art */}
+					<div
+						className={`relative aspect-square w-24 sm:w-28 md:w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${
+							audioState.isPlaying
+								? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background'
+								: ''
+						}`}
+						onClick={handlePlayPause}
+					>
+						<img
+							src={coverArt}
+							alt={`Cover art for ${title}`}
+							className="w-full h-full object-cover"
+							onError={(e) => {
+								(e.target as HTMLImageElement).src =
+									'/default-cover-art.jpg';
+							}}
+						/>
+						{/* Progress indicator on the bottom of cover */}
+						<div
+							className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary/80"
+							style={{
+								width: `${(audioState.currentTime / audioState.duration) * 100}%`,
+							}}
+						></div>
+					</div>
+
+					{/* Controls */}
+					<div className="flex-1">
+						<div className="mb-3">
+							<Waveform
+								bars={waveBars}
+								currentTime={audioState.currentTime}
+								duration={audioState.duration}
+								isPlaying={audioState.isPlaying}
+								onBarClick={handleWaveBarClick}
+							/>
+						</div>
+
+						<Controls
+							audioState={audioState}
+							onPlayPause={handlePlayPause}
+							onTimeChange={handleTimeChange}
+							onVolumeChange={handleVolumeChange}
+							onMuteToggle={handleMuteToggle}
+						/>
+					</div>
 				</div>
 			</div>
 
@@ -199,34 +234,7 @@ export function TrackPlayer({
 				ref={audioRef}
 				src={src}
 				className="hidden"
-				onEnded={() => {
-					if (audioRef.current) {
-						audioRef.current.pause();
-						audioRef.current.currentTime = 0;
-						setAudioState((s) => ({ ...s, isPlaying: false }));
-						pauseVideo();
-						videoRef.current?.seekTo(0);
-					}
-				}}
 				onLoadedMetadata={onLoadedMetadata}
-			/>
-
-			{showWaveform && isWaveformVisible && (
-				<Waveform
-					bars={waveBars}
-					currentTime={audioState.currentTime}
-					duration={audioState.duration}
-					isPlaying={audioState.isPlaying}
-					onBarClick={handleWaveBarClick}
-				/>
-			)}
-
-			<Controls
-				audioState={audioState}
-				onPlayPause={handlePlayPause}
-				onTimeChange={handleTimeChange}
-				onVolumeChange={handleVolumeChange}
-				onMuteToggle={handleMuteToggle}
 			/>
 		</div>
 	);
