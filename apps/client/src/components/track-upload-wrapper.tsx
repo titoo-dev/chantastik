@@ -268,27 +268,25 @@ export function TrackUploadWrapper({
 						: 'opacity-0 pointer-events-none'
 				)}
 			>
-				<div className="absolute -right-4 -top-4 z-10 flex gap-2">
+				<div className="absolute right-4 top-4 z-10 flex gap-2">
 					<Button
 						size="icon"
 						variant="ghost"
-						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive/10 focus-visible:outline-none"
+						className="h-8 w-8 rounded-full bg-transparent hover:bg-muted focus-visible:outline-1"
+						onClick={toggleRetracted}
+						title="Retract player"
+					>
+						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
+					</Button>
+					<Button
+						size="icon"
+						variant="ghost"
+						className="h-8 w-8 rounded-full bg-transparent focus-visible:outline-1"
 						onClick={() => setShowConfirmDialog(true)}
 						title="Remove audio"
 						disabled={uploadMutation.isPending}
 					>
 						<X className="h-4 w-4 text-muted-foreground" />
-					</Button>
-				</div>
-				<div className="absolute -left-4 -bottom-4 z-10 flex gap-2">
-					<Button
-						size="icon"
-						variant="ghost"
-						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-muted focus-visible:outline-none"
-						onClick={toggleRetracted}
-						title="Retract player"
-					>
-						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
 					</Button>
 				</div>
 
