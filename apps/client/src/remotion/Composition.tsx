@@ -9,6 +9,28 @@ import {
 	Img,
 } from 'remotion';
 import type { LyricsProps } from './schema';
+import { useColorFlow } from '@/hooks/use-color-flow';
+
+// Default color palette to use if no theme is available
+const DEFAULT_COLORS = {
+	primary: '#3b82f6',
+	onPrimary: '#ffffff',
+	primaryContainer: '#d1e0ff',
+	secondary: '#7c5800',
+	onSecondary: '#ffffff',
+	secondaryContainer: '#ffdf94',
+	tertiary: '#006875',
+	onTertiary: '#ffffff',
+	tertiaryContainer: '#95f0ff',
+	background: '#121212',
+	surface: '#1e1e1e',
+	surfaceVariant: '#292929',
+	outline: '#74777f',
+	onBackground: '#e3e3e3',
+	onSurface: '#ffffff',
+	onSurfaceVariant: '#c5c6d0',
+	error: '#ba1a1a',
+};
 
 export const MyComposition: React.FC<LyricsProps> = ({
 	lyrics,
@@ -21,6 +43,39 @@ export const MyComposition: React.FC<LyricsProps> = ({
 }) => {
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
+
+	// Use the color flow hook instead of local implementation
+	const theme = useColorFlow();
+
+	// Create a color scheme based on the theme or use defaults
+	const colors = React.useMemo(() => {
+		if (!theme) return DEFAULT_COLORS;
+
+		return {
+			primary: theme.dark.primary,
+			onPrimary: theme.dark.primary,
+			primaryContainer: theme.dark.primary,
+			secondary: theme.dark.secondary,
+			onSecondary: theme.dark.secondary,
+			secondaryContainer: theme.dark.secondary,
+			tertiary: theme.dark.tertiary,
+			onTertiary: theme.dark.tertiary,
+			tertiaryContainer: theme.dark.tertiary,
+			background: theme.dark.background,
+			surface: theme.dark.surface,
+			surfaceVariant: theme.dark.surfaceVariant,
+			outline: theme.dark.outline,
+			onBackground: theme.dark.onBackground,
+			onSurface: theme.dark.onSurface,
+			onSurfaceVariant: theme.dark.onSurfaceVariant,
+			error: theme.dark.error,
+		};
+	}, [theme]);
+
+	// Dynamic color assignments
+	const dynBackgroundColor = theme ? colors.background : backgroundColor;
+	const dynTextColor = theme ? colors.onSurface : textColor;
+	const dynHighlightColor = theme ? colors.primary : highlightColor;
 
 	// Find the current lyric
 	const currentLyricIndex = lyrics.findIndex(
@@ -65,7 +120,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 
 		return (
 			<>
-				{/* Current lyric */}
+				{/* Current lyric with shadcn-inspired styling */}
 				<p
 					style={{
 						position: 'absolute',
@@ -77,27 +132,35 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						fontSize: '4rem',
 						fontWeight: 700,
 						lineHeight: 1.2,
-						color: textColor,
+						color: dynTextColor,
 						letterSpacing: '-0.02em',
 						width: '90%',
 						maxWidth: '1200px',
-						textShadow: `0 2px 8px rgba(0,0,0,0.15)`,
+						textShadow: theme
+							? `0 2px 10px ${colors.background}80`
+							: `0 2px 8px rgba(0,0,0,0.15)`,
 						margin: 0,
+						padding: '1.5rem',
+						borderRadius: '1rem',
 					}}
 				>
 					<span
 						style={{
-							color: highlightColor,
+							color: dynHighlightColor,
 							fontWeight: 800,
 							position: 'relative',
 							display: 'inline-block',
 							zIndex: 1,
+							textDecoration: theme
+								? `underline 4px ${colors.primary}80`
+								: 'none',
+							textUnderlineOffset: '8px',
+							paddingBottom: '4px',
 						}}
 					>
 						{currentLyric.text}
 					</span>
 				</p>
-
 				{/* Next lyric with low opacity */}
 				{nextLyric && (
 					<p
@@ -111,7 +174,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 							fontSize: '2.5rem', // Smaller than current lyric
 							fontWeight: 500,
 							lineHeight: 1.2,
-							color: textColor,
+							color: dynTextColor,
 							letterSpacing: '-0.02em',
 							width: '90%',
 							maxWidth: '1200px',
@@ -125,15 +188,15 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		);
 	};
 
-	// Get accent colors from theme variables for decorative elements
-	const accentColor1 = 'var(--chart-1)'; // Purple
-	const accentColor2 = 'var(--chart-2)'; // Teal
-	const accentColor3 = 'var(--chart-4)'; // Gold/Yellow
+	// Get accent colors from dynamic theme or fall back to CSS variables
+	const accentColor1 = theme ? colors.primary : 'var(--chart-1)';
+	const accentColor2 = theme ? colors.tertiary : 'var(--chart-2)';
+	const accentColor3 = theme ? colors.secondary : 'var(--chart-4)';
 
 	return (
 		<AbsoluteFill
 			style={{
-				backgroundColor,
+				backgroundColor: dynBackgroundColor,
 				fontFamily,
 				overflow: 'hidden',
 			}}
@@ -153,19 +216,18 @@ export const MyComposition: React.FC<LyricsProps> = ({
 					pauseWhenLoading
 				/>
 			)}
-
-			{/* Modern gradient overlay */}
+			{/* Modern gradient overlay with dynamic colors */}
 			<div
 				style={{
 					position: 'absolute',
 					inset: 0,
-					background: backgroundImage
-						? 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)'
+					background: theme
+						? `linear-gradient(180deg, ${colors.surfaceVariant}80 0%, ${colors.background}cc 100%)`
 						: `linear-gradient(135deg, var(--background), var(--accent))`,
-					opacity: 0.8,
+					opacity: 0.85,
+					backdropFilter: 'blur(8px)',
 				}}
 			/>
-
 			{/* Modern minimalist patterns */}
 			<svg
 				width={width}
@@ -215,7 +277,6 @@ export const MyComposition: React.FC<LyricsProps> = ({
 					opacity="0.6"
 				/>
 			</svg>
-
 			{/* Animated gradient bar */}
 			<div
 				style={{
@@ -234,21 +295,20 @@ export const MyComposition: React.FC<LyricsProps> = ({
 					borderRadius: '1px',
 				}}
 			/>
-
-			{/* Subtle dot pattern */}
+			{/* Subtle dot pattern with dynamic colors */}
 			<div
 				style={{
 					position: 'absolute',
 					inset: 0,
-					backgroundImage: `radial-gradient(var(--chart-3) 1px, transparent 1px), radial-gradient(var(--chart-5) 1px, transparent 1px)`,
+					backgroundImage: theme
+						? `radial-gradient(${colors.onSurfaceVariant}20 1px, transparent 1px), radial-gradient(${colors.onSurface}10 1px, transparent 1px)`
+						: `radial-gradient(var(--chart-3) 1px, transparent 1px), radial-gradient(var(--chart-5) 1px, transparent 1px)`,
 					backgroundSize: '40px 40px, 30px 30px',
 					backgroundPosition: '0 0, 20px 20px',
-					opacity: 0.03,
+					opacity: 0.05,
 				}}
 			/>
-
 			{renderLyrics()}
-
 			{audioSrc && <Audio src={audioSrc} pauseWhenBuffering />}
 		</AbsoluteFill>
 	);

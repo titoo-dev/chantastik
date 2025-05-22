@@ -7,6 +7,7 @@ import { Button } from '../ui/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
+import { getCoverArtUrl } from '@/data/api';
 
 export const LyricsPlayer = () => {
 	// Calculate total duration based on lyrics
@@ -18,15 +19,13 @@ export const LyricsPlayer = () => {
 		setVideoTime,
 		showPreview,
 		showExternalLyrics,
+		audioId,
 	} = useAppContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		if (audioRef.current) {
 			setVideoTime(audioRef.current.currentTime);
-			if (audioRef.current.played) {
-				videoRef.current?.play();
-			}
 		}
 	}, [showVideoPreview]);
 
@@ -44,6 +43,7 @@ export const LyricsPlayer = () => {
 	const inputProps = useMemo(() => {
 		return {
 			lyrics: lyricsData,
+			backgroundImage: getCoverArtUrl(audioId ?? ''),
 		} as LyricsProps;
 	}, [lyricsData]);
 

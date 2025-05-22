@@ -227,6 +227,12 @@ export function TrackPlayer({
 				src={src}
 				className="hidden"
 				onLoadedMetadata={onLoadedMetadata}
+				onPlay={() => {
+					videoRef.current?.play();
+				}}
+				onPause={() => {
+					videoRef.current?.pause();
+				}}
 			/>
 		</div>
 	);

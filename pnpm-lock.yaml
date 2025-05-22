@@ -74,6 +74,9 @@ importers:
       lucide-react:
         specifier: ^0.476.0
         version: 0.476.0(react@19.1.0)
+      material-dynamic-colors:
+        specifier: ^1.1.2
+        version: 1.1.2
       motion:
         specifier: ^12.11.3
         version: 12.12.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1270,6 +1273,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@material/material-color-utilities@0.2.7':
+    resolution: {integrity: sha512-0FCeqG6WvK4/Cc06F/xXMd/pv4FeisI0c1tUpBbfhA2n9Y8eZEv4Karjbmf2ZqQCPUWMrGp8A571tCjizxoTiQ==}
 
   '@next/env@15.3.0':
     resolution: {integrity: sha512-6mDmHX24nWlHOlbwUiAOmMyY7KELimmi+ed8qWcJYjqXeC+G6JzPZ3QosOAfjNwgMIzwhXBiRiCgdh8axTTdTA==}
@@ -4061,6 +4067,10 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
+  material-dynamic-colors@1.1.2:
+    resolution: {integrity: sha512-8KD0jrPTFs2x06UJWbvkg6E0HyzFjrvS5oOc2DsXzIEOqZTbb3ruLMUhNuPSl8WeHA/O/RTAlTLcxqYXJzYwPA==}
+    hasBin: true
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -6779,6 +6789,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@material/material-color-utilities@0.2.7': {}
 
   '@next/env@15.3.0':
     optional: true
@@ -10022,6 +10034,10 @@ snapshots:
   makeerror@1.0.12:
     dependencies:
       tmpl: 1.0.5
+
+  material-dynamic-colors@1.1.2:
+    dependencies:
+      '@material/material-color-utilities': 0.2.7
 
   math-intrinsics@1.1.0: {}
 
