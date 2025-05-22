@@ -198,13 +198,6 @@ export function TrackPlayer({
 									'/default-cover-art.jpg';
 							}}
 						/>
-						{/* Progress indicator on the bottom of cover */}
-						<div
-							className="absolute bottom-0 left-0 right-0 h-[3px] bg-primary/80"
-							style={{
-								width: `${(audioState.currentTime / audioState.duration) * 100}%`,
-							}}
-						></div>
 					</div>
 
 					{/* Controls */}
