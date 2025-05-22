@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
@@ -14,6 +14,8 @@ import {
 	AlertDialogTitle,
 } from './ui/alert-dialog';
 import { useAppContext } from '@/hooks/use-app-context';
+import { getAudioUrl, notifications, uploadAudioFile } from '@/data/api';
+import { useMutation } from '@tanstack/react-query';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -33,26 +35,25 @@ export function TrackUploadWrapper({
 	const { setTrackLoaded, audioRef, resetAllStatesAndPlayers } =
 		useAppContext();
 
-	// Clean up object URL on unmount
-	useEffect(() => {
-		return () => {
-			if (audioUrl) {
-				URL.revokeObjectURL(audioUrl);
-			}
-		};
-	}, [audioUrl]);
+	// File upload mutation
+	const uploadMutation = useMutation({
+		mutationFn: uploadAudioFile,
+		onSuccess: (data) => {
+			console.log('Upload successful:', data);
+			notifications.uploadSuccess(data.message);
+			setAudioUrl(getAudioUrl(data.id));
+		},
+		onError: (error) => {
+			console.error('Upload failed:', error);
+			notifications.uploadError(error as Error);
+		},
+		retry: false, // Disable automatic retries
+	});
 
 	const handleFileChange = (file: File) => {
-		// Revoke previous URL if it exists
-		if (audioUrl) {
-			URL.revokeObjectURL(audioUrl);
-		}
-
 		setAudioFile(file);
-		const url = URL.createObjectURL(file);
-		setAudioUrl(url);
-
-		setTrackLoaded(true);
+		// Start upload process
+		uploadMutation.mutate(file);
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,9 +95,6 @@ export function TrackUploadWrapper({
 	};
 
 	const handleRemoveAudio = () => {
-		if (audioUrl) {
-			URL.revokeObjectURL(audioUrl);
-		}
 		setAudioFile(null);
 		setAudioUrl(null);
 		if (audioRef.current) {
@@ -107,6 +105,7 @@ export function TrackUploadWrapper({
 		// Call the onAudioRemove callback if provided
 		setTrackLoaded(false);
 		resetAllStatesAndPlayers();
+		uploadMutation.reset();
 	};
 
 	const handleBrowseClick = () => {
@@ -197,11 +196,13 @@ export function TrackUploadWrapper({
 						className="hidden"
 						accept="audio/*"
 						onChange={handleInputChange}
+						disabled={uploadMutation.isPending}
 					/>
 					<Button
 						variant="outline"
 						className="mt-2"
 						onClick={handleBrowseClick}
+						disabled={uploadMutation.isPending}
 					>
 						Browse Files
 					</Button>
@@ -227,6 +228,7 @@ export function TrackUploadWrapper({
 						className="h-8 w-8 rounded-full bg-background shadow-md hover:bg-destructive/10 focus-visible:outline-none"
 						onClick={() => setShowConfirmDialog(true)}
 						title="Remove audio"
+						disabled={uploadMutation.isPending}
 					>
 						<X className="h-4 w-4 text-muted-foreground" />
 					</Button>
@@ -242,6 +244,29 @@ export function TrackUploadWrapper({
 						<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
 					</Button>
 				</div>
+
+				{/* Upload Progress Overlay */}
+				{uploadMutation.isPending && (
+					<div className="absolute inset-0 z-20 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
+						<div className="w-full max-w-xs">
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-sm font-medium">
+									Uploading...
+								</span>
+								<span className="text-sm font-medium">
+									Processing
+								</span>
+							</div>
+							<div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+								<div className="h-full bg-primary animate-pulse rounded-full" />
+							</div>
+							<p className="text-xs text-muted-foreground mt-2">
+								Uploading {audioFile?.name}
+							</p>
+						</div>
+					</div>
+				)}
+
 				{audioFile && audioUrl && (
 					<TrackPlayer
 						title={audioFile.name}
@@ -249,6 +274,9 @@ export function TrackUploadWrapper({
 						iconColor={iconColor}
 						src={audioUrl}
 						showDownload={showDownload}
+						onLoadedMetadata={() => {
+							setTrackLoaded(true);
+						}}
 					/>
 				)}
 

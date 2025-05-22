@@ -12,6 +12,7 @@ type TrackPlayerProps = {
 	iconColor: string;
 	src: string;
 	showDownload?: boolean;
+	onLoadedMetadata: () => void;
 };
 
 export function TrackPlayer({
@@ -21,6 +22,7 @@ export function TrackPlayer({
 	src,
 	showDownload = true,
 	showWaveform = true,
+	onLoadedMetadata,
 }: TrackPlayerProps & {
 	showWaveform?: boolean;
 }) {
@@ -206,6 +208,7 @@ export function TrackPlayer({
 						videoRef.current?.seekTo(0);
 					}
 				}}
+				onLoadedMetadata={onLoadedMetadata}
 			/>
 
 			{showWaveform && isWaveformVisible && (

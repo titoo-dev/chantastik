@@ -11,16 +11,9 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AudioSeparatorImport } from './routes/audio-separator'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
-
-const AudioSeparatorRoute = AudioSeparatorImport.update({
-  id: '/audio-separator',
-  path: '/audio-separator',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -39,13 +32,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/audio-separator': {
-      id: '/audio-separator'
-      path: '/audio-separator'
-      fullPath: '/audio-separator'
-      preLoaderRoute: typeof AudioSeparatorImport
-      parentRoute: typeof rootRoute
-    }
   }
 }
 
@@ -53,37 +39,32 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/audio-separator': typeof AudioSeparatorRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/audio-separator'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/audio-separator'
-  id: '__root__' | '/' | '/audio-separator'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AudioSeparatorRoute: typeof AudioSeparatorRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AudioSeparatorRoute: AudioSeparatorRoute,
 }
 
 export const routeTree = rootRoute
@@ -96,15 +77,11 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/audio-separator"
+        "/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/audio-separator": {
-      "filePath": "audio-separator.tsx"
     }
   }
 }

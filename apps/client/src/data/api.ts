@@ -2,24 +2,18 @@ import { toast } from 'sonner';
 
 // API base URL - adjust based on your environment
 export const BASE_URL =
-	import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
+	import.meta.env.VITE_DEFAULT_REST_API_URL ||
+	'https://mp3-uploader.dev-titosy.workers.dev';
 
 type UploadResponse = {
-	file: {
-		originalFilename: string;
-		storedFilename: string;
-	};
+	message: string;
+	id: string;
 };
 
-export type SeparationResponse = {
-	success?: boolean;
-	message: string;
-	files: {
-		vocals?: string;
-		instrumental?: string;
-	};
-	filename?: string;
-};
+// get audio url function
+export function getAudioUrl(id: string): string {
+	return `${BASE_URL}/audio/${id}`;
+}
 
 /**
  * Uploads an audio file to the server
@@ -28,7 +22,7 @@ export async function uploadAudioFile(file: File): Promise<UploadResponse> {
 	const formData = new FormData();
 	formData.append('audio', file);
 
-	const response = await fetch(`${BASE_URL}/upload`, {
+	const response = await fetch(`${BASE_URL}/audio`, {
 		method: 'POST',
 		body: formData,
 	});
@@ -39,56 +33,6 @@ export async function uploadAudioFile(file: File): Promise<UploadResponse> {
 	}
 
 	return response.json();
-}
-
-/**
- * Separates vocals from instrumental in the uploaded audio file
- */
-export async function separateAudio(
-	filename: string
-): Promise<SeparationResponse> {
-	const response = await fetch(`${BASE_URL}/audio/separate/${filename}`, {
-		method: 'POST',
-	});
-
-	if (!response.ok) {
-		const error = await response.json();
-		throw new Error(error.message || 'Separation failed');
-	}
-
-	return response.json();
-}
-
-/**
- * Separates vocals from instrumental from a YouTube URL
- */
-export async function separateYoutubeAudio(
-	youtubeUrl: string
-): Promise<SeparationResponse> {
-	const response = await fetch(`${BASE_URL}/audio/separate-youtube`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ url: youtubeUrl }),
-	});
-
-	if (!response.ok) {
-		const error = await response.json();
-		throw new Error(error.message || 'YouTube audio separation failed');
-	}
-
-	return response.json();
-}
-
-/**
- * Gets the output file path for a specific track type
- */
-export function getOutputPath(filePath?: string): string {
-	if (!filePath) {
-		return '';
-	}
-	return `${BASE_URL}/audio/${filePath}`;
 }
 
 /**
@@ -147,39 +91,6 @@ export const notifications = {
 
 	uploadError: (error: Error) => {
 		toast.error('Upload failed', {
-			description: error.message,
-		});
-	},
-
-	separationSuccess: () => {
-		toast.success('Separation complete', {
-			description:
-				'Vocals and instrumental tracks are ready for download.',
-		});
-	},
-
-	separationError: (error: Error) => {
-		toast.error('Separation failed', {
-			description: error.message,
-		});
-	},
-
-	youtubeSeparationStart: () => {
-		toast.info('Processing YouTube audio', {
-			description: 'This may take a few minutes. Please wait...',
-		});
-	},
-
-	youtubeSeparationSuccess: (videoTitle?: string) => {
-		toast.success('YouTube audio separation complete', {
-			description: videoTitle
-				? `Successfully processed "${videoTitle}". Tracks are ready for download.`
-				: 'Vocals and instrumental tracks are ready for download.',
-		});
-	},
-
-	youtubeSeparationError: (error: Error) => {
-		toast.error('YouTube separation failed', {
 			description: error.message,
 		});
 	},
