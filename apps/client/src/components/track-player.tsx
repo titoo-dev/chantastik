@@ -116,7 +116,6 @@ export function TrackPlayer({
 	};
 
 	const handleTimeChange = (value: number[]) => {
-		console.log('Time changed:', value);
 		const newTime = value[0];
 		if (audioRef.current) {
 			audioRef.current.currentTime = newTime;
