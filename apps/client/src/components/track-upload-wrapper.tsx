@@ -15,12 +15,14 @@ import {
 } from './ui/alert-dialog';
 import { useAppContext } from '@/hooks/use-app-context';
 import {
+	createProject,
+	getAudioMetadata,
 	getAudioUrl,
 	getCoverArtUrl,
 	notifications,
 	uploadAudioFile,
 } from '@/data/api';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
 
 interface TrackUploadWrapperProps {
@@ -45,11 +47,34 @@ export function TrackUploadWrapper({
 		updateAudioId,
 	} = useAppContext();
 
+	// Preload cover art when audio ID changes
 	useEffect(() => {
 		if (audioId) {
 			preloadImage(getCoverArtUrl(audioId));
 		}
 	}, [audioId]);
+
+	// Fetch audio metadata using TanStack Query
+	const {
+		data: audioMetadata,
+		isLoading: isLoadingAudioMetadata,
+		isSuccess,
+	} = useQuery({
+		queryKey: ['audioMetadata', audioId],
+		queryFn: () => getAudioMetadata(audioId || ''),
+		enabled: !!audioId, // Only fetch if audioId is available
+		retry: false, // Disable automatic retries
+	});
+
+	const createProjectMutation = useMutation({
+		mutationFn: ({ name, audioId }: { name: string; audioId: string }) =>
+			createProject(name, audioId),
+		onSuccess: (data) => {
+			console.log('Project created successfully:', data);
+			notifications.projectCreationSuccess(data.id);
+		},
+		retry: false, // Disable automatic retries
+	});
 
 	// File upload mutation
 	const uploadMutation = useMutation({
@@ -65,6 +90,23 @@ export function TrackUploadWrapper({
 		},
 		retry: false, // Disable automatic retries
 	});
+
+	useEffect(() => {
+		if (
+			isLoadingAudioMetadata ||
+			!audioMetadata ||
+			!audioId ||
+			!isSuccess
+		) {
+			return;
+		}
+		createProjectMutation.mutate({
+			name:
+				`${audioMetadata?.metadata.title} - ${audioMetadata?.metadata.artist}` ||
+				'New Project',
+			audioId: audioId,
+		});
+	}, [audioMetadata, audioId, isLoadingAudioMetadata]);
 
 	const handleFileChange = (file: File) => {
 		setAudioFile(file);
@@ -132,7 +174,11 @@ export function TrackUploadWrapper({
 		setIsRetracted(!isRetracted);
 	};
 
-	if (uploadMutation.isPending) {
+	const handleTrackLoaded = () => {
+		setTrackLoaded(true);
+	};
+
+	if (uploadMutation.isPending || isLoadingAudioMetadata) {
 		return (
 			<div className="flex flex-col items-center justify-center w-full max-w-xl mx-auto p-6 rounded-xl border-2 border-dashed border-primary/30 bg-background/95 backdrop-blur-md shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
 				<div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
@@ -301,14 +347,15 @@ export function TrackUploadWrapper({
 
 				{audioFile && audioId && (
 					<TrackPlayer
-						title={audioFile.name}
+						title={
+							`${audioMetadata?.metadata.title} - ${audioMetadata?.metadata.artist}` ||
+							audioFile.name
+						}
 						icon={Music}
 						iconColor={iconColor}
 						src={getAudioUrl(audioId)}
 						showDownload={showDownload}
-						onLoadedMetadata={() => {
-							setTrackLoaded(true);
-						}}
+						onLoadedMetadata={handleTrackLoaded}
 						coverArt={getCoverArtUrl(audioId)}
 					/>
 				)}

@@ -1,5 +1,5 @@
-import { MyComposition } from '@/remotion/Composition';
 import type { LyricsProps } from '@/remotion/schema';
+import { VibrantMemories } from '@/remotion/themes/vibrant-memories';
 import { Player, type PlayerRef } from '@remotion/player';
 
 export const PlayerOnly: React.FC<{
@@ -10,7 +10,7 @@ export const PlayerOnly: React.FC<{
 	return (
 		<Player
 			ref={playerRef}
-			component={MyComposition}
+			component={VibrantMemories}
 			inputProps={{
 				...inputProps,
 			}}

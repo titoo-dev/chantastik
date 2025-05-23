@@ -1,33 +1,90 @@
 import { toast } from 'sonner';
+import type { AudioMeta } from './types';
 
 // API base URL - adjust based on your environment
-export const BASE_URL =
+export const AUDIO_BASE_URL =
 	import.meta.env.VITE_DEFAULT_REST_API_URL ||
 	'https://mp3-uploader.dev-titosy.workers.dev';
 
-type UploadResponse = {
+export const PROJECT_BASE_URL =
+	import.meta.env.VITE_DEFAULT_PROJECT_API_URL ||
+	'https://karaoke-milay-project.dev-titosy.workers.dev';
+
+type Response = {
 	message: string;
 	id: string;
 };
 
+// get audio metadata function
+export async function getAudioMetadata(id: string): Promise<AudioMeta> {
+	try {
+		const response = await fetch(`${AUDIO_BASE_URL}/audio/${id}/meta`);
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch audio metadata');
+		}
+
+		const data: AudioMeta = await response.json();
+		return data;
+	} catch (error) {
+		toast.error('Metadata fetch failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
 // get audio url function
 export function getAudioUrl(id: string): string {
-	return `${BASE_URL}/audio/${id}`;
+	return `${AUDIO_BASE_URL}/audio/${id}`;
 }
 
 // get cover art url function
 export function getCoverArtUrl(id: string): string {
-	return `${BASE_URL}/audio/${id}/cover`;
+	return `${AUDIO_BASE_URL}/audio/${id}/cover`;
+}
+
+// create project function
+export async function createProject(
+	name: string,
+	audioId: string
+): Promise<Response> {
+	try {
+		const response = await fetch(`${PROJECT_BASE_URL}/project`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				name,
+				audioId,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to create project');
+		}
+
+		const data: Response = await response.json();
+		return data;
+	} catch (error) {
+		toast.error('Project creation failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
 }
 
 /**
  * Uploads an audio file to the server
  */
-export async function uploadAudioFile(file: File): Promise<UploadResponse> {
+export async function uploadAudioFile(file: File): Promise<Response> {
 	const formData = new FormData();
 	formData.append('audio', file);
 
-	const response = await fetch(`${BASE_URL}/audio`, {
+	const response = await fetch(`${AUDIO_BASE_URL}/audio`, {
 		method: 'POST',
 		body: formData,
 	});
@@ -91,6 +148,11 @@ export const notifications = {
 	uploadSuccess: (filename: string) => {
 		toast.success('Upload successful', {
 			description: `File ${filename} uploaded successfully.`,
+		});
+	},
+	projectCreationSuccess: (projectId: string) => {
+		toast.success('Project created', {
+			description: `Project created successfully with ID: ${projectId}`,
 		});
 	},
 
