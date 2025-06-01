@@ -15,7 +15,6 @@ import {
 } from './ui/alert-dialog';
 import { useAppContext } from '@/hooks/use-app-context';
 import {
-	createProject,
 	getAudioMetadata,
 	getAudioUrl,
 	getCoverArtUrl,
@@ -55,26 +54,14 @@ export function TrackUploadWrapper({
 	}, [audioId]);
 
 	// Fetch audio metadata using TanStack Query
-	const {
-		data: audioMetadata,
-		isLoading: isLoadingAudioMetadata,
-		isSuccess,
-	} = useQuery({
-		queryKey: ['audioMetadata', audioId],
-		queryFn: () => getAudioMetadata(audioId || ''),
-		enabled: !!audioId, // Only fetch if audioId is available
-		retry: false, // Disable automatic retries
-	});
-
-	const createProjectMutation = useMutation({
-		mutationFn: ({ name, audioId }: { name: string; audioId: string }) =>
-			createProject(name, audioId),
-		onSuccess: (data) => {
-			console.log('Project created successfully:', data);
-			notifications.projectCreationSuccess(data.id);
-		},
-		retry: false, // Disable automatic retries
-	});
+	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } = useQuery(
+		{
+			queryKey: ['audioMetadata', audioId],
+			queryFn: () => getAudioMetadata(audioId || ''),
+			enabled: !!audioId, // Only fetch if audioId is available
+			retry: false, // Disable automatic retries
+		}
+	);
 
 	// File upload mutation
 	const uploadMutation = useMutation({
@@ -90,23 +77,6 @@ export function TrackUploadWrapper({
 		},
 		retry: false, // Disable automatic retries
 	});
-
-	useEffect(() => {
-		if (
-			isLoadingAudioMetadata ||
-			!audioMetadata ||
-			!audioId ||
-			!isSuccess
-		) {
-			return;
-		}
-		createProjectMutation.mutate({
-			name:
-				`${audioMetadata?.metadata.title} - ${audioMetadata?.metadata.artist}` ||
-				'New Project',
-			audioId: audioId,
-		});
-	}, [audioMetadata, audioId, isLoadingAudioMetadata]);
 
 	const handleFileChange = (file: File) => {
 		setAudioFile(file);

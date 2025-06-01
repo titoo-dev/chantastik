@@ -45,38 +45,6 @@ export function getCoverArtUrl(id: string): string {
 	return `${AUDIO_BASE_URL}/audio/${id}/cover`;
 }
 
-// create project function
-export async function createProject(
-	name: string,
-	audioId: string
-): Promise<Response> {
-	try {
-		const response = await fetch(`${PROJECT_BASE_URL}/project`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				name,
-				audioId,
-			}),
-		});
-
-		if (!response.ok) {
-			throw new Error('Failed to create project');
-		}
-
-		const data: Response = await response.json();
-		return data;
-	} catch (error) {
-		toast.error('Project creation failed', {
-			description:
-				error instanceof Error ? error.message : 'Unknown error',
-		});
-		throw error;
-	}
-}
-
 /**
  * Uploads an audio file to the server
  */
