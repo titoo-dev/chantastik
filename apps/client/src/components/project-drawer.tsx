@@ -9,25 +9,34 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from './ui/drawer';
-import { FolderOpen } from 'lucide-react';
+import { FolderOpen, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle } from './ui/card';
 import { useGetProjects } from '@/hooks/use-get-projects';
 import { ProjectListSkeleton } from './project-list-skeleton';
 import { getCoverArtUrl, type Project } from '@/data/api';
+import { ScrollArea } from './ui/scroll-area';
 
 interface ProjectsDrawerProps {
 	onProjectSelected: (project: Project) => void;
+	onDeleteProject: (projectId: string) => void;
 }
 
 export const ProjectsDrawer = memo<ProjectsDrawerProps>(
-	({ onProjectSelected }) => {
+	({ onProjectSelected, onDeleteProject }) => {
 		const { data: projects, isLoading, error } = useGetProjects();
 		const closeRef = useRef<HTMLButtonElement>(null);
 
 		const handleProjectSelect = (project: Project) => {
 			onProjectSelected(project);
 			closeRef.current?.click();
+		};
+
+		const handleProjectDelete = (projectId: string) => {
+			onDeleteProject(projectId);
+			if (closeRef.current) {
+				closeRef.current.click();
+			}
 		};
 
 		const formatDate = (dateString: string) => {
@@ -53,7 +62,7 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 							Select a project to continue working on.
 						</DrawerDescription>
 					</DrawerHeader>
-					<div className="flex-1 overflow-y-auto p-4">
+					<ScrollArea className="h-[70vh] w-full p-4">
 						{isLoading ? (
 							<ProjectListSkeleton />
 						) : error ? (
@@ -70,11 +79,25 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 								{projects.map((project) => (
 									<Card
 										key={project.id}
-										className="hover:shadow-none shadow-none transition-all duration-200 cursor-pointer group h-full flex flex-col"
+										className="hover:shadow-none shadow-none transition-all duration-200 cursor-pointer group h-full flex flex-col relative"
 										onClick={() =>
 											handleProjectSelect(project)
 										}
 									>
+										<Button
+											variant="ghost"
+											size="icon"
+											className="absolute top-auto bottom-auto right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleProjectDelete(project.id);
+											}}
+										>
+											<Trash2 className="h-4 w-4" />
+											<span className="sr-only">
+												Delete project
+											</span>
+										</Button>
 										<CardHeader className="flex-shrink-0">
 											<div className="flex items-center gap-6">
 												<div className="w-20 h-20 rounded-lg overflow-hidden">
@@ -134,7 +157,7 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 								</p>
 							</div>
 						)}
-					</div>{' '}
+					</ScrollArea>
 					<DrawerFooter>
 						<DrawerClose asChild>
 							<Button ref={closeRef} variant="outline">

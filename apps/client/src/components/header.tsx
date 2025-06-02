@@ -13,6 +13,11 @@ export const Header = memo(() => {
 		updateAudioId(project.audioId);
 	};
 
+	const handleProjectDelete = (projectId: string) => {
+		console.log('Delete project with ID:', projectId);
+		// Implement deletion logic here
+	};
+
 	return (
 		<header className="px-4 sticky top-0 z-50 w-full border-b bg-background/60 backdrop-blur">
 			<div className="container mx-auto flex h-16 items-center justify-between">
@@ -22,7 +27,10 @@ export const Header = memo(() => {
 						<Link to="/">Karaoke Milay</Link>
 					</h1>
 				</div>
-				<ProjectsDrawer onProjectSelected={handleProjectSelected} />
+				<ProjectsDrawer
+					onProjectSelected={handleProjectSelected}
+					onDeleteProject={handleProjectDelete}
+				/>
 			</div>
 		</header>
 	);
