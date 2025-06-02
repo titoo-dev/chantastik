@@ -4,8 +4,6 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "setup": "pnpm --filter \"@repo/server\" run setup",
-    "clean": "pnpm --filter \"@repo/server\" run clean",
     "studio": "pnpm --filter \"@repo/client\" run studio",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
