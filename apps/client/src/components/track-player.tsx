@@ -160,7 +160,9 @@ export function TrackPlayer({
 				<div className="flex items-center justify-between">
 					<h3 className="flex items-center gap-2 font-medium">
 						<Icon className={`h-4 w-4 ${iconColor}`} />
-						<span className="text-sm">{title}</span>
+						<span className="text-sm max-w-96 truncate">
+							{title}
+						</span>
 					</h3>
 					<div className="flex items-center gap-1">
 						{showDownload && (

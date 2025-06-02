@@ -23,6 +23,7 @@ import {
 } from '@/data/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
+import { useGetProjects } from '@/hooks/use-get-projects';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -33,6 +34,7 @@ export function TrackUploadWrapper({
 	iconColor = 'text-primary',
 	showDownload = false,
 }: TrackUploadWrapperProps) {
+	const { refetch } = useGetProjects(false);
 	const [audioFile, setAudioFile] = useState<File | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -146,6 +148,7 @@ export function TrackUploadWrapper({
 
 	const handleTrackLoaded = () => {
 		setTrackLoaded(true);
+		refetch();
 	};
 
 	if (uploadMutation.isPending || isLoadingAudioMetadata) {

@@ -109,7 +109,7 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 													</div>
 												</div>
 												<div className="flex-1 min-w-0">
-													<CardTitle className="text-sm truncate leading-tight">
+													<CardTitle className="text-sm leading-tight break-words">
 														{project.name}
 													</CardTitle>
 													<span className="text-xs text-muted-foreground">
