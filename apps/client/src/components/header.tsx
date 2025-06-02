@@ -15,6 +15,7 @@ import {
 	AlertDialogTitle,
 } from './ui/alert-dialog';
 import { useDeleteProject } from '@/hooks/use-delete-project';
+import { ThemeModeToggle } from './theme-mode-toggle';
 
 export const Header = memo(() => {
 	const { updateAudioId } = useAppContext();
@@ -60,10 +61,13 @@ export const Header = memo(() => {
 							<Link to="/">Karaoke Milay</Link>
 						</h1>
 					</div>
-					<ProjectsDrawer
-						onProjectSelected={handleProjectSelected}
-						onDeleteProject={handleProjectDelete}
-					/>
+					<div className="flex items-center gap-4">
+						<ProjectsDrawer
+							onProjectSelected={handleProjectSelected}
+							onDeleteProject={handleProjectDelete}
+						/>
+						<ThemeModeToggle />
+					</div>
 				</div>
 			</header>
 
