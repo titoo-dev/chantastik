@@ -60,6 +60,8 @@ export function TrackUploadWrapper({
 			queryFn: () => getAudioMetadata(audioId || ''),
 			enabled: !!audioId, // Only fetch if audioId is available
 			retry: false, // Disable automatic retries
+			retryOnMount: false, // Don't retry on mount
+			refetchOnWindowFocus: false, // Don't refetch on window focus
 		}
 	);
 
