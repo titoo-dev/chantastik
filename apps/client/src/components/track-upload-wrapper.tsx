@@ -44,9 +44,7 @@ export function TrackUploadWrapper({
 		resetAllStatesAndPlayers,
 		audioId,
 		updateAudioId,
-	} = useAppContext();
-
-	// Preload cover art when audio ID changes
+	} = useAppContext(); // Preload cover art when audio ID changes
 	useEffect(() => {
 		if (audioId) {
 			preloadImage(getCoverArtUrl(audioId));
@@ -60,8 +58,8 @@ export function TrackUploadWrapper({
 			queryFn: () => getAudioMetadata(audioId || ''),
 			enabled: !!audioId, // Only fetch if audioId is available
 			retry: false, // Disable automatic retries
-			retryOnMount: false, // Don't retry on mount
 			refetchOnWindowFocus: false, // Don't refetch on window focus
+			// Remove retryOnMount: false to allow refetching when audioId changes
 		}
 	);
 
@@ -208,26 +206,25 @@ export function TrackUploadWrapper({
 						: 'opacity-0 pointer-events-none'
 				)}
 				title={
-					audioFile ? 'Expand audio player' : 'Expand audio uploader'
+					audioId ? 'Expand audio player' : 'Expand audio uploader'
 				}
 			>
 				<span className="relative flex items-center justify-center w-6 h-6">
-					{audioFile ? (
+					{audioId ? (
 						<Music className="h-5 w-5 text-primary" />
 					) : (
 						<MoveDiagonal className="h-5 w-5 text-primary" />
 					)}
 				</span>
 				<span className="font-medium text-sm">
-					{audioFile ? 'Show Player' : 'Upload Track'}
+					{audioId ? 'Show Player' : 'Upload Track'}
 				</span>
-			</Button>
-
-			{/* Upload interface - only visible when not retracted and no file is uploaded */}
+			</Button>{' '}
+			{/* Upload interface - only visible when not retracted and no audioId exists */}
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					(!audioFile || !audioId) && !isRetracted
+					!audioId && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none hidden'
 				)}
@@ -284,13 +281,12 @@ export function TrackUploadWrapper({
 						Supports MP3, WAV, OGG, FLAC
 					</p>
 				</div>
-			</div>
-
-			{/* Player interface - only visible when a file is uploaded and not retracted */}
+			</div>{' '}
+			{/* Player interface - only visible when audioId exists and not retracted */}
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					audioFile && audioId && !isRetracted
+					audioId && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none'
 				)}
@@ -315,13 +311,14 @@ export function TrackUploadWrapper({
 					>
 						<X className="h-4 w-4 text-muted-foreground" />
 					</Button>
-				</div>
-
-				{audioFile && audioId && (
+				</div>{' '}
+				{audioId && (
 					<TrackPlayer
 						title={
-							`${audioMetadata?.metadata.title} - ${audioMetadata?.metadata.artist}` ||
-							audioFile.name
+							audioMetadata?.metadata.title &&
+							audioMetadata?.metadata.artist
+								? `${audioMetadata.metadata.title} - ${audioMetadata.metadata.artist}`
+								: audioFile?.name || 'Unknown Track'
 						}
 						icon={Music}
 						iconColor={iconColor}
@@ -331,7 +328,6 @@ export function TrackUploadWrapper({
 						coverArt={getCoverArtUrl(audioId)}
 					/>
 				)}
-
 				<AlertDialog
 					open={showConfirmDialog}
 					onOpenChange={setShowConfirmDialog}
