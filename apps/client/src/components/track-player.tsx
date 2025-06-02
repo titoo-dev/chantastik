@@ -169,7 +169,7 @@ export function TrackPlayer({
 							<Button
 								variant="ghost"
 								size="icon"
-								className="h-7 w-7 rounded-full"
+								className="h-7 w-7 rounded-full hover:bg-accent hover:text-accent-foreground"
 								onClick={() => downloadAudioFile(src)}
 								title="Download track"
 							>
