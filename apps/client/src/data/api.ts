@@ -15,6 +15,35 @@ type Response = {
 	id: string;
 };
 
+export type Project = {
+	id: string;
+	name: string;
+	description?: string;
+	createdAt: string;
+	updatedAt: string;
+	audioId: string;
+};
+
+// get all projects function
+export async function getAllProjects(): Promise<Project[]> {
+	try {
+		const response = await fetch(`${PROJECT_BASE_URL}/projects`);
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch projects');
+		}
+
+		const data: Project[] = await response.json();
+		return data;
+	} catch (error) {
+		toast.error('Projects fetch failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
 // get audio metadata function
 export async function getAudioMetadata(id: string): Promise<AudioMeta> {
 	try {
