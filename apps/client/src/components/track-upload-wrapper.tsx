@@ -154,10 +154,6 @@ export function TrackUploadWrapper({
 	if (uploadMutation.isPending || isLoadingAudioMetadata) {
 		return (
 			<div className="flex flex-col items-center justify-center w-full max-w-xl mx-auto p-6 rounded-xl border-2 border-dashed border-primary/30 bg-background/95 backdrop-blur-md shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
-				<div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-					<Upload className="h-8 w-8 text-primary animate-pulse" />
-				</div>
-				<h3 className="text-lg font-semibold mb-2">Uploading Track</h3>
 				<div className="w-full max-w-md mx-auto mt-2 mb-4">
 					<div className="flex items-center justify-between mb-2">
 						<span className="text-sm font-medium text-muted-foreground">
