@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import type { AudioMeta } from './types';
+import { QueryClient } from '@tanstack/react-query';
 
 // API base URL - adjust based on your environment
 export const AUDIO_BASE_URL =
@@ -23,6 +24,8 @@ export type Project = {
 	updatedAt: string;
 	audioId: string;
 };
+
+export const queryClient = new QueryClient();
 
 // get all projects function
 export async function getAllProjects(): Promise<Project[]> {

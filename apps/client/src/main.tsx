@@ -10,6 +10,8 @@ import { routeTree } from './routeTree.gen';
 import './styles.css';
 import reportWebVitals from './reportWebVitals.ts';
 import { scan } from 'react-scan';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './data/api.ts';
 
 scan({
 	enabled: true,
@@ -41,7 +43,9 @@ if (rootElement && !rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<TanstackQuery.Provider>
-				<RouterProvider router={router} />
+				<QueryClientProvider client={queryClient}>
+					<RouterProvider router={router} />
+				</QueryClientProvider>
 			</TanstackQuery.Provider>
 		</StrictMode>
 	);
