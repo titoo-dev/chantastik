@@ -10,8 +10,7 @@ import { routeTree } from './routeTree.gen';
 import './styles.css';
 import reportWebVitals from './reportWebVitals.ts';
 import { scan } from 'react-scan';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from './data/api.ts';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 scan({
 	enabled: true,
@@ -36,17 +35,17 @@ declare module '@tanstack/react-router' {
 	}
 }
 
+const queryClient = new QueryClient();
+
 // Render the app
 const rootElement = document.getElementById('app');
 if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<TanstackQuery.Provider>
-				<QueryClientProvider client={queryClient}>
-					<RouterProvider router={router} />
-				</QueryClientProvider>
-			</TanstackQuery.Provider>
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
 		</StrictMode>
 	);
 }

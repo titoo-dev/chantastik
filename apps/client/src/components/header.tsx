@@ -3,7 +3,7 @@ import { AudioWaveform } from 'lucide-react';
 import { memo, useState } from 'react';
 import { ProjectsDrawer } from './project-drawer';
 import { useAppContext } from '@/hooks/use-app-context';
-import type { Project } from '@/data/api';
+import { type Project } from '@/data/api';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -14,11 +14,18 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from './ui/alert-dialog';
+import { useDeleteProject } from '@/hooks/use-delete-project';
 
 export const Header = memo(() => {
 	const { updateAudioId } = useAppContext();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+	const deleteProjectMutation = useDeleteProject({
+		onSuccess: () => {
+			setShowDeleteDialog(false);
+			setProjectToDelete(null);
+		},
+	});
 
 	const handleProjectSelected = (project: Project) => {
 		console.log('Selected project:', project);
@@ -31,13 +38,11 @@ export const Header = memo(() => {
 		setShowDeleteDialog(true);
 	};
 
-	const confirmDelete = () => {
+	const confirmDelete = (e: { preventDefault: () => void }) => {
+		e.preventDefault();
 		if (projectToDelete) {
-			// Implement deletion logic here
-			console.log('Confirming deletion of project:', projectToDelete);
+			deleteProjectMutation.mutate(projectToDelete);
 		}
-		setShowDeleteDialog(false);
-		setProjectToDelete(null);
 	};
 
 	const cancelDelete = () => {
@@ -75,14 +80,20 @@ export const Header = memo(() => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel onClick={cancelDelete}>
+						<AlertDialogCancel
+							onClick={cancelDelete}
+							disabled={deleteProjectMutation.isPending}
+						>
 							Cancel
 						</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={confirmDelete}
-							className="bg-destructive text-background hover:bg-destructive/90"
+							disabled={deleteProjectMutation.isPending}
+							className="bg-destructive text-background hover:bg-destructive/90 disabled:opacity-50"
 						>
-							Delete
+							{deleteProjectMutation.isPending
+								? 'Deleting...'
+								: 'Delete'}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

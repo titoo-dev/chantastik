@@ -1,6 +1,5 @@
 import { toast } from 'sonner';
 import type { AudioMeta } from './types';
-import { QueryClient } from '@tanstack/react-query';
 
 // API base URL - adjust based on your environment
 export const AUDIO_BASE_URL =
@@ -25,8 +24,6 @@ export type Project = {
 	audioId: string;
 };
 
-export const queryClient = new QueryClient();
-
 // get all projects function
 export async function getAllProjects(): Promise<Project[]> {
 	try {
@@ -40,6 +37,29 @@ export async function getAllProjects(): Promise<Project[]> {
 		return data;
 	} catch (error) {
 		toast.error('Projects fetch failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
+// delete project function
+export async function deleteProject(id: string): Promise<void> {
+	try {
+		const response = await fetch(`${PROJECT_BASE_URL}/project/${id}`, {
+			method: 'DELETE',
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to delete project');
+		}
+
+		toast.success('Project deleted', {
+			description: 'Project has been successfully deleted',
+		});
+	} catch (error) {
+		toast.error('Project deletion failed', {
 			description:
 				error instanceof Error ? error.message : 'Unknown error',
 		});
@@ -73,7 +93,7 @@ export function getAudioUrl(id: string): string {
 }
 
 // get cover art url function
-export function getCoverArtUrl(id: string): string {
+export function getCoverArtUrl(id?: string): string {
 	return `${AUDIO_BASE_URL}/audio/${id}/cover`;
 }
 

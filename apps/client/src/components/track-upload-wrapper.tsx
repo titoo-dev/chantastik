@@ -19,10 +19,9 @@ import {
 	getAudioUrl,
 	getCoverArtUrl,
 	notifications,
-	queryClient,
 	uploadAudioFile,
 } from '@/data/api';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
 
 interface TrackUploadWrapperProps {
@@ -34,6 +33,7 @@ export function TrackUploadWrapper({
 	iconColor = 'text-primary',
 	showDownload = false,
 }: TrackUploadWrapperProps) {
+	const queryClient = useQueryClient();
 	const [audioFile, setAudioFile] = useState<File | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);

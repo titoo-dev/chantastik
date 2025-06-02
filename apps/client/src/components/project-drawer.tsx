@@ -24,7 +24,11 @@ interface ProjectsDrawerProps {
 
 export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 	({ onProjectSelected, onDeleteProject }) => {
-		const { data: projects, isLoading, error } = useGetProjects();
+		const {
+			data: projects,
+			isLoading,
+			error,
+		} = useGetProjects({ enabled: true });
 		const closeRef = useRef<HTMLButtonElement>(null);
 
 		const handleProjectSelect = (project: Project) => {
