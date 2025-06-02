@@ -14,7 +14,7 @@ export const Route = createFileRoute('/')({
 
 function App() {
 	return (
-		<ScrollArea className="h-[calc(100vh-100px)]">
+		<ScrollArea className="h-[calc(100vh-65px)]">
 			<main className="container mx-auto relative py-6 px-4 md:px-0">
 				<LyricStudioHeader />
 

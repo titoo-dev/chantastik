@@ -1,88 +1,147 @@
-import { useColorFlow } from "@/hooks/use-color-flow";
-import { useTheme } from "@/hooks/use-theme";
-import Color from "color";
-import { type ReactNode, useEffect, useMemo, useRef, useCallback } from "react";
+import { useColorFlow } from '@/hooks/use-color-flow';
+import { useTheme } from '@/hooks/use-theme';
+import Color from 'color';
+import { type ReactNode, useEffect, useMemo, useRef, useCallback } from 'react';
 
 const useCssVarSetter = () => {
-  const styleElementRef = useRef<HTMLStyleElement | null>(null);
+	const styleElementRef = useRef<HTMLStyleElement | null>(null);
 
-  if (typeof window !== "undefined" && !styleElementRef.current) {
-    const styleElement = document.createElement("style");
-    styleElement.setAttribute("id", "theme-variables");
-    document.head.appendChild(styleElement);
-    styleElementRef.current = styleElement;
-  }
+	if (typeof window !== 'undefined' && !styleElementRef.current) {
+		const styleElement = document.createElement('style');
+		styleElement.setAttribute('id', 'theme-variables');
+		document.head.appendChild(styleElement);
+		styleElementRef.current = styleElement;
+	}
 
-  // code bellow is 100% AI generated
-  return useCallback((vars: Record<string, string>) => {
-    if (!styleElementRef.current) return;
+	// code bellow is 100% AI generated
+	return useCallback((vars: Record<string, string>) => {
+		if (!styleElementRef.current) return;
 
-    requestAnimationFrame(() => {
-      let cssText = ":root {";
-      Object.entries(vars).forEach(([key, value]) => {
-        cssText += `${key}: ${value};`;
-      });
-      cssText += "}";
+		requestAnimationFrame(() => {
+			let cssText = ':root {';
+			Object.entries(vars).forEach(([key, value]) => {
+				cssText += `${key}: ${value};`;
+			});
+			cssText += '}';
 
-      styleElementRef.current!.textContent = cssText;
-    });
-  }, []);
+			styleElementRef.current!.textContent = cssText;
+		});
+	}, []);
 };
 
 const useSystemTheme = () => {
-  const darkModeMediaQuery = useMemo(
-    () =>
-      typeof window !== "undefined"
-        ? window.matchMedia("(prefers-color-scheme: dark)")
-        : null,
-    [],
-  );
+	const darkModeMediaQuery = useMemo(
+		() =>
+			typeof window !== 'undefined'
+				? window.matchMedia('(prefers-color-scheme: dark)')
+				: null,
+		[]
+	);
 
-  return useMemo(
-    () => (darkModeMediaQuery?.matches ? "dark" : "light"),
-    [darkModeMediaQuery?.matches],
-  );
+	return useMemo(
+		() => (darkModeMediaQuery?.matches ? 'dark' : 'light'),
+		[darkModeMediaQuery?.matches]
+	);
 };
 
-type ColorMode = "light" | "dark";
+type ColorMode = 'light' | 'dark';
 
 export function WithColorFlow({ children }: { children: ReactNode }) {
-  const mdc = useColorFlow();
-  const { theme } = useTheme();
-  const systemTheme = useSystemTheme();
-  const setCssVars = useCssVarSetter();
+	const mdc = useColorFlow();
+	const { theme } = useTheme();
+	const systemTheme = useSystemTheme();
+	const setCssVars = useCssVarSetter();
 
-  const mode: ColorMode = theme === "system" ? systemTheme : theme;
+	const mode: ColorMode = theme === 'system' ? systemTheme : theme;
 
-  const cssVars = useMemo(() => {
-    if (!mdc || !mdc[mode]) return {};
+	const cssVars = useMemo(() => {
+		if (!mdc || !mdc[mode]) return {};
 
-    const colors = mdc[mode];
-    const borderValue = Color(colors.onBackground).alpha(0.1).hsl().string();
+		const colors = mdc[mode];
+		const borderValue = Color(colors.onBackground)
+			.alpha(0.1)
+			.hsl()
+			.string();
 
-    return {
-      "--background": colors.background,
-      "--color-foreground": colors.onBackground,
-      "--primary": colors.primary,
-      "--destructive": colors.error,
-      "--popover": colors.background,
-      "--popover-foreground": colors.onBackground,
-      "--primary-foreground": colors.onPrimary,
-      "--accent-foreground": colors.onBackground,
-      "--secondary": colors.secondary,
-      "--secondary-foreground": colors.onSecondary,
-      "--accent": Color(colors.primary).alpha(0.1).hsl().string(),
-      "--input": borderValue,
-      "--border": borderValue,
-      "--primary-container": colors.primaryContainer,
-    };
-  }, [mdc, mode]);
+		return {
+			// Core theme variables
+			'--background': colors.surface,
+			'--foreground': colors.onBackground,
+			'--card': colors.surface,
+			'--card-foreground': colors.onBackground,
+			'--popover': colors.background,
+			'--popover-foreground': colors.onBackground,
+			'--primary': colors.primary,
+			'--primary-foreground': colors.onPrimary,
+			'--secondary': colors.secondary,
+			'--secondary-foreground': colors.onSecondary,
+			'--muted': Color(colors.onBackground).alpha(0.05).hsl().string(),
+			'--muted-foreground': Color(colors.onBackground)
+				.alpha(0.6)
+				.hsl()
+				.string(),
+			'--accent': Color(colors.primary).alpha(0.1).hsl().string(),
+			'--accent-foreground': colors.onBackground,
+			'--destructive': colors.error,
+			'--destructive-foreground': colors.onError,
+			'--border': borderValue,
+			'--input': borderValue,
+			'--ring': Color(colors.primary).alpha(0.3).hsl().string(),
 
-  useEffect(() => {
-    if (Object.keys(cssVars).length > 0) {
-      setCssVars(cssVars as Record<string, string>);
-    }
-  }, [cssVars, setCssVars]);
+			// Chart colors
+			'--chart-1': Color(colors.primary).rotate(0).hsl().string(),
+			'--chart-2': Color(colors.primary).rotate(60).hsl().string(),
+			'--chart-3': Color(colors.primary).rotate(120).hsl().string(),
+			'--chart-4': Color(colors.primary).rotate(180).hsl().string(),
+			'--chart-5': Color(colors.primary).rotate(240).hsl().string(),
 
-  return <>{children}</>;
+			// Sidebar variables
+			'--sidebar': colors.surface,
+			'--sidebar-foreground': colors.onBackground,
+			'--sidebar-primary': colors.primary,
+			'--sidebar-primary-foreground': colors.onPrimary,
+			'--sidebar-accent': Color(colors.primary).alpha(0.1).hsl().string(),
+			'--sidebar-accent-foreground': colors.onBackground,
+			'--sidebar-border': borderValue,
+			'--sidebar-ring': Color(colors.primary).alpha(0.3).hsl().string(),
+
+			// Font families
+			'--font-sans':
+				'Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+			'--font-serif':
+				'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+			'--font-mono':
+				'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+
+			// Border radius
+			'--radius': '0.625rem',
+
+			// Shadow variables
+			'--shadow-2xs': '0 1px 3px 0px hsl(0 0% 0% / 0.05)',
+			'--shadow-xs': '0 1px 3px 0px hsl(0 0% 0% / 0.05)',
+			'--shadow-sm':
+				'0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10)',
+			'--shadow':
+				'0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10)',
+			'--shadow-md':
+				'0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10)',
+			'--shadow-lg':
+				'0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10)',
+			'--shadow-xl':
+				'0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10)',
+			'--shadow-2xl': '0 1px 3px 0px hsl(0 0% 0% / 0.25)',
+
+			// Legacy variables for backward compatibility
+			'--color-foreground': colors.onBackground,
+			'--primary-container': colors.primaryContainer,
+		};
+	}, [mdc, mode]);
+
+	useEffect(() => {
+		if (Object.keys(cssVars).length > 0) {
+			setCssVars(cssVars as Record<string, string>);
+		}
+	}, [cssVars, setCssVars]);
+
+	return <>{children}</>;
 }

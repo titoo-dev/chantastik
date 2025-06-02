@@ -4,98 +4,23 @@
 
 body {
 	@apply m-0;
-	font-family:
-		-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-		sans-serif;
+	font-family: var(--font-sans);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 code {
-	font-family:
-		source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
-@theme inline {
-	--radius-lg: var(--radius);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-sm: calc(var(--radius) - 4px);
-
-	--color-background: hsl(var(--background));
-	--color-foreground: hsl(var(--foreground));
-
-	--color-card: hsl(var(--card));
-	--color-card-foreground: hsl(var(--card-foreground));
-
-	--color-popover: hsl(var(--popover));
-	--color-popover-foreground: hsl(var(--popover-foreground));
-
-	--color-primary: hsl(var(--primary));
-	--color-primary-foreground: hsl(var(--primary-foreground));
-
-	--color-secondary: hsl(var(--secondary));
-	--color-secondary-foreground: hsl(var(--secondary-foreground));
-
-	--color-muted: hsl(var(--muted));
-	--color-muted-foreground: hsl(var(--muted-foreground));
-
-	--color-accent: hsl(var(--accent));
-	--color-accent-foreground: hsl(var(--accent-foreground));
-
-	--color-destructive: hsl(var(--destructive));
-	--color-destructive-foreground: hsl(var(--destructive-foreground));
-
-	--color-border: hsl(var(--border));
-	--color-input: hsl(var(--input));
-	--color-ring: hsl(var(--ring));
-
-	--color-chart-1: hsl(var(--chart-1));
-	--color-chart-2: hsl(var(--chart-2));
-	--color-chart-3: hsl(var(--chart-3));
-	--color-chart-4: hsl(var(--chart-4));
-	--color-chart-5: hsl(var(--chart-5));
-
-	--color-sidebar: hsl(var(--sidebar-background));
-	--color-sidebar-foreground: hsl(var(--sidebar-foreground));
-	--color-sidebar-primary: hsl(var(--sidebar-primary));
-	--color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-	--color-sidebar-accent: hsl(var(--sidebar-accent));
-	--color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-	--color-sidebar-border: hsl(var(--sidebar-border));
-	--color-sidebar-ring: hsl(var(--sidebar-ring));
-
-	--font-sans: Manrope, sans-serif;
-
-	--animate-fade-in: fadeIn 0.3s ease-in-out;
-	--animate-marquee: marquee 2s linear infinite;
-
-	@keyframes marquee {
-		0% {
-			transform: translateX(0);
-		}
-		100% {
-			transform: translateX(-100%);
-		}
-	}
-
-	@keyframes fadeIn {
-		0% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
-		}
-	}
+	font-family: var(--font-mono);
 }
 
 @layer base {
 	:root {
 		--bg-src: ;
+
+		/* Default fallback values - will be overridden by WithColorFlow */
 		--background: 0 0% 100%;
 		--foreground: 20 14.3% 4.1%;
 		--card: 0 0% 100%;
-		--color-primary-container: theme('colors.background');
 		--card-foreground: 20 14.3% 4.1%;
 		--popover: 0 0% 100%;
 		--popover-foreground: 20 14.3% 4.1%;
@@ -117,8 +42,7 @@ code {
 		--chart-3: 197 37% 24%;
 		--chart-4: 43 74% 66%;
 		--chart-5: 27 87% 67%;
-		--radius: 0.5rem;
-		--sidebar-background: 0 0% 98%;
+		--sidebar: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;
 		--sidebar-primary-foreground: 0 0% 98%;
@@ -126,6 +50,38 @@ code {
 		--sidebar-accent-foreground: 240 5.9% 10%;
 		--sidebar-border: 220 13% 91%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
+
+		/* Font families */
+		--font-sans:
+			Manrope, ui-sans-serif, system-ui, -apple-system,
+			BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+			'Noto Sans', sans-serif;
+		--font-serif:
+			ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+		--font-mono:
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+			'Liberation Mono', 'Courier New', monospace;
+
+		/* Border radius */
+		--radius: 0.625rem;
+
+		/* Shadow variables */
+		--shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+		--shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+		--shadow-sm:
+			0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+		--shadow:
+			0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+		--shadow-md:
+			0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+		--shadow-lg:
+			0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+		--shadow-xl:
+			0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+		--shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+
+		/* Legacy compatibility */
+		--color-primary-container: theme('colors.background');
 	}
 
 	.dark {
@@ -153,7 +109,7 @@ code {
 		--chart-3: 30 80% 55%;
 		--chart-4: 280 65% 60%;
 		--chart-5: 340 75% 55%;
-		--sidebar-background: 240 5.9% 10%;
+		--sidebar: 240 5.9% 10%;
 		--sidebar-foreground: 240 4.8% 95.9%;
 		--sidebar-primary: 224.3 76.3% 48%;
 		--sidebar-primary-foreground: 0 0% 100%;
@@ -162,11 +118,11 @@ code {
 		--sidebar-border: 240 3.7% 15.9%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
 	}
-}
-@layer base {
+
 	* {
 		@apply border-border outline-ring/50;
 	}
+
 	body {
 		@apply bg-background text-foreground;
 	}
