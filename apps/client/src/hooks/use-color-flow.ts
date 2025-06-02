@@ -10,6 +10,8 @@ export const useColorFlow = () => {
 	const [theme, setTheme] = useState<MDC | null>();
 	const { audioId } = useAppContext();
 
+	console.log('useColorFlow', audioId);
+
 	useEffect(() => {
 		if (!audioId) return;
 		const src = getCoverArtUrl(audioId);
