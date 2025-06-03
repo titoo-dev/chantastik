@@ -4,16 +4,12 @@ import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
 import { Button } from './ui/button';
 import { useAppContext } from '@/hooks/use-app-context';
-import {
-	getAudioMetadata,
-	getAudioUrl,
-	getCoverArtUrl,
-	notifications,
-	uploadAudioFile,
-} from '@/data/api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getAudioUrl, getCoverArtUrl } from '@/data/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
+import { useGetAudio } from '@/hooks/use-get-audio';
+import { useFileUpload } from '@/hooks/use-file-upload';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -44,36 +40,18 @@ export function TrackUploadWrapper({
 	}, [audioId]);
 
 	// Fetch audio metadata using TanStack Query
-	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } = useQuery(
-		{
-			queryKey: ['audioMetadata', audioId],
-			queryFn: () => getAudioMetadata(audioId || ''),
-			enabled: !!audioId, // Only fetch if audioId is available
-			retry: false, // Disable automatic retries
-			refetchOnWindowFocus: false, // Don't refetch on window focus
-			// Remove retryOnMount: false to allow refetching when audioId changes
-		}
-	);
+	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } =
+		useGetAudio(audioId, () => {
+			// Handle audio metadata success
+		});
 
 	// File upload mutation
-	const uploadMutation = useMutation({
-		mutationFn: uploadAudioFile,
-		onSuccess: (data) => {
-			console.log('Upload successful:', data);
-			notifications.uploadSuccess(data.message);
-			updateAudioId(data.id);
-		},
-		onError: (error) => {
-			console.error('Upload failed:', error);
-			notifications.uploadError(error as Error);
-		},
-		retry: false, // Disable automatic retries
-	});
+	const { uploadFile, isUploading, reset } = useFileUpload();
 
 	const handleFileChange = (file: File) => {
 		setAudioFile(file);
 		// Start upload process
-		uploadMutation.mutate(file);
+		uploadFile(file);
 	};
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +103,7 @@ export function TrackUploadWrapper({
 		// Call the onAudioRemove callback if provided
 		setTrackLoaded(false);
 		resetAllStatesAndPlayers();
-		uploadMutation.reset();
+		reset();
 	};
 
 	const handleBrowseClick = () => {
@@ -141,7 +119,7 @@ export function TrackUploadWrapper({
 		queryClient.invalidateQueries({ queryKey: ['projects'] });
 	};
 
-	if (uploadMutation.isPending || isLoadingAudioMetadata) {
+	if (isUploading || isLoadingAudioMetadata) {
 		return (
 			<div className="flex flex-col items-center justify-center w-full max-w-xl mx-auto p-6 rounded-xl border-2 border-dashed border-primary/30 bg-background/95 backdrop-blur-md shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
 				<div className="w-full max-w-md mx-auto mt-2 mb-4">
@@ -256,13 +234,13 @@ export function TrackUploadWrapper({
 						className="hidden"
 						accept="audio/*"
 						onChange={handleInputChange}
-						disabled={uploadMutation.isPending}
+						disabled={isUploading}
 					/>
 					<Button
 						variant="outline"
 						className="mt-2"
 						onClick={handleBrowseClick}
-						disabled={uploadMutation.isPending}
+						disabled={isUploading}
 					>
 						Browse Files
 					</Button>
@@ -296,7 +274,7 @@ export function TrackUploadWrapper({
 						className="h-8 w-8 rounded-full bg-transparent focus-visible:outline-1"
 						onClick={() => setShowConfirmDialog(true)}
 						title="Remove audio"
-						disabled={uploadMutation.isPending}
+						disabled={isUploading}
 					>
 						<X className="h-4 w-4 text-muted-foreground" />
 					</Button>
