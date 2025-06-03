@@ -1,10 +1,10 @@
 import { downloadAudioFile } from '@/data/api';
 import { Button } from './ui/button';
-import { useRef, useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
-import { Controls, type AudioPlayerState } from './track-player/controls';
+import { Controls } from './track-player/controls';
 import { Waveform } from './track-player/wave-form';
 import { useAppContext } from '@/hooks/use-app-context';
+import { useTrackPlayer } from '@/hooks/use-track-player';
 
 type TrackPlayerProps = {
 	title: string;
@@ -22,132 +22,22 @@ export function TrackPlayer({
 	src,
 	showDownload = true,
 	onLoadedMetadata,
-	coverArt = '/default-cover-art.jpg', // Add default cover art path
+	coverArt = '/default-cover-art.jpg',
 }: TrackPlayerProps & {
-	coverArt?: string; // Add optional cover art prop
+	coverArt?: string;
 }) {
-	const { audioRef, videoRef, setVideoTime } = useAppContext();
-	const playerRef = useRef<HTMLDivElement>(null);
-	const [waveBars] = useState(
-		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
-	);
-	const [audioState, setAudioState] = useState<AudioPlayerState>({
-		isPlaying: false,
-		duration: 0,
-		currentTime: 0,
-		volume: 1,
-		isMuted: false,
-	});
+	const {
+		playerRef,
+		audioState,
+		waveBars,
+		handlePlayPause,
+		handleTimeChange,
+		handleVolumeChange,
+		handleMuteToggle,
+		handleWaveBarClick,
+	} = useTrackPlayer({ onLoadedMetadata });
 
-	useEffect(() => {
-		const audio = audioRef.current;
-		if (!audio) return;
-
-		const handlers = {
-			loadedmetadata: () =>
-				setAudioState((oldState) => ({
-					...oldState,
-					duration: audio.duration,
-				})),
-			timeupdate: () => {
-				setAudioState((oldState) => ({
-					...oldState,
-					currentTime: audio.currentTime,
-				}));
-			},
-			ended: () => setAudioState((s) => ({ ...s, isPlaying: false })),
-		};
-
-		Object.entries(handlers).forEach(([event, handler]) => {
-			audio.addEventListener(event, handler);
-		});
-
-		return () => {
-			Object.entries(handlers).forEach(([event, handler]) => {
-				audio?.removeEventListener(event, handler);
-			});
-		};
-	}, [audioRef]);
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (
-				e.code === 'Space' &&
-				playerRef.current &&
-				(playerRef.current.contains(document.activeElement) ||
-					document.activeElement === document.body)
-			) {
-				e.preventDefault();
-				handlePlayPause();
-			}
-		};
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-		};
-	}, [audioState.isPlaying]);
-
-	const handlePlayPause = () => {
-		if (audioRef.current) {
-			if (audioState.isPlaying) {
-				audioRef.current.pause();
-				pauseVideo();
-			} else {
-				audioRef.current.play();
-				setVideoTime(audioState.currentTime);
-				playVideo();
-			}
-			setAudioState((s) => ({ ...s, isPlaying: !s.isPlaying }));
-		}
-	};
-
-	const playVideo = () => {
-		if (videoRef.current) {
-			setVideoTime(audioRef.current?.currentTime || 0);
-			videoRef.current.play();
-		}
-	};
-
-	const pauseVideo = () => {
-		if (videoRef.current) {
-			videoRef.current.pause();
-		}
-	};
-
-	const handleTimeChange = (value: number[]) => {
-		const newTime = value[0];
-		if (audioRef.current) {
-			audioRef.current.currentTime = newTime;
-			if (!audioState.isPlaying) {
-				audioRef.current.play();
-			}
-			playVideo();
-			setAudioState((s) => ({ ...s, currentTime: newTime }));
-		}
-	};
-
-	const handleVolumeChange = (value: number[]) => {
-		const newVolume = value[0];
-		if (audioRef.current) {
-			audioRef.current.volume = newVolume;
-			setAudioState((s) => ({ ...s, volume: newVolume }));
-		}
-	};
-
-	const handleMuteToggle = () => {
-		if (audioRef.current) {
-			audioRef.current.muted = !audioState.isMuted;
-			setAudioState((s) => ({ ...s, isMuted: !s.isMuted }));
-		}
-	};
-
-	const handleWaveBarClick = (index: number) => {
-		if (audioRef.current && audioState.duration) {
-			const newTime = (index / waveBars.length) * audioState.duration;
-			handleTimeChange([newTime]);
-		}
-	};
+	const { audioRef, videoRef } = useAppContext();
 
 	return (
 		<div
