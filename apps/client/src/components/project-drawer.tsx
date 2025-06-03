@@ -89,15 +89,15 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 										}
 									>
 										<Button
-											variant="ghost"
+											variant="outline"
 											size="icon"
-											className="absolute top-auto bottom-auto right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+											className="absolute bottom-3 right-3 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
 											onClick={(e) => {
 												e.stopPropagation();
 												handleProjectDelete(project.id);
 											}}
 										>
-											<Trash2 className="h-4 w-4" />
+											<Trash2 className="h-9 w-9" />
 											<span className="sr-only">
 												Delete project
 											</span>
