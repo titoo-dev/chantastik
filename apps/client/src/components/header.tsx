@@ -4,19 +4,10 @@ import { memo, useState } from 'react';
 import { ProjectsDrawer } from './project-drawer';
 import { useAppContext } from '@/hooks/use-app-context';
 import { type Project } from '@/data/api';
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from './ui/alert-dialog';
 import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import { Input } from './ui/input';
+import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 
 export const Header = memo(() => {
 	const { updateAudioId } = useAppContext();
@@ -84,37 +75,14 @@ export const Header = memo(() => {
 				</div>
 			</header>
 
-			<AlertDialog
-				open={showDeleteDialog}
-				onOpenChange={setShowDeleteDialog}
-			>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Delete project?</AlertDialogTitle>
-						<AlertDialogDescription>
-							This action cannot be undone. This will permanently
-							delete the project and all associated data.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel
-							onClick={cancelDelete}
-							disabled={deleteProjectMutation.isPending}
-						>
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={confirmDelete}
-							disabled={deleteProjectMutation.isPending}
-							className="bg-destructive text-background hover:bg-destructive/90 disabled:opacity-50"
-						>
-							{deleteProjectMutation.isPending
-								? 'Deleting...'
-								: 'Delete'}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+			{createDeleteConfirmationDialog({
+				open: showDeleteDialog,
+				onOpenChange: setShowDeleteDialog,
+				onConfirm: confirmDelete,
+				onCancel: cancelDelete,
+				isLoading: deleteProjectMutation.isPending,
+				itemName: 'project',
+			})}
 		</>
 	);
 });
