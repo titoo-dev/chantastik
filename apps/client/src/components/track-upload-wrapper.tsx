@@ -3,16 +3,6 @@ import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
 import { Button } from './ui/button';
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from './ui/alert-dialog';
 import { useAppContext } from '@/hooks/use-app-context';
 import {
 	getAudioMetadata,
@@ -23,6 +13,7 @@ import {
 } from '@/data/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
+import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -326,25 +317,13 @@ export function TrackUploadWrapper({
 						coverArt={getCoverArtUrl(audioId)}
 					/>
 				)}
-				<AlertDialog
-					open={showConfirmDialog}
-					onOpenChange={setShowConfirmDialog}
-				>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Remove track?</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action will remove the current audio track.
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel>Cancel</AlertDialogCancel>
-							<AlertDialogAction onClick={handleRemoveAudio}>
-								Remove
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
+				{createDeleteConfirmationDialog({
+					open: showConfirmDialog,
+					onOpenChange: setShowConfirmDialog,
+					onConfirm: handleRemoveAudio,
+					itemName: 'track',
+					isLoading: false,
+				})}
 			</div>
 		</>
 	);
