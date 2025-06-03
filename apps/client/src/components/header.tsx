@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { AudioWaveform } from 'lucide-react';
+import { AudioWaveform, Search } from 'lucide-react';
 import { memo, useState } from 'react';
 import { ProjectsDrawer } from './project-drawer';
 import { useAppContext } from '@/hooks/use-app-context';
@@ -16,6 +16,7 @@ import {
 } from './ui/alert-dialog';
 import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
+import { Input } from './ui/input';
 
 export const Header = memo(() => {
 	const { updateAudioId } = useAppContext();
@@ -60,6 +61,18 @@ export const Header = memo(() => {
 						<h1 className="text-xl font-bold text-foreground">
 							<Link to="/">Karaoke Milay</Link>
 						</h1>
+					</div>
+					<div className="flex-1 max-w-md mx-8">
+						<div className="relative">
+							<Input
+								type="text"
+								placeholder="Search available lyrics..."
+								className="w-full h-10 pr-10"
+							/>
+							<div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+								<Search className="h-4 w-4 text-muted-foreground" />
+							</div>
+						</div>
 					</div>
 					<div className="flex items-center gap-4">
 						<ProjectsDrawer
