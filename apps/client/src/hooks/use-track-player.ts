@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useAppContext } from './use-app-context';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 export type AudioPlayerState = {
 	isPlaying: boolean;
@@ -77,26 +78,6 @@ export function useTrackPlayer({ onLoadedMetadata }: UseTrackPlayerProps) {
 		};
 	}, [audioRef, videoRef, setVideoTime, onLoadedMetadata]);
 
-	// Keyboard controls
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (
-				e.code === 'Space' &&
-				playerRef.current &&
-				(playerRef.current.contains(document.activeElement) ||
-					document.activeElement === document.body)
-			) {
-				e.preventDefault();
-				handlePlayPause();
-			}
-		};
-
-		window.addEventListener('keydown', handleKeyDown);
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown);
-		};
-	}, [audioState.isPlaying]);
-
 	const playVideo = () => {
 		if (videoRef.current) {
 			setVideoTime(audioRef.current?.currentTime || 0);
@@ -154,6 +135,41 @@ export function useTrackPlayer({ onLoadedMetadata }: UseTrackPlayerProps) {
 			handleTimeChange([newTime]);
 		}
 	};
+
+	// Hotkeys
+	useHotkeys(
+		'space',
+		(e) => {
+			e.preventDefault();
+			handlePlayPause();
+		},
+		{ enableOnFormTags: false }
+	);
+
+	useHotkeys(
+		'arrowleft',
+		() => {
+			if (audioRef.current) {
+				const newTime = Math.max(0, audioState.currentTime - 10);
+				handleTimeChange([newTime]);
+			}
+		},
+		{ enableOnFormTags: false }
+	);
+
+	useHotkeys(
+		'arrowright',
+		() => {
+			if (audioRef.current) {
+				const newTime = Math.min(
+					audioState.duration,
+					audioState.currentTime + 10
+				);
+				handleTimeChange([newTime]);
+			}
+		},
+		{ enableOnFormTags: false }
+	);
 
 	return {
 		playerRef,
