@@ -197,7 +197,7 @@ export function TrackUploadWrapper({
 				className={cn(
 					'fixed inset-x-0 bottom-6 mx-auto flex items-center gap-3 px-6 h-12 rounded-full',
 					'border-2 border-dotted border-primary/50 bg-background/80 backdrop-blur-sm',
-					'shadow-md hover:shadow-primary/20 hover:border-primary transition-all duration-300',
+					'shadow-sm hover:shadow-primary/20 hover:border-primary transition-all duration-300',
 					'group max-w-xs',
 					isRetracted
 						? 'opacity-100'

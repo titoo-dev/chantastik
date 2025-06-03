@@ -151,7 +151,7 @@ export function TrackPlayer({
 
 	return (
 		<div
-			className="rounded-xl border bg-card p-6 shadow-sm dark:bg-card/95"
+			className="rounded-xl border bg-card p-6 shadow-sm dark:bg-card/95 with-blur"
 			ref={playerRef}
 			tabIndex={0}
 		>
