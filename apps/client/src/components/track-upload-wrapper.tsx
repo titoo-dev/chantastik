@@ -1,15 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
 import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TrackPlayer } from './track-player';
 import { Button } from './ui/button';
-import { useAppContext } from '@/hooks/use-app-context';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
-import { useQueryClient } from '@tanstack/react-query';
-import { preloadImage } from '@remotion/preload';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
-import { useGetAudio } from '@/hooks/use-get-audio';
-import { useFileUpload } from '@/hooks/use-file-upload';
+import { useTrackUpload } from '@/hooks/use-track-upload';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
@@ -20,104 +15,29 @@ export function TrackUploadWrapper({
 	iconColor = 'text-primary',
 	showDownload = false,
 }: TrackUploadWrapperProps) {
-	const queryClient = useQueryClient();
-	const [audioFile, setAudioFile] = useState<File | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
-	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-	const [isRetracted, setIsRetracted] = useState(false);
-	const fileInputRef = useRef<HTMLInputElement>(null);
 	const {
-		setTrackLoaded,
-		audioRef,
-		resetAllStatesAndPlayers,
+		// State
+		audioFile,
+		isDragging,
+		showConfirmDialog,
+		isRetracted,
 		audioId,
-		updateAudioId,
-	} = useAppContext(); // Preload cover art when audio ID changes
-	useEffect(() => {
-		if (audioId) {
-			preloadImage(getCoverArtUrl(audioId));
-		}
-	}, [audioId]);
+		audioMetadata,
+		isUploading,
+		isLoadingAudioMetadata,
+		fileInputRef,
 
-	// Fetch audio metadata using TanStack Query
-	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } =
-		useGetAudio(audioId, () => {
-			// Handle audio metadata success
-		});
+		// Actions
+		handleInputChange,
+		handleRemoveAudio,
+		handleBrowseClick,
+		toggleRetracted,
+		handleTrackLoaded,
+		setShowConfirmDialog,
 
-	// File upload mutation
-	const { uploadFile, isUploading, reset } = useFileUpload();
-
-	const handleFileChange = (file: File) => {
-		setAudioFile(file);
-		// Start upload process
-		uploadFile(file);
-	};
-
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			handleFileChange(file);
-		}
-	};
-
-	const handleDragEnter = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(true);
-	};
-
-	const handleDragLeave = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(false);
-	};
-
-	const handleDragOver = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		if (!isDragging) {
-			setIsDragging(true);
-		}
-	};
-
-	const handleDrop = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(false);
-
-		const file = e.dataTransfer.files?.[0];
-		if (file && file.type.startsWith('audio/')) {
-			handleFileChange(file);
-		}
-	};
-
-	const handleRemoveAudio = () => {
-		setAudioFile(null);
-		updateAudioId(undefined);
-		if (audioRef.current) {
-			audioRef.current.pause();
-			audioRef.current.src = '';
-		}
-
-		// Call the onAudioRemove callback if provided
-		setTrackLoaded(false);
-		resetAllStatesAndPlayers();
-		reset();
-	};
-
-	const handleBrowseClick = () => {
-		fileInputRef.current?.click();
-	};
-
-	const toggleRetracted = () => {
-		setIsRetracted(!isRetracted);
-	};
-
-	const handleTrackLoaded = () => {
-		setTrackLoaded(true);
-		queryClient.invalidateQueries({ queryKey: ['projects'] });
-	};
+		// Drag handlers
+		dragHandlers,
+	} = useTrackUpload();
 
 	if (isUploading || isLoadingAudioMetadata) {
 		return (
@@ -216,10 +136,7 @@ export function TrackUploadWrapper({
 							? 'border-primary border-opacity-70 bg-muted/30'
 							: 'border-muted-foreground/20'
 					)}
-					onDragEnter={handleDragEnter}
-					onDragLeave={handleDragLeave}
-					onDragOver={handleDragOver}
-					onDrop={handleDrop}
+					{...dragHandlers}
 				>
 					<div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
 						<Upload className="h-8 w-8 text-primary" />
