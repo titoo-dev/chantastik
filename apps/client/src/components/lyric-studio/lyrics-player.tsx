@@ -64,23 +64,8 @@ export const LyricsPlayer = () => {
 			<CardHeader className="flex flex-row items-center justify-between py-8 border-b">
 				<CardTitle className="flex items-center gap-2 py-2">
 					<PlayCircle className="h-5 w-5 text-primary" />
-					Lyric Player
+					Lyric Video Player
 				</CardTitle>
-
-				<div className="flex items-center gap-3">
-					<Button
-						onClick={updateVideoPlayer}
-						variant="outline"
-						className="gap-2"
-						title="Update video player with current lyrics"
-						disabled={isLoading}
-					>
-						<RotateCcw
-							className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-						/>
-						Update Video Player
-					</Button>
-				</div>
 			</CardHeader>
 
 			<CardContent className="p-6">

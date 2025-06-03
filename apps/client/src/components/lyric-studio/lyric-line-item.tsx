@@ -79,7 +79,7 @@ const RemoveLyricLineButton = memo(
 	}) => {
 		return (
 			<Button
-				variant="ghost"
+				variant="outline"
 				size="icon"
 				onClick={() => onDeleteLine(lineId)}
 				className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-destructive"
