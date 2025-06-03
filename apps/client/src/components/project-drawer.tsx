@@ -9,7 +9,7 @@ import {
 	DrawerTitle,
 	DrawerTrigger,
 } from './ui/drawer';
-import { FolderOpen, Trash2 } from 'lucide-react';
+import { FolderOpen, Trash2, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle } from './ui/card';
 import { useGetProjects } from '@/hooks/use-get-projects';
@@ -60,13 +60,13 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 					</Button>
 				</DrawerTrigger>
 				<DrawerContent className="max-h-[80vh]">
-					<DrawerHeader>
+					<DrawerHeader className="container mx-auto max-w-8xl px-0">
 						<DrawerTitle>Projects</DrawerTitle>
 						<DrawerDescription>
 							Select a project to continue working on.
 						</DrawerDescription>
 					</DrawerHeader>
-					<ScrollArea className="h-[70vh] w-full p-4">
+					<ScrollArea className="h-[60vh] w-full p-4">
 						{isLoading ? (
 							<ProjectListSkeleton />
 						) : error ? (
@@ -79,7 +79,7 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 								</p>
 							</div>
 						) : projects && projects.length > 0 ? (
-							<div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+							<div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr container mx-auto max-w-8xl">
 								{projects.map((project) => (
 									<Card
 										key={project.id}
@@ -162,10 +162,16 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 							</div>
 						)}
 					</ScrollArea>
-					<DrawerFooter>
+					<DrawerFooter className="flex pb-4 pt-0">
 						<DrawerClose asChild>
-							<Button ref={closeRef} variant="outline">
-								Close
+							<Button
+								ref={closeRef}
+								variant="outline"
+								size="icon"
+								className="h-9 w-9 self-center"
+							>
+								<X className="h-4 w-4" />
+								<span className="sr-only">Close projects</span>
 							</Button>
 						</DrawerClose>
 					</DrawerFooter>
