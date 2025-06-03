@@ -7,3 +7,5 @@ dist-ssr
 .github/*
 
 public/assets/
+
+.env
