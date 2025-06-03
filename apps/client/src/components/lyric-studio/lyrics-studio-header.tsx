@@ -23,7 +23,7 @@ export const LyricStudioHeader = memo(() => {
 			<div className="flex flex-row items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold tracking-tight leading-relaxed">
-						Lyric Studio
+						Create Amazing Lyrics
 					</h1>
 					<p className="text-muted-foreground leading-relaxed">
 						{trackLoaded
