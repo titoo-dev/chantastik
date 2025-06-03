@@ -89,15 +89,15 @@ export function LyricsPreviewCard() {
 								className={cn(
 									'cursor-pointer text-center py-2 px-4 my-1 transition-all duration-300 rounded-lg',
 									isActive
-										? 'lyrics-preview-active'
+										? 'text-primary font-semibold origin-center'
 										: 'opacity-60 hover:opacity-90'
 								)}
 								initial={{ opacity: 0, y: 20 }}
 								animate={{
 									opacity: isActive ? 1 : 0.6,
 									y: 0,
-									scale: isActive ? 1.15 : 1,
-									transition: { duration: 0.3 },
+									scale: isActive ? 1.4 : 1,
+									transition: { duration: 0.1 },
 								}}
 								exit={{ opacity: 0, y: -20 }}
 								onClick={() => jumpToLyricLine(line.id)}

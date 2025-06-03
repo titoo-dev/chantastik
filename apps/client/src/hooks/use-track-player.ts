@@ -37,6 +37,8 @@ export function useTrackPlayer({ onLoadedMetadata }: UseTrackPlayerProps) {
 				setAudioState((oldState) => ({
 					...oldState,
 					duration: audio.duration,
+					volume: audio.volume,
+					isMuted: audio.muted,
 				}));
 				onLoadedMetadata?.();
 			},
@@ -46,7 +48,14 @@ export function useTrackPlayer({ onLoadedMetadata }: UseTrackPlayerProps) {
 					currentTime: audio.currentTime,
 				}));
 			},
-			ended: () => setAudioState((s) => ({ ...s, isPlaying: false })),
+			ended: () => {
+				setAudioState((s) => ({
+					...s,
+					isPlaying: false,
+					currentTime: 0,
+				}));
+				videoRef.current?.pause();
+			},
 			play: () => {
 				setAudioState((s) => ({ ...s, isPlaying: true }));
 				videoRef.current?.play();
