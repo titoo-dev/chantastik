@@ -6,6 +6,7 @@ import { Waveform } from './track-player/wave-form';
 import { useAppContext } from '@/hooks/use-app-context';
 import { useTrackPlayer } from '@/hooks/use-track-player';
 import { useRef } from 'react';
+import { memo } from 'react';
 
 type TrackPlayerProps = {
 	title: string;
@@ -143,6 +144,19 @@ function TrackPlayerMain({
 	);
 }
 
+const CoverArtImage = memo(
+	({ coverArt, title }: { coverArt: string; title: string }) => (
+		<img
+			src={coverArt}
+			alt={`Cover art for ${title}`}
+			className="w-full h-full object-cover"
+			onError={(e) => {
+				(e.target as HTMLImageElement).src = '/default-cover-art.jpg';
+			}}
+		/>
+	)
+);
+
 function CoverArt({
 	coverArt,
 	title,
@@ -155,23 +169,16 @@ function CoverArt({
 	onPlayPause: () => void;
 }) {
 	return (
-		<div
-			className={`relative aspect-square w-24 sm:w-28 md:w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${
-				isPlaying
-					? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background'
-					: ''
-			}`}
-			onClick={onPlayPause}
-		>
-			<img
-				src={coverArt}
-				alt={`Cover art for ${title}`}
-				className="w-full h-full object-cover"
-				onError={(e) => {
-					(e.target as HTMLImageElement).src =
-						'/default-cover-art.jpg';
-				}}
-			/>
+		<div className="relative">
+			<div
+				className="aspect-square w-24 sm:w-28 md:w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300"
+				onClick={onPlayPause}
+			>
+				<CoverArtImage coverArt={coverArt} title={title} />
+			</div>
+			{isPlaying && (
+				<div className="absolute inset-0 ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background rounded-lg pointer-events-none" />
+			)}
 		</div>
 	);
 }
