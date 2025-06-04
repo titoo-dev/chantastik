@@ -12,7 +12,6 @@ type TrackPlayerProps = {
 	iconColor: string;
 	src: string;
 	showDownload?: boolean;
-	onLoadedMetadata: () => void;
 };
 
 export function TrackPlayer({
@@ -21,7 +20,6 @@ export function TrackPlayer({
 	iconColor,
 	src,
 	showDownload = true,
-	onLoadedMetadata,
 	coverArt = '/default-cover-art.jpg',
 }: TrackPlayerProps & {
 	coverArt?: string;
@@ -35,9 +33,9 @@ export function TrackPlayer({
 		handleVolumeChange,
 		handleMuteToggle,
 		handleWaveBarClick,
-	} = useTrackPlayer({ onLoadedMetadata });
+	} = useTrackPlayer();
 
-	const { audioRef, videoRef } = useAppContext();
+	const { audioRef } = useAppContext();
 
 	return (
 		<div
@@ -114,18 +112,7 @@ export function TrackPlayer({
 				</div>
 			</div>
 
-			<audio
-				ref={audioRef}
-				src={src}
-				className="hidden"
-				onLoadedMetadata={onLoadedMetadata}
-				onPlay={() => {
-					videoRef.current?.play();
-				}}
-				onPause={() => {
-					videoRef.current?.pause();
-				}}
-			/>
+			<audio ref={audioRef} src={src} className="hidden" />
 		</div>
 	);
 }

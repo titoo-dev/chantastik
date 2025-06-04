@@ -6,5 +6,6 @@ export function useGetProjects({ enabled = true }: { enabled: boolean }) {
 		queryKey: ['projects'],
 		queryFn: getAllProjects,
 		enabled,
+		refetchOnWindowFocus: false,
 	});
 }

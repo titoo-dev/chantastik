@@ -32,7 +32,6 @@ export function TrackUploadWrapper({
 		handleRemoveAudio,
 		handleBrowseClick,
 		toggleRetracted,
-		handleTrackLoaded,
 		setShowConfirmDialog,
 
 		// Drag handlers
@@ -208,7 +207,6 @@ export function TrackUploadWrapper({
 						iconColor={iconColor}
 						src={getAudioUrl(audioId)}
 						showDownload={showDownload}
-						onLoadedMetadata={handleTrackLoaded}
 						coverArt={getCoverArtUrl(audioId)}
 					/>
 				)}

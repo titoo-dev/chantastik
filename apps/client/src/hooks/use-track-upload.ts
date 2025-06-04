@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { preloadImage } from '@remotion/preload';
 import { useAppContext } from '@/hooks/use-app-context';
 import { getCoverArtUrl } from '@/data/api';
@@ -7,7 +6,6 @@ import { useGetAudio } from '@/hooks/use-get-audio';
 import { useFileUpload } from '@/hooks/use-file-upload';
 
 export function useTrackUpload() {
-	const queryClient = useQueryClient();
 	const [audioFile, setAudioFile] = useState<File | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -101,11 +99,6 @@ export function useTrackUpload() {
 		setIsRetracted(!isRetracted);
 	};
 
-	const handleTrackLoaded = () => {
-		setTrackLoaded(true);
-		queryClient.invalidateQueries({ queryKey: ['projects'] });
-	};
-
 	const dragHandlers = {
 		onDragEnter: handleDragEnter,
 		onDragLeave: handleDragLeave,
@@ -130,7 +123,6 @@ export function useTrackUpload() {
 		handleRemoveAudio,
 		handleBrowseClick,
 		toggleRetracted,
-		handleTrackLoaded,
 		setShowConfirmDialog,
 
 		// Drag handlers
