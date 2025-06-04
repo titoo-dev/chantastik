@@ -138,39 +138,52 @@ function TrackPlayerMain({
 }
 
 const CoverArtImage = memo(
-	({ coverArt, title }: { coverArt: string; title: string }) => (
-		<img
-			src={coverArt}
-			alt={`Cover art for ${title}`}
-			className="w-full h-full object-cover"
-			onError={(e) => {
-				(e.target as HTMLImageElement).src = '/default-cover-art.jpg';
-			}}
-		/>
-	)
-);
+	({ coverArt, title }: { coverArt: string; title: string }) => {
+		const { handlePlayPause } = useTrackPlayer();
 
-function CoverArt({ coverArt, title }: { coverArt: string; title: string }) {
-	const { audioState, handlePlayPause } = useTrackPlayer();
-
-	return (
-		<div className="relative">
+		return (
 			<div
 				className="aspect-square w-24 sm:w-28 md:w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300"
 				onClick={handlePlayPause}
 			>
-				<CoverArtImage coverArt={coverArt} title={title} />
+				<img
+					src={coverArt}
+					alt={`Cover art for ${title}`}
+					className="w-full h-full object-cover"
+					onError={(e) => {
+						(e.target as HTMLImageElement).src =
+							'/default-cover-art.jpg';
+					}}
+				/>
 			</div>
-			<div
-				className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-300 ease-in-out ${
-					audioState.isPlaying
-						? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background opacity-100'
-						: 'ring-0 ring-transparent ring-offset-0 opacity-0'
-				}`}
-			/>
-		</div>
+		);
+	}
+);
+
+const CoverArt = memo(
+	({ coverArt, title }: { coverArt: string; title: string }) => {
+		return (
+			<div className="relative">
+				<CoverArtImage coverArt={coverArt} title={title} />
+				<PlayingRing />
+			</div>
+		);
+	}
+);
+
+const PlayingRing = memo(() => {
+	const { audioState } = useTrackPlayer();
+
+	return (
+		<div
+			className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-300 ease-in-out ${
+				audioState.isPlaying
+					? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background opacity-100'
+					: 'ring-0 ring-transparent ring-offset-0 opacity-0'
+			}`}
+		/>
 	);
-}
+});
 
 function PlayerControls() {
 	return (
