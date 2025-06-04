@@ -17,6 +17,8 @@ export const useProjectDrawer = ({
 		data: projects,
 		isLoading,
 		error,
+		refetch,
+		isFetching,
 	} = useGetProjects({ enabled: true });
 
 	const handleProjectSelect = (project: Project) => {
@@ -45,5 +47,7 @@ export const useProjectDrawer = ({
 		handleProjectSelect,
 		handleProjectDelete,
 		formatDate,
+		refetch,
+		isFetching,
 	};
 };

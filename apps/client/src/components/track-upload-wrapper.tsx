@@ -21,7 +21,7 @@ export function TrackUploadWrapper({
 		isDragging,
 		showConfirmDialog,
 		isRetracted,
-		audioId,
+		audio,
 		audioMetadata,
 		isUploading,
 		isLoadingAudioMetadata,
@@ -91,26 +91,24 @@ export function TrackUploadWrapper({
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none'
 				)}
-				title={
-					audioId ? 'Expand audio player' : 'Expand audio uploader'
-				}
+				title={audio ? 'Expand audio player' : 'Expand audio uploader'}
 			>
 				<span className="relative flex items-center justify-center w-6 h-6">
-					{audioId ? (
+					{audio ? (
 						<Music className="h-5 w-5 text-primary" />
 					) : (
 						<MoveDiagonal className="h-5 w-5 text-primary" />
 					)}
 				</span>
 				<span className="font-medium text-sm">
-					{audioId ? 'Show Player' : 'Upload Track'}
+					{audio?.id ? 'Show Player' : 'Upload Track'}
 				</span>
 			</Button>{' '}
-			{/* Upload interface - only visible when not retracted and no audioId exists */}
+			{/* Upload interface - only visible when not retracted and no audio exists */}
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					!audioId && !isRetracted
+					!audio?.id && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none hidden'
 				)}
@@ -169,7 +167,7 @@ export function TrackUploadWrapper({
 			<div
 				className={cn(
 					'relative w-full max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-300',
-					audioId && !isRetracted
+					audio?.id && !isRetracted
 						? 'opacity-100'
 						: 'opacity-0 pointer-events-none'
 				)}
@@ -195,19 +193,19 @@ export function TrackUploadWrapper({
 						<X className="h-4 w-4 text-muted-foreground" />
 					</Button>
 				</div>{' '}
-				{audioId && (
+				{audio?.id && (
 					<TrackPlayer
 						title={
-							audioMetadata?.metadata.title &&
+							audioMetadata?.metadata?.title &&
 							audioMetadata?.metadata.artist
 								? `${audioMetadata.metadata.title} - ${audioMetadata.metadata.artist}`
 								: audioFile?.name || 'Unknown Track'
 						}
 						icon={Music}
 						iconColor={iconColor}
-						src={getAudioUrl(audioId)}
+						src={getAudioUrl(audio?.id ?? '')}
 						showDownload={showDownload}
-						coverArt={getCoverArtUrl(audioId)}
+						coverArt={getCoverArtUrl(audio?.id)}
 					/>
 				)}
 				{createDeleteConfirmationDialog({

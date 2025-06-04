@@ -1,5 +1,5 @@
 import { Skeleton } from './ui/skeleton';
-import { Card, CardContent, CardHeader } from './ui/card';
+import { Card, CardHeader } from './ui/card';
 
 export const ProjectListSkeleton = () => {
 	return (
@@ -18,12 +18,6 @@ export const ProjectListSkeleton = () => {
 							</div>
 						</div>
 					</CardHeader>
-					<CardContent className="pt-0 flex-1 flex flex-col justify-start">
-						<div className="space-y-2">
-							<Skeleton className="h-3 w-full" />
-							<Skeleton className="h-3 w-3/4" />
-						</div>
-					</CardContent>
 				</Card>
 			))}
 		</div>

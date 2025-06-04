@@ -16,20 +16,20 @@ export function useTrackUpload() {
 		setTrackLoaded,
 		audioRef,
 		resetAllStatesAndPlayers,
-		audioId,
-		updateAudioId,
+		audio,
+		updateAudio,
 	} = useAppContext();
 
-	// Preload cover art when audio ID changes
+	// Preload cover art when audio changes
 	useEffect(() => {
-		if (audioId) {
-			preloadImage(getCoverArtUrl(audioId));
+		if (audio) {
+			preloadImage(getCoverArtUrl(audio.id));
 		}
-	}, [audioId]);
+	}, [audio]);
 
 	// Fetch audio metadata using TanStack Query
 	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } =
-		useGetAudio(audioId, () => {
+		useGetAudio(audio?.id, () => {
 			// Handle audio metadata success
 		});
 
@@ -81,7 +81,7 @@ export function useTrackUpload() {
 
 	const handleRemoveAudio = () => {
 		setAudioFile(null);
-		updateAudioId(undefined);
+		updateAudio(undefined);
 		if (audioRef.current) {
 			audioRef.current.pause();
 			audioRef.current.src = '';
@@ -112,7 +112,7 @@ export function useTrackUpload() {
 		isDragging,
 		showConfirmDialog,
 		isRetracted,
-		audioId,
+		audio,
 		audioMetadata,
 		isUploading,
 		isLoadingAudioMetadata,

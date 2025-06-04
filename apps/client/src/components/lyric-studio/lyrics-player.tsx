@@ -17,7 +17,7 @@ export const LyricsPlayer = () => {
 		setVideoTime,
 		showPreview,
 		showExternalLyrics,
-		audioId,
+		audio,
 	} = useAppContext();
 
 	useEffect(() => {
@@ -39,7 +39,7 @@ export const LyricsPlayer = () => {
 	const inputProps = useMemo(() => {
 		return {
 			lyrics: lyricsData,
-			backgroundImage: getCoverArtUrl(audioId ?? ''),
+			backgroundImage: getCoverArtUrl(audio?.id ?? ''),
 		} as LyricsProps;
 	}, [lyricsData]);
 

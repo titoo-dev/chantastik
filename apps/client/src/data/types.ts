@@ -1,11 +1,11 @@
 export interface AudioMeta {
-	id: string;
-	filename: string;
-	contentType: string;
-	size: number;
-	fileHash: string;
-	createdAt: Date;
-	metadata: Metadata;
+	id?: string;
+	filename?: string;
+	contentType?: string;
+	size?: number;
+	fileHash?: string;
+	createdAt?: Date;
+	metadata?: Metadata;
 	coverArt?: CoverArt; // Cover art might not always be available
 }
 

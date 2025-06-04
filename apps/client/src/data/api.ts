@@ -11,10 +11,10 @@ export const PROJECT_BASE_URL =
 	import.meta.env.VITE_DEFAULT_PROJECT_API_URL ||
 	'https://karaoke-milay-project.dev-titosy.workers.dev';
 
-type Response = {
+type UploadAudioResponse = {
 	message: string;
-	id: string;
 	projectId: string;
+	audioMetadata: AudioMeta;
 };
 
 export type Project = {
@@ -141,7 +141,9 @@ export function getCoverArtUrl(id?: string): string {
 /**
  * Uploads an audio file to the server
  */
-export async function uploadAudioFile(file: File): Promise<Response> {
+export async function uploadAudioFile(
+	file: File
+): Promise<UploadAudioResponse> {
 	const formData = new FormData();
 	formData.append('audio', file);
 

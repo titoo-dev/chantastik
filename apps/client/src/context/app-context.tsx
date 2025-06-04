@@ -1,4 +1,5 @@
 import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
+import type { AudioMeta } from '@/data/types';
 import { formatLRCTimestamp } from '@/lib/utils';
 import type { PlayerRef } from '@remotion/player';
 import {
@@ -15,9 +16,9 @@ type AppContextType = {
 	setTrackLoaded: (loaded: boolean) => void;
 	audioRef: RefObject<ComponentRef<'audio'> | null>;
 	videoRef: RefObject<PlayerRef | null>;
-	audioId?: string;
+	audio?: AudioMeta;
 	projectId?: string;
-	updateAudioId: (id?: string) => void;
+	updateAudio: (data?: AudioMeta) => void;
 	updateProjectId: (id?: string) => void;
 	jumpToLyricLine: (id: number) => void;
 	lyricLines: LyricLine[];
@@ -70,7 +71,7 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
 	const audioRef = useRef<ComponentRef<'audio'>>(null);
 	const videoRef = useRef<PlayerRef>(null);
-	const [audioId, setAudioId] = useState<string>();
+	const [audio, setAudio] = useState<AudioMeta>();
 	const [projectId, setProjectId] = useState<string>();
 	const [externalLyrics, setExternalLyrics] = useState<string>('');
 	const [lyricLines, setLyricLines] = useState<LyricLine[]>([]);
@@ -84,8 +85,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 		return lyricLines.every((line) => line.timestamp === 0);
 	};
 
-	const updateAudioId = (id?: string) => {
-		setAudioId(id);
+	const updateAudio = (data?: Partial<AudioMeta>) => {
+		if (!data) return;
+		setAudio((prev) => ({ ...prev, ...data }));
 	};
 
 	const updateProjectId = (id?: string) => {
@@ -311,6 +313,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 		setShowPreview(false);
 		setShowExternalLyrics(false);
 		setShowVideoPreview(false);
+		setAudio(undefined);
 
 		// Dispose and reset audio player
 		if (audioRef.current) {
@@ -364,8 +367,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				setVideoTime,
 				resetAllStatesAndPlayers,
 				toggleShowPreview,
-				audioId,
-				updateAudioId,
+				audio,
+				updateAudio,
 				projectId,
 				updateProjectId,
 			}}

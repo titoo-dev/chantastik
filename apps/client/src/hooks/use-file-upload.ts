@@ -8,13 +8,13 @@ interface UseFileUploadOptions {
 }
 
 export function useFileUpload(options?: UseFileUploadOptions) {
-	const { updateAudioId, updateProjectId } = useAppContext();
+	const { updateAudio, updateProjectId } = useAppContext();
 
 	const uploadMutation = useMutation({
 		mutationFn: uploadAudioFile,
 		onSuccess: (data) => {
 			notifications.uploadSuccess(data.message);
-			updateAudioId(data.id);
+			updateAudio(data.audioMetadata);
 			updateProjectId(data.projectId);
 			options?.onSuccess?.(data);
 		},
