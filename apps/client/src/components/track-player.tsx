@@ -129,16 +129,9 @@ function TrackPlayerMain({
 	coverArt: string;
 	title: string;
 }) {
-	const { audioState, handlePlayPause } = useTrackPlayer();
-
 	return (
 		<div className="flex items-center gap-5">
-			<CoverArt
-				coverArt={coverArt}
-				title={title}
-				isPlaying={audioState.isPlaying}
-				onPlayPause={handlePlayPause}
-			/>
+			<CoverArt coverArt={coverArt} title={title} />
 			<PlayerControls />
 		</div>
 	);
@@ -157,28 +150,20 @@ const CoverArtImage = memo(
 	)
 );
 
-function CoverArt({
-	coverArt,
-	title,
-	isPlaying,
-	onPlayPause,
-}: {
-	coverArt: string;
-	title: string;
-	isPlaying: boolean;
-	onPlayPause: () => void;
-}) {
+function CoverArt({ coverArt, title }: { coverArt: string; title: string }) {
+	const { audioState, handlePlayPause } = useTrackPlayer();
+
 	return (
 		<div className="relative">
 			<div
 				className="aspect-square w-24 sm:w-28 md:w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300"
-				onClick={onPlayPause}
+				onClick={handlePlayPause}
 			>
 				<CoverArtImage coverArt={coverArt} title={title} />
 			</div>
 			<div
 				className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-300 ease-in-out ${
-					isPlaying
+					audioState.isPlaying
 						? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background opacity-100'
 						: 'ring-0 ring-transparent ring-offset-0 opacity-0'
 				}`}
@@ -188,35 +173,13 @@ function CoverArt({
 }
 
 function PlayerControls() {
-	const {
-		audioState,
-		waveBars,
-		handlePlayPause,
-		handleTimeChange,
-		handleVolumeChange,
-		handleMuteToggle,
-		handleWaveBarClick,
-	} = useTrackPlayer();
-
 	return (
 		<div className="flex-1">
 			<div className="mb-3">
-				<Waveform
-					bars={waveBars}
-					currentTime={audioState.currentTime}
-					duration={audioState.duration}
-					isPlaying={audioState.isPlaying}
-					onBarClick={handleWaveBarClick}
-				/>
+				<Waveform />
 			</div>
 
-			<Controls
-				audioState={audioState}
-				onPlayPause={handlePlayPause}
-				onTimeChange={handleTimeChange}
-				onVolumeChange={handleVolumeChange}
-				onMuteToggle={handleMuteToggle}
-			/>
+			<Controls />
 		</div>
 	);
 }

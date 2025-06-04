@@ -1,35 +1,22 @@
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Slider } from '../ui/slider';
+import { useTrackPlayer } from '@/hooks/use-track-player';
 
-export type AudioPlayerState = {
-	isPlaying: boolean;
-	duration: number;
-	currentTime: number;
-	volume: number;
-	isMuted: boolean;
-};
-
-type ControlsProps = {
-	audioState: AudioPlayerState;
-	onPlayPause: () => void;
-	onTimeChange: (value: number[]) => void;
-	onVolumeChange: (value: number[]) => void;
-	onMuteToggle: () => void;
-};
-
-export const Controls = ({
-	audioState,
-	onPlayPause,
-	onTimeChange,
-	onVolumeChange,
-	onMuteToggle,
-}: ControlsProps) => {
+export const Controls = () => {
 	const formatTime = (time: number) => {
 		const minutes = Math.floor(time / 60);
 		const seconds = Math.floor(time % 60);
 		return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 	};
+
+	const {
+		audioState,
+		handlePlayPause,
+		handleTimeChange,
+		handleVolumeChange,
+		handleMuteToggle,
+	} = useTrackPlayer();
 
 	return (
 		<div className="mb-3 flex items-center gap-2">
@@ -37,7 +24,7 @@ export const Controls = ({
 				variant="outline"
 				size="icon"
 				className="h-9 w-9 rounded-full"
-				onClick={onPlayPause}
+				onClick={handlePlayPause}
 			>
 				{audioState.isPlaying ? (
 					<Pause className="h-4 w-4" />
@@ -56,7 +43,7 @@ export const Controls = ({
 					min={0}
 					max={audioState.duration || 100}
 					step={0.1}
-					onValueChange={onTimeChange}
+					onValueChange={handleTimeChange}
 					className="hover:cursor-pointer"
 				/>
 			</div>
@@ -69,7 +56,7 @@ export const Controls = ({
 				variant="ghost"
 				size="icon"
 				className="h-8 w-8"
-				onClick={onMuteToggle}
+				onClick={handleMuteToggle}
 			>
 				{audioState.isMuted ? (
 					<VolumeX className="h-4 w-4" />
@@ -83,7 +70,7 @@ export const Controls = ({
 				min={0}
 				max={1}
 				step={0.01}
-				onValueChange={onVolumeChange}
+				onValueChange={handleVolumeChange}
 				className="w-20"
 			/>
 		</div>
