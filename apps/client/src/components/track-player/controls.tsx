@@ -3,12 +3,7 @@ import { Button } from '../ui/button';
 import { Slider } from '../ui/slider';
 import { useTrackPlayer } from '@/hooks/use-track-player';
 import { memo } from 'react';
-
-const formatTime = (time: number) => {
-	const minutes = Math.floor(time / 60);
-	const seconds = Math.floor(time % 60);
-	return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-};
+import { formatPlayerTime } from '@/lib/utils';
 
 const PlayPauseButton = memo(() => {
 	const { audioState, handlePlayPause } = useTrackPlayer();
@@ -34,7 +29,7 @@ const CurrentTime = memo(() => {
 
 	return (
 		<div className="w-10 text-xs text-muted-foreground text-right">
-			{formatTime(audioState.currentTime)}
+			{formatPlayerTime(audioState.currentTime)}
 		</div>
 	);
 });
@@ -44,7 +39,7 @@ const Duration = memo(() => {
 
 	return (
 		<div className="w-10 text-xs text-muted-foreground text-left">
-			{formatTime(audioState.duration)}
+			{formatPlayerTime(audioState.duration)}
 		</div>
 	);
 });

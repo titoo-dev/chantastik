@@ -44,3 +44,9 @@ export const formatLRCTimestamp = (seconds: number): string => {
 		.toFixed(2)
 		.padStart(5, '0')}`;
 };
+
+export const formatPlayerTime = (time: number) => {
+	const minutes = Math.floor(time / 60);
+	const seconds = Math.floor(time % 60);
+	return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
