@@ -12,7 +12,7 @@ const PlayPauseButton = memo(() => {
 		<Button
 			variant="outline"
 			size="icon"
-			className="h-9 w-9 rounded-full"
+			className={`h-9 w-9 rounded-full ${audioState.isPlaying ? 'text-primary hover:text-primary' : ''}`}
 			onClick={handlePlayPause}
 		>
 			{audioState.isPlaying ? (
