@@ -176,9 +176,13 @@ function CoverArt({
 			>
 				<CoverArtImage coverArt={coverArt} title={title} />
 			</div>
-			{isPlaying && (
-				<div className="absolute inset-0 ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background rounded-lg pointer-events-none" />
-			)}
+			<div
+				className={`absolute inset-0 rounded-lg pointer-events-none transition-all duration-300 ease-in-out ${
+					isPlaying
+						? 'ring-2 ring-primary/70 ring-offset-2 dark:ring-offset-background opacity-100'
+						: 'ring-0 ring-transparent ring-offset-0 opacity-0'
+				}`}
+			/>
 		</div>
 	);
 }
