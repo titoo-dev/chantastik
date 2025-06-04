@@ -58,6 +58,7 @@ export function useTrackPlayer() {
 			},
 			play: () => {
 				setAudioState((s) => ({ ...s, isPlaying: true }));
+				setVideoTime(audioRef.current?.currentTime || 0);
 				videoRef.current?.play();
 			},
 			pause: () => {
@@ -77,13 +78,6 @@ export function useTrackPlayer() {
 		};
 	}, [audioRef, videoRef, setVideoTime]);
 
-	const playVideo = () => {
-		if (videoRef.current) {
-			setVideoTime(audioRef.current?.currentTime || 0);
-			videoRef.current.play();
-		}
-	};
-
 	const pauseVideo = () => {
 		if (videoRef.current) {
 			videoRef.current.pause();
@@ -95,8 +89,8 @@ export function useTrackPlayer() {
 			if (audioState.isPlaying) {
 				audioRef.current.pause();
 			} else {
-				audioRef.current.play();
 				setVideoTime(audioState.currentTime);
+				audioRef.current.play();
 			}
 		}
 	};
@@ -108,8 +102,6 @@ export function useTrackPlayer() {
 			if (!audioState.isPlaying) {
 				audioRef.current.play();
 			}
-			playVideo();
-			setAudioState((s) => ({ ...s, currentTime: newTime }));
 		}
 	};
 
@@ -131,7 +123,7 @@ export function useTrackPlayer() {
 	const handleWaveBarClick = (index: number) => {
 		if (audioRef.current && audioState.duration) {
 			const newTime = (index / waveBars.length) * audioState.duration;
-			handleTimeChange([newTime]);
+			audioRef.current.currentTime = newTime;
 		}
 	};
 
@@ -150,7 +142,7 @@ export function useTrackPlayer() {
 		() => {
 			if (audioRef.current) {
 				const newTime = Math.max(0, audioState.currentTime - 10);
-				handleTimeChange([newTime]);
+				audioRef.current.currentTime = newTime;
 			}
 		},
 		{ enableOnFormTags: false }
@@ -164,7 +156,7 @@ export function useTrackPlayer() {
 					audioState.duration,
 					audioState.currentTime + 10
 				);
-				handleTimeChange([newTime]);
+				audioRef.current.currentTime = newTime;
 			}
 		},
 		{ enableOnFormTags: false }
