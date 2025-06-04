@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react';
+import { memo } from 'react';
 import {
 	Drawer,
 	DrawerClose,
@@ -12,10 +12,10 @@ import {
 import { FolderOpen, Trash2, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle } from './ui/card';
-import { useGetProjects } from '@/hooks/use-get-projects';
 import { ProjectListSkeleton } from './project-list-skeleton';
 import { getCoverArtUrl, type Project } from '@/data/api';
 import { ScrollArea } from './ui/scroll-area';
+import { useProjectDrawer } from '@/hooks/use-project-drawer';
 
 interface ProjectsDrawerProps {
 	onProjectSelected: (project: Project) => void;
@@ -25,31 +25,17 @@ interface ProjectsDrawerProps {
 export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 	({ onProjectSelected, onDeleteProject }) => {
 		const {
-			data: projects,
+			closeRef,
+			projects,
 			isLoading,
 			error,
-		} = useGetProjects({ enabled: true });
-		const closeRef = useRef<HTMLButtonElement>(null);
-
-		const handleProjectSelect = (project: Project) => {
-			onProjectSelected(project);
-			closeRef.current?.click();
-		};
-
-		const handleProjectDelete = (projectId: string) => {
-			onDeleteProject(projectId);
-			if (closeRef.current) {
-				closeRef.current.click();
-			}
-		};
-
-		const formatDate = (dateString: string) => {
-			return new Date(dateString).toLocaleDateString('en-US', {
-				month: 'short',
-				day: 'numeric',
-				year: 'numeric',
-			});
-		};
+			formatDate,
+			handleProjectDelete,
+			handleProjectSelect,
+		} = useProjectDrawer({
+			onProjectSelected,
+			onDeleteProject,
+		});
 
 		return (
 			<Drawer>

@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import type { AudioMeta } from './types';
+import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 
 // API base URL - adjust based on your environment
 export const AUDIO_BASE_URL =
@@ -13,6 +14,7 @@ export const PROJECT_BASE_URL =
 type Response = {
 	message: string;
 	id: string;
+	projectId: string;
 };
 
 export type Project = {
@@ -22,6 +24,11 @@ export type Project = {
 	createdAt: string;
 	updatedAt: string;
 	audioId: string;
+};
+
+type LyricsDataToUpdate = {
+	text: string;
+	lines: LyricLine[];
 };
 
 // get all projects function
@@ -37,6 +44,40 @@ export async function getAllProjects(): Promise<Project[]> {
 		return data;
 	} catch (error) {
 		toast.error('Projects fetch failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
+// update project function
+export async function updateProject(
+	id: string,
+	updates: LyricsDataToUpdate
+): Promise<Project> {
+	try {
+		const response = await fetch(`${PROJECT_BASE_URL}/project/${id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(updates),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to update project');
+		}
+
+		const updatedProject: Project = await response.json();
+
+		toast.success('Project updated', {
+			description: 'Project has been successfully updated',
+		});
+
+		return updatedProject;
+	} catch (error) {
+		toast.error('Project update failed', {
 			description:
 				error instanceof Error ? error.message : 'Unknown error',
 		});

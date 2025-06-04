@@ -16,7 +16,9 @@ type AppContextType = {
 	audioRef: RefObject<ComponentRef<'audio'> | null>;
 	videoRef: RefObject<PlayerRef | null>;
 	audioId?: string;
+	projectId?: string;
 	updateAudioId: (id?: string) => void;
+	updateProjectId: (id?: string) => void;
 	jumpToLyricLine: (id: number) => void;
 	lyricLines: LyricLine[];
 	setLyricLines: (lines: LyricLine[]) => void;
@@ -69,6 +71,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 	const audioRef = useRef<ComponentRef<'audio'>>(null);
 	const videoRef = useRef<PlayerRef>(null);
 	const [audioId, setAudioId] = useState<string>();
+	const [projectId, setProjectId] = useState<string>();
 	const [externalLyrics, setExternalLyrics] = useState<string>('');
 	const [lyricLines, setLyricLines] = useState<LyricLine[]>([]);
 	const [trackLoaded, setTrackLoaded] = useState(false);
@@ -83,6 +86,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 	const updateAudioId = (id?: string) => {
 		setAudioId(id);
+	};
+
+	const updateProjectId = (id?: string) => {
+		setProjectId(id);
 	};
 
 	// check if all lyrics line timestamps are ascending order
@@ -359,6 +366,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 				toggleShowPreview,
 				audioId,
 				updateAudioId,
+				projectId,
+				updateProjectId,
 			}}
 		>
 			{children}

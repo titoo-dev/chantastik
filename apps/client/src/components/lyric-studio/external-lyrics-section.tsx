@@ -2,29 +2,20 @@ import { ArrowRightCircle, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useExternalLyricsSection } from '@/hooks/use-external-lyrics-section';
 
 export function ExternalLyricsSection() {
 	const {
 		externalLyrics,
-		setExternalLyrics,
-		addLinesFromExternal,
-		showExternalLyrics,
-		showPreview,
-	} = useAppContext();
+		handleConvertToLines,
+		handleTextareaChange,
+		handleTextareaFocus,
+		isConvertDisabled,
+		shouldRender,
+	} = useExternalLyricsSection();
 
-	const handleConvertToLines = () => {
-		// Split the text into lines and filter out empty lines
-		const lines = externalLyrics
-			.split('\n')
-			.map((line) => line.trim())
-			.filter((line) => line.length > 0);
-
-		addLinesFromExternal(lines);
-	};
-
-	if (!showExternalLyrics || showPreview) {
-		return null; // Don't render if external lyrics are not shown
+	if (!shouldRender) {
+		return null;
 	}
 
 	return (
@@ -39,7 +30,7 @@ export function ExternalLyricsSection() {
 					variant="outline"
 					size="sm"
 					className="gap-2"
-					disabled={!externalLyrics.trim()}
+					disabled={isConvertDisabled}
 					title="Create lyric lines from this text"
 				>
 					<ArrowRightCircle className="h-4 w-4" />
@@ -51,17 +42,8 @@ export function ExternalLyricsSection() {
 					placeholder="Paste lyrics here, one line per lyric..."
 					className="min-h-[200px] w-full resize-none border-muted text-foreground/90 focus:border-primary transition-colors scrollbar-hide overflow-hidden"
 					value={externalLyrics}
-					onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-						setExternalLyrics(e.target.value);
-						// Auto-resize the textarea
-						e.target.style.height = 'auto';
-						e.target.style.height = `${e.target.scrollHeight}px`;
-					}}
-					onFocus={(e) => {
-						// Ensure correct height on focus
-						e.target.style.height = 'auto';
-						e.target.style.height = `${e.target.scrollHeight}px`;
-					}}
+					onChange={handleTextareaChange}
+					onFocus={handleTextareaFocus}
 					spellCheck={false}
 				/>
 				<div className="mt-2 text-sm text-muted-foreground">

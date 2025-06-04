@@ -1,0 +1,49 @@
+import { useRef } from 'react';
+import { useGetProjects } from '@/hooks/use-get-projects';
+import { type Project } from '@/data/api';
+
+interface UseProjectDrawerProps {
+	onProjectSelected: (project: Project) => void;
+	onDeleteProject: (projectId: string) => void;
+}
+
+export const useProjectDrawer = ({
+	onProjectSelected,
+	onDeleteProject,
+}: UseProjectDrawerProps) => {
+	const closeRef = useRef<HTMLButtonElement>(null);
+
+	const {
+		data: projects,
+		isLoading,
+		error,
+	} = useGetProjects({ enabled: true });
+
+	const handleProjectSelect = (project: Project) => {
+		onProjectSelected(project);
+		closeRef.current?.click();
+	};
+
+	const handleProjectDelete = (projectId: string) => {
+		onDeleteProject(projectId);
+		closeRef.current?.click();
+	};
+
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric',
+		});
+	};
+
+	return {
+		projects,
+		isLoading,
+		error,
+		closeRef,
+		handleProjectSelect,
+		handleProjectDelete,
+		formatDate,
+	};
+};
