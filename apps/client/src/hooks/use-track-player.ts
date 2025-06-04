@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from './use-app-context';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,7 +15,6 @@ export function useTrackPlayer() {
 	const queryClient = useQueryClient();
 	const { audioRef, videoRef, setVideoTime, setTrackLoaded } =
 		useAppContext();
-	const playerRef = useRef<HTMLDivElement>(null);
 	const [waveBars] = useState(
 		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
 	);
@@ -172,7 +171,6 @@ export function useTrackPlayer() {
 	);
 
 	return {
-		playerRef,
 		audioState,
 		waveBars,
 		handlePlayPause,
