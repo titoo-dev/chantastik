@@ -76,55 +76,44 @@ export function useTrackPlayer() {
 				audio?.removeEventListener(event, handler);
 			});
 		};
-	}, [audioRef, videoRef, setVideoTime]);
-
-	const pauseVideo = () => {
-		if (videoRef.current) {
-			videoRef.current.pause();
-		}
-	};
+	}, [audioRef, videoRef]);
 
 	const handlePlayPause = () => {
-		if (audioRef.current) {
-			if (audioState.isPlaying) {
-				audioRef.current.pause();
-			} else {
-				setVideoTime(audioState.currentTime);
-				audioRef.current.play();
-			}
+		if (!audioRef.current) return;
+		if (audioState.isPlaying) {
+			audioRef.current.pause();
+		} else {
+			audioRef.current.play();
 		}
 	};
 
 	const handleTimeChange = (value: number[]) => {
+		if (!audioRef.current || !audioState.duration) return;
 		const newTime = value[0];
-		if (audioRef.current) {
-			audioRef.current.currentTime = newTime;
-			if (!audioState.isPlaying) {
-				audioRef.current.play();
-			}
+		audioRef.current.currentTime = newTime;
+		if (!audioState.isPlaying) {
+			audioRef.current.play();
 		}
 	};
 
 	const handleVolumeChange = (value: number[]) => {
+		if (!audioRef.current) return;
 		const newVolume = value[0];
-		if (audioRef.current) {
-			audioRef.current.volume = newVolume;
-			setAudioState((s) => ({ ...s, volume: newVolume }));
-		}
+		audioRef.current.volume = newVolume;
+		setAudioState((s) => ({ ...s, volume: newVolume }));
 	};
 
 	const handleMuteToggle = () => {
-		if (audioRef.current) {
-			audioRef.current.muted = !audioState.isMuted;
-			setAudioState((s) => ({ ...s, isMuted: !s.isMuted }));
-		}
+		if (!audioRef.current) return;
+		audioRef.current.muted = !audioState.isMuted;
+		setAudioState((s) => ({ ...s, isMuted: !s.isMuted }));
 	};
 
 	const handleWaveBarClick = (index: number) => {
-		if (audioRef.current && audioState.duration) {
-			const newTime = (index / waveBars.length) * audioState.duration;
-			audioRef.current.currentTime = newTime;
-		}
+		if (!audioRef.current || !audioState.duration || waveBars.length === 0)
+			return;
+		const newTime = (index / waveBars.length) * audioState.duration;
+		audioRef.current.currentTime = newTime;
 	};
 
 	// Hotkeys
@@ -140,10 +129,9 @@ export function useTrackPlayer() {
 	useHotkeys(
 		'arrowleft',
 		() => {
-			if (audioRef.current) {
-				const newTime = Math.max(0, audioState.currentTime - 10);
-				audioRef.current.currentTime = newTime;
-			}
+			if (!audioRef.current) return;
+			const newTime = Math.max(0, audioState.currentTime - 10);
+			audioRef.current.currentTime = newTime;
 		},
 		{ enableOnFormTags: false }
 	);
@@ -151,13 +139,12 @@ export function useTrackPlayer() {
 	useHotkeys(
 		'arrowright',
 		() => {
-			if (audioRef.current) {
-				const newTime = Math.min(
-					audioState.duration,
-					audioState.currentTime + 10
-				);
-				audioRef.current.currentTime = newTime;
-			}
+			if (!audioRef.current) return;
+			const newTime = Math.min(
+				audioState.duration,
+				audioState.currentTime + 10
+			);
+			audioRef.current.currentTime = newTime;
 		},
 		{ enableOnFormTags: false }
 	);
@@ -170,6 +157,5 @@ export function useTrackPlayer() {
 		handleVolumeChange,
 		handleMuteToggle,
 		handleWaveBarClick,
-		pauseVideo,
 	};
 }
