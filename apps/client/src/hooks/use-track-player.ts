@@ -20,7 +20,6 @@ export function useTrackPlayer() {
 
 	const { volume, position, duration, isPlaying, isMuted } = usePlayerStore(
 		useShallow((state) => ({
-			src: state.src,
 			volume: state.volume,
 			position: state.position,
 			currentTrackId: state.currentTrackId,
