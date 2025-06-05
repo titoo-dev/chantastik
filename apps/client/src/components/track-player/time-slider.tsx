@@ -8,7 +8,7 @@ export const TimeSlider = memo(() => {
 	return (
 		<div className="flex-1">
 			<Slider
-				value={[audioState.currentTime]}
+				value={[audioState.position]}
 				min={0}
 				max={audioState.duration || 100}
 				step={0.1}

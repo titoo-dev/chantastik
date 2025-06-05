@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { uploadAudioFile, notifications } from '@/data/api';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useAppStore } from '@/stores/app/store';
+import { useTrackUploadStore } from '@/stores/track-upload/store';
 
 interface UseFileUploadOptions {
 	onSuccess?: (data: any) => void;
@@ -8,13 +9,14 @@ interface UseFileUploadOptions {
 }
 
 export function useFileUpload(options?: UseFileUploadOptions) {
-	const { updateAudio, updateProjectId } = useAppContext();
+	const { updateProjectId } = useAppStore.getState();
+	const { setAudio } = useTrackUploadStore.getState();
 
 	const uploadMutation = useMutation({
 		mutationFn: uploadAudioFile,
 		onSuccess: (data) => {
 			notifications.uploadSuccess(data.message);
-			updateAudio(data.audioMetadata);
+			setAudio(data.audioMetadata);
 			updateProjectId(data.projectId);
 			options?.onSuccess?.(data);
 		},

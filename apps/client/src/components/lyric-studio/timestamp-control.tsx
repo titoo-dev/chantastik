@@ -1,6 +1,8 @@
 import { formatTimestamp } from '@/lib/utils';
 import { Button } from '../ui/button';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useAppStore } from '@/stores/app/store';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
+import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 
 // Component for the timestamp control
 interface TimestampControlProps {
@@ -16,13 +18,17 @@ export function TimestampControl({
 	canSetCurrentTime,
 	onSetCurrentTime,
 }: TimestampControlProps) {
-	const { jumpToLyricLine } = useAppContext();
+	const { audioRef } = useAudioRefContext();
+	const { videoRef } = useVideoRefContext();
+	const { jumpToLyricLine } = useAppStore.getState();
 
 	return (
 		<div className="flex items-center gap-2 rounded-lg border bg-background/50 backdrop-blur-sm p-2">
 			{timestamp !== undefined ? (
 				<Button
-					onClick={() => jumpToLyricLine(lineId)}
+					onClick={() =>
+						jumpToLyricLine({ id: lineId, audioRef, videoRef })
+					}
 					variant="ghost"
 					className="flex items-center gap-2 hover:bg-primary/10 rounded-sm px-2 py-2 transition-colors"
 					title="Jump to this timestamp"

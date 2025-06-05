@@ -2,15 +2,15 @@ import { Link } from '@tanstack/react-router';
 import { AudioWaveform, Search } from 'lucide-react';
 import { memo, useState } from 'react';
 import { ProjectsDrawer } from './project-drawer';
-import { useAppContext } from '@/hooks/use-app-context';
 import { type Project } from '@/data/api';
 import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import { Input } from './ui/input';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
+import { useTrackUploadStore } from '@/stores/track-upload/store';
 
 export const Header = memo(() => {
-	const { updateAudio } = useAppContext();
+	const { setAudio } = useTrackUploadStore.getState();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 	const deleteProjectMutation = useDeleteProject({
@@ -22,7 +22,7 @@ export const Header = memo(() => {
 
 	const handleProjectSelected = (project: Project) => {
 		console.log('Selected project:', project);
-		updateAudio({
+		setAudio({
 			id: project.audioId,
 		});
 	};

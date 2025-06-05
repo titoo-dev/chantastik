@@ -1,9 +1,21 @@
 import { useEffect, useState, useRef } from 'react';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useAudioRefContext } from './use-audio-ref-context';
+import { useAppStore } from '@/stores/app/store';
+import { useShallow } from 'zustand/react/shallow';
+import { useVideoRefContext } from './use-video-ref-context';
 
 export function useLyricsPreviewCard() {
-	const { audioRef, trackLoaded, jumpToLyricLine, lyricLines } =
-		useAppContext();
+	const { audioRef } = useAudioRefContext();
+	const { videoRef } = useVideoRefContext();
+
+	const { jumpToLyricLine } = useAppStore.getState();
+
+	const { lyricLines, trackLoaded } = useAppStore(
+		useShallow((state) => ({
+			lyricLines: state.lyricLines,
+			trackLoaded: state.trackLoaded,
+		}))
+	);
 
 	const [currentTime, setCurrentTime] = useState(0);
 	const [activeLyricId, setActiveLyricId] = useState<number | null>(null);
@@ -63,7 +75,11 @@ export function useLyricsPreviewCard() {
 	].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
 	const handleLyricClick = (lineId: number) => {
-		jumpToLyricLine(lineId);
+		jumpToLyricLine({
+			id: lineId,
+			audioRef,
+			videoRef,
+		});
 	};
 
 	return {

@@ -1,31 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
-import { preloadImage } from '@remotion/preload';
-import { useAppContext } from '@/hooks/use-app-context';
-import { getCoverArtUrl } from '@/data/api';
+import { useRef } from 'react';
 import { useGetAudio } from '@/hooks/use-get-audio';
 import { useFileUpload } from '@/hooks/use-file-upload';
+import { useTrackUploadStore } from '@/stores/track-upload/store';
+import { useAudioRefContext } from './use-audio-ref-context';
+import { useAppStore } from '@/stores/app/store';
+import { useVideoRefContext } from './use-video-ref-context';
 
 export function useTrackUpload() {
-	const [audioFile, setAudioFile] = useState<File | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
-	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-	const [isRetracted, setIsRetracted] = useState(false);
+	const { videoRef } = useVideoRefContext();
+	const { audioRef } = useAudioRefContext();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const {
-		setTrackLoaded,
-		audioRef,
-		resetAllStatesAndPlayers,
-		audio,
-		updateAudio,
-	} = useAppContext();
+	const { setTrackLoaded, resetAllStatesAndPlayers } = useAppStore.getState();
 
-	// Preload cover art when audio changes
-	useEffect(() => {
-		if (audio) {
-			preloadImage(getCoverArtUrl(audio.id));
-		}
-	}, [audio]);
+	// Use Zustand store for state management
+	const {
+		audioFile,
+		isDragging,
+		showConfirmDialog,
+		isRetracted,
+		audio,
+		isUploading,
+
+		setShowConfirmDialog,
+		handleFileChange,
+		handleDragEnter,
+		handleDragLeave,
+		handleDragOver,
+		handleDrop,
+		toggleRetracted,
+		reset,
+		setAudio,
+	} = useTrackUploadStore();
 
 	// Fetch audio metadata using TanStack Query
 	const { data: audioMetadata, isLoading: isLoadingAudioMetadata } =
@@ -34,76 +40,47 @@ export function useTrackUpload() {
 		});
 
 	// File upload mutation
-	const { uploadFile, isUploading, reset } = useFileUpload();
-
-	const handleFileChange = (file: File) => {
-		setAudioFile(file);
-		uploadFile(file);
-	};
+	const {
+		uploadFile,
+		isUploading: fileUploadLoading,
+		reset: resetFileUpload,
+	} = useFileUpload();
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			handleFileChange(file);
-		}
-	};
-
-	const handleDragEnter = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(true);
-	};
-
-	const handleDragLeave = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(false);
-	};
-
-	const handleDragOver = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		if (!isDragging) {
-			setIsDragging(true);
-		}
-	};
-
-	const handleDrop = (e: React.DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDragging(false);
-
-		const file = e.dataTransfer.files?.[0];
-		if (file && file.type.startsWith('audio/')) {
-			handleFileChange(file);
+			uploadFile(file);
 		}
 	};
 
 	const handleRemoveAudio = () => {
-		setAudioFile(null);
-		updateAudio(undefined);
-		if (audioRef.current) {
+		setAudio(undefined);
+		if (audioRef?.current) {
 			audioRef.current.pause();
 			audioRef.current.src = '';
+			audioRef.current.load();
+			audioRef.current.currentTime = 0;
+		}
+		if (videoRef?.current) {
+			videoRef.current.pause();
+			videoRef.current.seekTo(0);
 		}
 		setTrackLoaded(false);
 		resetAllStatesAndPlayers();
 		reset();
+		resetFileUpload();
 	};
 
 	const handleBrowseClick = () => {
 		fileInputRef.current?.click();
 	};
 
-	const toggleRetracted = () => {
-		setIsRetracted(!isRetracted);
-	};
-
 	const dragHandlers = {
 		onDragEnter: handleDragEnter,
 		onDragLeave: handleDragLeave,
 		onDragOver: handleDragOver,
-		onDrop: handleDrop,
+		onDrop: (e: React.DragEvent) => handleDrop(e, uploadFile),
 	};
 
 	return {
@@ -114,7 +91,7 @@ export function useTrackUpload() {
 		isRetracted,
 		audio,
 		audioMetadata,
-		isUploading,
+		isUploading: isUploading || fileUploadLoading,
 		isLoadingAudioMetadata,
 		fileInputRef,
 

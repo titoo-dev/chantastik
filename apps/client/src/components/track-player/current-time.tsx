@@ -7,7 +7,7 @@ export const CurrentTime = memo(() => {
 
 	return (
 		<div className="w-10 text-xs text-muted-foreground text-right">
-			{formatPlayerTime(audioState.currentTime)}
+			{formatPlayerTime(audioState.position)}
 		</div>
 	);
 });

@@ -1,6 +1,7 @@
-import { useAppContext } from '@/hooks/use-app-context';
 import { useUpdateProject } from '@/hooks/use-update-project';
+import { useAppStore } from '@/stores/app/store';
 import { createContext, useEffect, useRef, type ReactNode } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface UpdateProjectContextType {
 	isLoading: boolean;
@@ -22,7 +23,15 @@ interface UpdateProjectProviderProps {
 export function UpdateProjectProvider({
 	children,
 }: UpdateProjectProviderProps) {
-	const { lyricLines, isValidLyricLines, projectId } = useAppContext();
+	const { isValidLyricLines } = useAppStore.getState();
+
+	const { lyricLines, projectId } = useAppStore(
+		useShallow((state) => ({
+			lyricLines: state.lyricLines,
+			projectId: state.projectId,
+		}))
+	);
+
 	const intervalRef = useRef<number | null>(null);
 
 	const mutation = useUpdateProject();

@@ -1,23 +1,42 @@
-import { useAppContext } from '@/hooks/use-app-context';
 import { Card, CardContent } from '../ui/card';
 import { EmptyLyrics } from './empty-lyrics';
 import { LyricHeader } from './lyric-header';
 import { LyricList } from './lyric-list';
 import { memo } from 'react';
 import { Music } from 'lucide-react';
+import { useAppStore } from '@/stores/app/store';
+import { useShallow } from 'zustand/react/shallow';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 
 export const LyricEditor = memo(function LyricEditor() {
+	const { audioRef } = useAudioRefContext();
+
+	const { updateLyricLine, deleteLyricLine, addLyricLine } =
+		useAppStore.getState();
+
 	const {
 		lyricLines,
-		updateLyricLine,
-		deleteLyricLine,
-		setCurrentTimeAsTimestamp,
-		addLyricLine,
 		showPreview,
 		showExternalLyrics,
 		showVideoPreview,
 		trackLoaded,
-	} = useAppContext();
+	} = useAppStore(
+		useShallow((state) => ({
+			lyricLines: state.lyricLines,
+			showPreview: state.showPreview,
+			showExternalLyrics: state.showExternalLyrics,
+			showVideoPreview: state.showVideoPreview,
+			trackLoaded: state.trackLoaded,
+		}))
+	);
+
+	const setCurrentTimeAsTimestamp = (id: number) => {
+		if (audioRef?.current) {
+			const newTimestamp = audioRef.current.currentTime;
+			updateLyricLine(id, { timestamp: newTimestamp });
+		}
+	};
+
 	return (
 		<Card
 			className={`pt-0 shadow-none ${showPreview || showExternalLyrics || showVideoPreview ? 'col-span-1' : 'col-span-2'}`}
@@ -47,7 +66,11 @@ export const LyricEditor = memo(function LyricEditor() {
 						onUpdateLine={updateLyricLine}
 						onDeleteLine={deleteLyricLine}
 						onSetCurrentTime={setCurrentTimeAsTimestamp}
-						onAddLine={() => addLyricLine()}
+						onAddLine={() =>
+							addLyricLine({
+								audioRef,
+							})
+						}
 					/>
 				)}
 			</CardContent>

@@ -1,28 +1,41 @@
 import { PlayCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { useAppContext } from '@/hooks/use-app-context';
 import { parseLyrics } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { useCallback, useEffect, useMemo } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
 import { getCoverArtUrl } from '@/data/api';
+import { useAppStore } from '@/stores/app/store';
+import { useVideoRefContext } from '@/hooks/use-video-ref-context';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
+import { useShallow } from 'zustand/react/shallow';
+import { useTrackUploadStore } from '@/stores/track-upload/store';
 
 export const LyricsPlayer = () => {
-	const {
-		showVideoPreview,
-		lyricLines,
-		videoRef,
-		audioRef,
-		setVideoTime,
-		showPreview,
-		showExternalLyrics,
-		audio,
-	} = useAppContext();
+	const { audioRef } = useAudioRefContext();
+	const { videoRef } = useVideoRefContext();
+
+	const { lyricLines, showVideoPreview, showExternalLyrics, showPreview } =
+		useAppStore(
+			useShallow((state) => ({
+				lyricLines: state.lyricLines,
+				showVideoPreview: state.showVideoPreview,
+				showExternalLyrics: state.showExternalLyrics,
+				showPreview: state.showPreview,
+			}))
+		);
+
+	const audio = useTrackUploadStore((state) => state.audio);
+
+	const { setVideoTime } = useAppStore.getState();
 
 	useEffect(() => {
 		if (audioRef.current) {
-			setVideoTime(audioRef.current.currentTime);
+			setVideoTime({
+				timestamp: audioRef.current.currentTime,
+				videoRef: videoRef,
+			});
 		}
 	}, [showVideoPreview]);
 

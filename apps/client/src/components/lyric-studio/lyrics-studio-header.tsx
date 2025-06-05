@@ -1,22 +1,34 @@
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Eye, FileText } from 'lucide-react';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useAppStore } from '@/stores/app/store';
+import { useShallow } from 'zustand/react/shallow';
 
 export const LyricStudioHeader = memo(() => {
 	const {
-		showPreview,
-		setShowPreview,
-		isValidLyricLines,
-		lyricLines,
-		showExternalLyrics,
 		areLyricLinesWithoutTimestamps,
 		handleDownload,
-		trackLoaded,
 		toggleShowExternalLyrics,
-		showVideoPreview,
+		setShowPreview,
 		toggleShowVideoPreview,
-	} = useAppContext();
+		isValidLyricLines,
+	} = useAppStore.getState();
+
+	const {
+		showPreview,
+		showVideoPreview,
+		lyricLines,
+		showExternalLyrics,
+		trackLoaded,
+	} = useAppStore(
+		useShallow((state) => ({
+			showPreview: state.showPreview,
+			showVideoPreview: state.showVideoPreview,
+			lyricLines: state.lyricLines,
+			showExternalLyrics: state.showExternalLyrics,
+			trackLoaded: state.trackLoaded,
+		}))
+	);
 
 	return (
 		<div className="mb-6 space-y-4">

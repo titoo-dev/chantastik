@@ -1,13 +1,16 @@
-import { useAppContext } from './use-app-context';
+import { useAppStore } from '@/stores/app/store';
+import { useShallow } from 'zustand/react/shallow';
 
 export function useExternalLyricsSection() {
-	const {
-		externalLyrics,
-		setExternalLyrics,
-		addLinesFromExternal,
-		showExternalLyrics,
-		showPreview,
-	} = useAppContext();
+	const { addLinesFromExternal, setExternalLyrics } = useAppStore.getState();
+
+	const { externalLyrics, showExternalLyrics, showPreview } = useAppStore(
+		useShallow((state) => ({
+			externalLyrics: state.externalLyrics,
+			showExternalLyrics: state.showExternalLyrics,
+			showPreview: state.showPreview,
+		}))
+	);
 
 	const handleConvertToLines = () => {
 		// Split the text into lines and filter out empty lines

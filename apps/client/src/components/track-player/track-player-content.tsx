@@ -1,6 +1,6 @@
-import { useAppContext } from '@/hooks/use-app-context';
 import { TrackHeader } from './track-header';
 import { TrackPlayerMain } from './track-player-main';
+import { Audio } from '@/components/audio';
 
 export function TrackPlayerContent({
 	title,
@@ -17,8 +17,6 @@ export function TrackPlayerContent({
 	showDownload: boolean;
 	coverArt: string;
 }) {
-	const { audioRef } = useAppContext();
-
 	return (
 		<div className="flex flex-col gap-6">
 			<TrackHeader
@@ -29,7 +27,7 @@ export function TrackPlayerContent({
 				showDownload={showDownload}
 			/>
 			<TrackPlayerMain coverArt={coverArt} title={title} />
-			<audio ref={audioRef} src={src} className="hidden" />
+			<Audio />
 		</div>
 	);
 }

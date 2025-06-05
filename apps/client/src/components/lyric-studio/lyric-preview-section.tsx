@@ -1,11 +1,17 @@
 import { Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
-import { useAppContext } from '@/hooks/use-app-context';
+import { useShallow } from 'zustand/react/shallow';
+import { useAppStore } from '@/stores/app/store';
 
 export function LyricPreviewSection() {
-	const { showPreview, showExternalLyrics, showVideoPreview } =
-		useAppContext();
+	const { showPreview, showExternalLyrics, showVideoPreview } = useAppStore(
+		useShallow((state) => ({
+			showPreview: state.showPreview,
+			showExternalLyrics: state.showExternalLyrics,
+			showVideoPreview: state.showVideoPreview,
+		}))
+	);
 
 	if (!showPreview || showExternalLyrics || showVideoPreview) {
 		return null; // Don't render if preview is not shown or external lyrics are visible

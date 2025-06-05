@@ -13,8 +13,7 @@ export const Waveform = () => {
 						'h-full w-full transition-all duration-300 hover:opacity-70 cursor-pointer',
 						index <
 							waveBars.length *
-								(audioState.currentTime / audioState.duration ||
-									0)
+								(audioState.position / audioState.duration || 0)
 							? 'bg-primary'
 							: 'bg-muted'
 					)}
@@ -25,7 +24,7 @@ export const Waveform = () => {
 							index ===
 								Math.floor(
 									waveBars.length *
-										(audioState.currentTime /
+										(audioState.position /
 											audioState.duration || 0)
 								)
 								? '0.8'

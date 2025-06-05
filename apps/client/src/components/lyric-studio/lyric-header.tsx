@@ -2,13 +2,14 @@ import { CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { ArrowUpFromLine, Music } from 'lucide-react';
 import { memo, useRef } from 'react';
-import { useAppContext } from '@/hooks/use-app-context';
 import { toast } from 'sonner';
 import type { LyricLine } from './lyric-line-item';
+import { useAppStore } from '@/stores/app/store';
 
 export const LyricHeader = memo(function LyricHeader() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const { setLyricLines, trackLoaded } = useAppContext();
+	const trackLoaded = useAppStore((state) => state.trackLoaded);
+	const { setLyricLines } = useAppStore.getState();
 
 	const loadFromLrcFile = () => {
 		if (fileInputRef.current) {
