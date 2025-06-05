@@ -1,10 +1,10 @@
 import { MoveDiagonal, Music, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TrackPlayer } from './track-player';
 import { Button } from './ui/button';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 import { useTrackUpload } from '@/hooks/use-track-upload';
+import { TrackPlayer } from './track-player';
 
 interface TrackUploadWrapperProps {
 	iconColor?: string;
