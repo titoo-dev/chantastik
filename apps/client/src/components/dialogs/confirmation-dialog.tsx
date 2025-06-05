@@ -90,12 +90,18 @@ export const createDeleteConfirmationDialog = (props: {
 	onCancel?: () => void;
 	isLoading?: boolean;
 	itemName?: string;
+	title?: string;
+	description?: string;
+	confirmText?: string;
 }) => (
 	<ConfirmationDialog
 		{...props}
-		title={`Delete ${props.itemName || 'item'}?`}
-		description="This action cannot be undone. This will permanently delete the item and all associated data."
-		confirmText="Delete"
+		title={props.title || `Delete ${props.itemName || 'item'}?`}
+		description={
+			props.description ||
+			'This action cannot be undone. This will permanently delete the item and all associated data.'
+		}
+		confirmText={props.confirmText || 'Delete'}
 		cancelText="Cancel"
 		loadingText="Deleting..."
 		variant="destructive"

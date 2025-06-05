@@ -212,8 +212,10 @@ export function TrackUploadWrapper({
 					open: showConfirmDialog,
 					onOpenChange: setShowConfirmDialog,
 					onConfirm: handleRemoveAudio,
-					itemName: 'track',
 					isLoading: false,
+					title: 'Remove Track',
+					description: 'Are you sure you want to remove this track?',
+					confirmText: 'Remove',
 				})}
 			</div>
 		</>
