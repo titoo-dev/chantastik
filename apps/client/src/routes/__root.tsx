@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/context/theme-context';
 import { WithColorFlow } from '@/components/with-color-flow';
 import { AudioRefProvider } from '@/context/audio-ref-context';
 import { VideoRefProvider } from '@/context/video-ref-context';
+import { Audio } from '@/components/audio';
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -23,6 +24,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 							<>
 								<Outlet />
 								<Toaster />
+								<Audio />
 							</>
 						</main>
 					</WithColorFlow>

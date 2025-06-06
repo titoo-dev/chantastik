@@ -20,19 +20,24 @@ export interface PlayerStateActions {
 	setVolume: (volume: number) => void;
 	setMuted: (muted: boolean) => void;
 	setCurrentTrackId?: (id: string) => void;
+	reset: () => void;
 }
 
 export type PlayerState = PlayerStateProperties & PlayerStateActions;
 
+const initialState: PlayerStateProperties = {
+	duration: 1,
+	position: 0,
+	volume: 1,
+	muted: false,
+	isPlaying: false,
+	currentTrackId: undefined,
+};
+
 export const usePlayerStore = create<PlayerState>()(
 	devtools(
 		(set) => ({
-			duration: 1,
-			position: 0,
-			volume: 1,
-			muted: false,
-			isPlaying: false,
-			currentTrackId: undefined,
+			...initialState,
 
 			setMuted(muted) {
 				set({ muted });
@@ -50,6 +55,7 @@ export const usePlayerStore = create<PlayerState>()(
 			play: () => set({ isPlaying: true }),
 			pause: () => set({ isPlaying: false }),
 			toggle: () => set((state) => ({ isPlaying: !state.isPlaying })),
+			reset: () => set(initialState),
 		}),
 		{
 			name: 'player-state',

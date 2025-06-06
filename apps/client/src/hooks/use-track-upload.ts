@@ -5,6 +5,7 @@ import { useTrackUploadStore } from '@/stores/track-upload/store';
 import { useAudioRefContext } from './use-audio-ref-context';
 import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from './use-video-ref-context';
+import { usePlayerStore } from '@/stores/player/store';
 
 export function useTrackUpload() {
 	const { videoRef } = useVideoRefContext();
@@ -12,6 +13,7 @@ export function useTrackUpload() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const { setTrackLoaded, resetAllStatesAndPlayers } = useAppStore.getState();
+	const { reset: resetAudioPlayer } = usePlayerStore.getState();
 
 	// Use Zustand store for state management
 	const {
@@ -70,6 +72,7 @@ export function useTrackUpload() {
 		resetAllStatesAndPlayers();
 		reset();
 		resetFileUpload();
+		resetAudioPlayer();
 	};
 
 	const handleBrowseClick = () => {
