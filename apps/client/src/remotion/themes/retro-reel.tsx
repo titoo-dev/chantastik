@@ -8,8 +8,8 @@ import {
 	Audio,
 	Img,
 } from 'remotion';
-import type { LyricsProps } from './schema';
 import { useColorFlow } from '@/hooks/use-color-flow';
+import type { LyricsProps } from '../schema';
 
 // Default color palette to use if no theme is available
 const DEFAULT_COLORS = {
@@ -32,17 +32,16 @@ const DEFAULT_COLORS = {
 	error: '#ba1a1a',
 };
 
-export const MyComposition: React.FC<LyricsProps> = ({
+export const RetroReel: React.FC<LyricsProps> = ({
 	lyrics,
 	fontFamily = 'Inter, system-ui, sans-serif',
 	backgroundColor = 'var(--background)',
 	textColor = 'var(--foreground)',
-	highlightColor = 'var(--primary)',
 	backgroundImage,
 	audioSrc,
 }) => {
 	const frame = useCurrentFrame();
-	const { fps, width, height } = useVideoConfig();
+	const { fps } = useVideoConfig();
 
 	// Use the color flow hook instead of local implementation
 	const theme = useColorFlow();
@@ -75,24 +74,11 @@ export const MyComposition: React.FC<LyricsProps> = ({
 	// Dynamic color assignments
 	const dynBackgroundColor = theme ? colors.background : backgroundColor;
 	const dynTextColor = theme ? colors.onSurface : textColor;
-	const dynHighlightColor = theme ? colors.primary : highlightColor;
 
 	// Find the current lyric
 	const currentLyricIndex = lyrics.findIndex(
 		(l) => frame >= l.startFrame && frame <= l.endFrame
 	);
-
-	// Generate deterministic random positions based on lyric index
-	const getRandomPosition = (index: number) => {
-		const seed = index * 12345;
-		const pseudoRand1 = (seed * 9301 + 49297) % 233280;
-		const pseudoRand2 = (seed * 7919 + 31337) % 233280;
-
-		return {
-			x: (pseudoRand1 / 233280) * 0.6 + 0.2, // 20% to 80% of width
-			y: (pseudoRand2 / 233280) * 0.4 + 0.3, // 30% to 70% of height
-		};
-	};
 
 	// Parallax effect for background
 	const parallaxOffset = interpolate(
@@ -111,9 +97,6 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		const progress =
 			(frame - currentLyric.startFrame) /
 			(currentLyric.endFrame - currentLyric.startFrame);
-
-		// Get random position for current lyric
-		const position = getRandomPosition(currentLyricIndex);
 
 		// Enhanced spring animation with vintage feel
 		const entrance = spring({
@@ -155,13 +138,13 @@ export const MyComposition: React.FC<LyricsProps> = ({
 
 		return (
 			<>
-				{/* Current lyric with random positioning and vintage animations */}
+				{/* Current lyric centered */}
 				<div
 					style={{
 						position: 'absolute',
 						opacity,
-						left: `${position.x * 100}%`,
-						top: `${position.y * 100}%`,
+						left: '50%',
+						top: '50%',
 						transform: `translate(-50%, -50%) translateY(${floatY}px) scale(${scale}) rotate(${rotation}deg)`,
 						textAlign: 'center',
 						zIndex: 10,
@@ -215,7 +198,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						style={{
 							position: 'absolute',
 							opacity: 0.25,
-							bottom: '15%',
+							bottom: '2%',
 							left: '50%',
 							transform: 'translateX(-50%)',
 							textAlign: 'center',
@@ -241,11 +224,6 @@ export const MyComposition: React.FC<LyricsProps> = ({
 			</>
 		);
 	};
-
-	// Get accent colors from dynamic theme or fall back to CSS variables
-	const accentColor1 = theme ? colors.primary : 'var(--chart-1)';
-	const accentColor2 = theme ? colors.tertiary : 'var(--chart-2)';
-	const accentColor3 = theme ? colors.secondary : 'var(--chart-4)';
 
 	return (
 		<AbsoluteFill
@@ -306,9 +284,9 @@ export const MyComposition: React.FC<LyricsProps> = ({
 					position: 'absolute',
 					inset: 0,
 					backgroundImage: `
-						radial-gradient(circle at ${25 + (frame % 50)}% ${30 + (frame % 30)}%, rgba(255,255,255,0.1) 1px, transparent 1px),
-						radial-gradient(circle at ${75 - (frame % 40)}% ${70 - (frame % 35)}%, rgba(255,255,255,0.05) 1px, transparent 1px)
-					`,
+                        radial-gradient(circle at ${25 + (frame % 50)}% ${30 + (frame % 30)}%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                        radial-gradient(circle at ${75 - (frame % 40)}% ${70 - (frame % 35)}%, rgba(255,255,255,0.05) 1px, transparent 1px)
+                    `,
 					backgroundSize: '100px 100px, 150px 150px',
 					opacity: 0.3,
 				}}
