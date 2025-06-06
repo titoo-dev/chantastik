@@ -59,7 +59,7 @@ export function TrackUploadWrapper({
 					initial={false}
 					animate={
 						isRetracted
-							? { y: -100, opacity: 0, scale: 0.95 }
+							? { y: 100, opacity: 0, scale: 0.95 }
 							: { y: 0, opacity: 1, scale: 1 }
 					}
 					transition={{

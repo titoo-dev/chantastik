@@ -50,6 +50,14 @@ export const Audio = memo(() => {
 		}
 	}, [audio?.id]);
 
+	const setVideoTime = (timestamp: number) => {
+		if (videoRef.current) {
+			const fps = 30; // Using the same FPS as in Root.tsx
+			const frame = Math.floor(timestamp * fps);
+			videoRef.current.seekTo(frame);
+		}
+	};
+
 	const onTimeUpdate: ReactEventHandler<HTMLAudioElement> = (event) => {
 		const audioElement = event.target as HTMLAudioElement;
 		setPosition(audioElement.currentTime);
@@ -94,6 +102,19 @@ export const Audio = memo(() => {
 		updateNavigatorMetadata();
 	};
 
+	// on seek
+	const onSeek: ReactEventHandler<HTMLAudioElement> = useCallback(
+		(event) => {
+			const audioElement = event.target as HTMLAudioElement;
+			setPosition(audioElement.currentTime);
+			setVideoTime(audioElement.currentTime);
+			if (!audioElement.paused) {
+				videoRef.current?.play();
+			}
+		},
+		[setPosition, setVideoTime]
+	);
+
 	useEffect(() => {
 		const typedRef = audioRef;
 
@@ -123,14 +144,6 @@ export const Audio = memo(() => {
 			audioRef.current.pause();
 		} else {
 			audioRef.current.play();
-		}
-	};
-
-	const setVideoTime = (timestamp: number) => {
-		if (videoRef.current) {
-			const fps = 30; // Using the same FPS as in Root.tsx
-			const frame = Math.floor(timestamp * fps);
-			videoRef.current.seekTo(frame);
 		}
 	};
 
@@ -172,6 +185,7 @@ export const Audio = memo(() => {
 			onPause={onPause}
 			onEnded={onEnded}
 			onError={onError}
+			onSeeked={onSeek}
 			title={audio?.metadata?.title}
 			onTimeUpdate={onTimeUpdate}
 			onLoadedMetadata={onLoadedMetadata}
