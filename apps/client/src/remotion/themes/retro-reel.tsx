@@ -41,7 +41,11 @@ export const RetroReel: React.FC<LyricsProps> = ({
 	audioSrc,
 }) => {
 	const frame = useCurrentFrame();
-	const { fps } = useVideoConfig();
+	const { fps, width, height } = useVideoConfig();
+
+	// Determine aspect ratio
+	const aspectRatio = width / height;
+	const isVertical = aspectRatio < 1; // Vertical if width < height
 
 	// Use the color flow hook instead of local implementation
 	const theme = useColorFlow();
@@ -87,6 +91,47 @@ export const RetroReel: React.FC<LyricsProps> = ({
 		[-10, 10]
 	);
 
+	// Responsive sizing based on aspect ratio
+	const getResponsiveStyles = () => {
+		if (isVertical) {
+			// Vertical (TikTok) format
+			return {
+				currentLyric: {
+					fontSize: '2.5rem',
+					padding: '1.5rem 2rem',
+					maxWidth: '90%',
+					minWidth: '250px',
+					top: '60%', // Lower position for vertical
+				},
+				nextLyric: {
+					fontSize: '1.5rem',
+					bottom: '10%',
+					width: '85%',
+					padding: '0.8rem',
+				},
+			};
+		} else {
+			// Horizontal (YouTube) format
+			return {
+				currentLyric: {
+					fontSize: '3.5rem',
+					padding: '2rem 3rem',
+					maxWidth: '800px',
+					minWidth: '300px',
+					top: '50%', // Centered for horizontal
+				},
+				nextLyric: {
+					fontSize: '2rem',
+					bottom: '2%',
+					width: '80%',
+					padding: '1rem',
+				},
+			};
+		}
+	};
+
+	const responsiveStyles = getResponsiveStyles();
+
 	const renderLyrics = () => {
 		if (currentLyricIndex === -1) return null;
 
@@ -129,22 +174,23 @@ export const RetroReel: React.FC<LyricsProps> = ({
 
 		const rotation = interpolate(entrance, [0, 1], [-5, 0]);
 
-		// Subtle floating animation
+		// Subtle floating animation - reduced for vertical format
+		const floatIntensity = isVertical ? 4 : 8;
 		const floatY = interpolate(
 			Math.sin((frame + currentLyricIndex * 30) / 25),
 			[-1, 1],
-			[-8, 8]
+			[-floatIntensity, floatIntensity]
 		);
 
 		return (
 			<>
-				{/* Current lyric centered */}
+				{/* Current lyric positioned based on aspect ratio */}
 				<div
 					style={{
 						position: 'absolute',
 						opacity,
 						left: '50%',
-						top: '50%',
+						top: responsiveStyles.currentLyric.top,
 						transform: `translate(-50%, -50%) translateY(${floatY}px) scale(${scale}) rotate(${rotation}deg)`,
 						textAlign: 'center',
 						zIndex: 10,
@@ -152,14 +198,14 @@ export const RetroReel: React.FC<LyricsProps> = ({
 				>
 					<p
 						style={{
-							fontSize: '3.5rem',
+							fontSize: responsiveStyles.currentLyric.fontSize,
 							fontWeight: 800,
-							lineHeight: 1.1,
+							lineHeight: isVertical ? 1.2 : 1.1,
 							color: dynTextColor,
 							letterSpacing: '-0.03em',
 							margin: 0,
-							padding: '2rem 3rem',
-							borderRadius: '1.5rem',
+							padding: responsiveStyles.currentLyric.padding,
+							borderRadius: isVertical ? '1rem' : '1.5rem',
 							background: theme
 								? `linear-gradient(135deg, ${colors.surface}90, ${colors.surfaceVariant}80)`
 								: 'rgba(0,0,0,0.7)',
@@ -171,8 +217,8 @@ export const RetroReel: React.FC<LyricsProps> = ({
 								? `0 20px 40px ${colors.background}60, inset 0 1px 0 ${colors.onSurface}20`
 								: '0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
 							textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-							maxWidth: '800px',
-							minWidth: '300px',
+							maxWidth: responsiveStyles.currentLyric.maxWidth,
+							minWidth: responsiveStyles.currentLyric.minWidth,
 						}}
 					>
 						<span
@@ -192,26 +238,26 @@ export const RetroReel: React.FC<LyricsProps> = ({
 					</p>
 				</div>
 
-				{/* Next lyric with subtle preview */}
+				{/* Next lyric with aspect ratio specific positioning */}
 				{nextLyric && (
 					<p
 						style={{
 							position: 'absolute',
 							opacity: 0.25,
-							bottom: '2%',
+							bottom: responsiveStyles.nextLyric.bottom,
 							left: '50%',
 							transform: 'translateX(-50%)',
 							textAlign: 'center',
-							fontSize: '2rem',
+							fontSize: responsiveStyles.nextLyric.fontSize,
 							fontWeight: 400,
-							lineHeight: 1.3,
+							lineHeight: isVertical ? 1.4 : 1.3,
 							color: dynTextColor,
 							letterSpacing: '-0.01em',
-							width: '80%',
-							maxWidth: '900px',
+							width: responsiveStyles.nextLyric.width,
+							maxWidth: isVertical ? '350px' : '900px',
 							margin: 0,
-							padding: '1rem',
-							borderRadius: '0.75rem',
+							padding: responsiveStyles.nextLyric.padding,
+							borderRadius: isVertical ? '0.5rem' : '0.75rem',
 							background: theme
 								? `${colors.surface}40`
 								: 'rgba(255,255,255,0.1)',
