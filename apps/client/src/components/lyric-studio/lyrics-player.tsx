@@ -44,10 +44,20 @@ export const LyricsPlayer = () => {
 	}, [lyricLines])();
 
 	const totalFrames = useMemo(() => {
-		return lyricsData.length > 0
-			? lyricsData[lyricsData.length - 1].endFrame + 30
-			: 0;
-	}, [lyricsData]);
+		if (lyricsData.length === 0) return 0;
+
+		// Get audio duration in seconds
+		const audioDuration = audioRef.current?.duration || 0;
+
+		// Calculate frames based on audio duration (assuming 30 FPS)
+		const audioFrames = Math.ceil(audioDuration * 30);
+
+		// Get last lyric end frame
+		const lastLyricFrame = lyricsData[lyricsData.length - 1].endFrame;
+
+		// Use the maximum between audio duration and last lyric frame, plus buffer
+		return Math.max(audioFrames, lastLyricFrame) + 30;
+	}, [lyricsData, audioRef.current?.duration]);
 
 	const inputProps = useMemo(() => {
 		return {

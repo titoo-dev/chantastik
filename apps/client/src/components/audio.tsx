@@ -84,6 +84,9 @@ export const Audio = memo(() => {
 	};
 
 	const onEnded: ReactEventHandler<HTMLAudioElement> = () => {
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+		}
 		setPosition(0);
 		setIsPlaying(false);
 		videoRef.current?.pause();
