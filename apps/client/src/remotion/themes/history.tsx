@@ -94,10 +94,6 @@ export const MalagasyHistoryComposition: React.FC<LyricsProps> = ({
 		const currentLyric = lyrics[currentLyricIndex];
 		const nextLyric = lyrics[currentLyricIndex + 1];
 
-		const progress =
-			(frame - currentLyric.startFrame) /
-			(currentLyric.endFrame - currentLyric.startFrame);
-
 		// Smooth entrance animation respecting reduced motion
 		const entrance = spring({
 			frame: frame - currentLyric.startFrame,
