@@ -82,25 +82,6 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		(l) => frame >= l.startFrame && frame <= l.endFrame
 	);
 
-	// Generate deterministic random positions based on lyric index
-	const getRandomPosition = (index: number) => {
-		const seed = index * 12345;
-		const pseudoRand1 = (seed * 9301 + 49297) % 233280;
-		const pseudoRand2 = (seed * 7919 + 31337) % 233280;
-
-		return {
-			x: (pseudoRand1 / 233280) * 0.6 + 0.2, // 20% to 80% of width
-			y: (pseudoRand2 / 233280) * 0.4 + 0.3, // 30% to 70% of height
-		};
-	};
-
-	// Parallax effect for background
-	const parallaxOffset = interpolate(
-		Math.sin(frame / 120),
-		[-1, 1],
-		[-10, 10]
-	);
-
 	const renderLyrics = () => {
 		if (currentLyricIndex === -1) return null;
 
@@ -112,130 +93,95 @@ export const MyComposition: React.FC<LyricsProps> = ({
 			(frame - currentLyric.startFrame) /
 			(currentLyric.endFrame - currentLyric.startFrame);
 
-		// Get random position for current lyric
-		const position = getRandomPosition(currentLyricIndex);
-
-		// Enhanced spring animation with vintage feel
+		// Modern entrance animation with spring physics
 		const entrance = spring({
 			frame: frame - currentLyric.startFrame,
 			fps,
 			config: {
-				damping: 12,
-				mass: 1.2,
-				stiffness: 100,
+				damping: 16,
+				mass: 0.9,
+				stiffness: 150,
 			},
 		});
 
-		// Smooth fade out animation
-		const exitStart = 0.8;
-		const fadeOut =
+		// Smooth exit animation
+		const exitStart = 0.85;
+		const exitOpacity =
 			progress > exitStart
-				? interpolate(progress, [exitStart, 1], [1, 0], {
-						easing: (t) => 1 - Math.pow(1 - t, 3),
-					})
+				? interpolate(progress, [exitStart, 1], [1, 0])
 				: 1;
 
-		// Combined opacity with subtle pulsing
-		const pulse = interpolate(Math.sin(frame / 15), [-1, 1], [0.9, 1]);
-		const opacity = entrance * fadeOut * pulse;
+		// Combined opacity
+		const opacity = entrance * exitOpacity;
 
-		// Dynamic scale and rotation for vintage feel
-		const scale = interpolate(entrance, [0, 1], [0.7, 1], {
-			easing: (t) => 1 - Math.pow(1 - t, 2),
-		});
-
-		const rotation = interpolate(entrance, [0, 1], [-5, 0]);
-
-		// Subtle floating animation
-		const floatY = interpolate(
-			Math.sin((frame + currentLyricIndex * 30) / 25),
-			[-1, 1],
-			[-8, 8]
-		);
+		// Subtle entrance transform
+		const translateY = interpolate(entrance, [0, 1], [25, 0]);
+		const scale = interpolate(entrance, [0, 1], [0.92, 1]);
 
 		return (
 			<>
-				{/* Current lyric with random positioning and vintage animations */}
-				<div
+				{/* Current lyric with shadcn-inspired styling */}
+				<p
 					style={{
 						position: 'absolute',
 						opacity,
-						left: `${position.x * 100}%`,
-						top: `${position.y * 100}%`,
-						transform: `translate(-50%, -50%) translateY(${floatY}px) scale(${scale}) rotate(${rotation}deg)`,
+						bottom: '30%',
+						left: '50%',
+						transform: `translateX(-50%) translateY(${translateY}px) scale(${scale})`,
 						textAlign: 'center',
-						zIndex: 10,
+						fontSize: '4rem',
+						fontWeight: 700,
+						lineHeight: 1.2,
+						color: dynTextColor,
+						letterSpacing: '-0.02em',
+						width: '90%',
+						maxWidth: '1200px',
+						textShadow: theme
+							? `0 2px 10px ${colors.background}80`
+							: `0 2px 8px rgba(0,0,0,0.15)`,
+						margin: 0,
+						padding: '1.5rem',
+						borderRadius: '1rem',
 					}}
 				>
-					<p
+					<span
 						style={{
-							fontSize: '3.5rem',
+							color: dynHighlightColor,
 							fontWeight: 800,
-							lineHeight: 1.1,
-							color: dynTextColor,
-							letterSpacing: '-0.03em',
-							margin: 0,
-							padding: '2rem 3rem',
-							borderRadius: '1.5rem',
-							background: theme
-								? `linear-gradient(135deg, ${colors.surface}90, ${colors.surfaceVariant}80)`
-								: 'rgba(0,0,0,0.7)',
-							backdropFilter: 'blur(20px)',
-							border: theme
-								? `2px solid ${colors.primary}40`
-								: '2px solid rgba(255,255,255,0.2)',
-							boxShadow: theme
-								? `0 20px 40px ${colors.background}60, inset 0 1px 0 ${colors.onSurface}20`
-								: '0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-							textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-							maxWidth: '800px',
-							minWidth: '300px',
+							position: 'relative',
+							display: 'inline-block',
+							zIndex: 1,
+							textDecoration: theme
+								? `underline 4px ${colors.primary}80`
+								: 'none',
+							textUnderlineOffset: '8px',
+							paddingBottom: '4px',
 						}}
 					>
-						<span
-							style={{
-								background: theme
-									? `linear-gradient(135deg, ${colors.primary}, ${colors.tertiary})`
-									: 'linear-gradient(135deg, var(--primary), var(--accent))',
-								backgroundClip: 'text',
-								WebkitBackgroundClip: 'text',
-								color: 'transparent',
-								position: 'relative',
-								display: 'inline-block',
-							}}
-						>
-							{currentLyric.text}
-						</span>
-					</p>
-				</div>
-
-				{/* Next lyric with subtle preview */}
+						{currentLyric.text}
+					</span>
+				</p>
+				{/* Next lyric with low opacity */}
 				{nextLyric && (
 					<p
 						style={{
 							position: 'absolute',
-							opacity: 0.25,
-							bottom: '15%',
+							opacity: 0.3, // Low opacity for next line
+							bottom: '20%', // Below the current lyric
 							left: '50%',
 							transform: 'translateX(-50%)',
 							textAlign: 'center',
-							fontSize: '2rem',
-							fontWeight: 400,
-							lineHeight: 1.3,
+							fontSize: '2.5rem', // Smaller than current lyric
+							fontWeight: 500,
+							lineHeight: 1.2,
 							color: dynTextColor,
-							letterSpacing: '-0.01em',
-							width: '80%',
-							maxWidth: '900px',
+							letterSpacing: '-0.02em',
+							width: '90%',
+							maxWidth: '1200px',
 							margin: 0,
-							padding: '1rem',
-							borderRadius: '0.75rem',
-							background: theme
-								? `${colors.surface}40`
-								: 'rgba(255,255,255,0.1)',
-							backdropFilter: 'blur(10px)',
 						}}
 					>
-						{nextLyric.text}
+						<span>{nextLyric.text}</span>
 					</p>
 				)}
 			</>
@@ -255,76 +201,119 @@ export const MyComposition: React.FC<LyricsProps> = ({
 				overflow: 'hidden',
 			}}
 		>
-			{/* Background image with parallax effect */}
+			{/* Background image with minimal movement */}
 			{backgroundImage && (
-				<div
+				<Img
+					src={backgroundImage}
+					alt="Background"
 					style={{
-						position: 'absolute',
-						width: '110%',
-						height: '110%',
-						left: '-5%',
-						top: '-5%',
-						transform: `translate(${parallaxOffset}px, ${parallaxOffset * 0.7}px) scale(1.1)`,
+						width: '100%',
+						height: '100%',
+						objectFit: 'cover',
+						objectPosition: 'center',
+						filter: 'brightness(0.9)',
 					}}
-				>
-					<Img
-						src={backgroundImage}
-						alt="Background"
-						style={{
-							width: '100%',
-							height: '100%',
-							objectFit: 'cover',
-							objectPosition: 'center',
-							filter: 'brightness(0.7) contrast(1.1) sepia(0.1)',
-						}}
-						pauseWhenLoading
-						onError={(e) => {
-							console.error('Error loading image:', e);
-							e.currentTarget.src =
-								'https://example.com/default-image.jpg';
-						}}
-					/>
-				</div>
+					pauseWhenLoading
+					onError={(e) => {
+						console.error('Error loading image:', e);
+						// Fallback to a default image or color
+						e.currentTarget.src =
+							'https://example.com/default-image.jpg'; // Replace with your default image URL
+					}}
+				/>
 			)}
-
-			{/* Vintage film grain overlay */}
+			{/* Modern gradient overlay with dynamic colors */}
 			<div
 				style={{
 					position: 'absolute',
 					inset: 0,
 					background: theme
-						? `linear-gradient(180deg, ${colors.background}60 0%, ${colors.surfaceVariant}80 100%)`
-						: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%)',
-					opacity: 0.8,
-					mixBlendMode: 'multiply',
+						? `linear-gradient(180deg, ${colors.surfaceVariant}80 0%, ${colors.background}cc 100%)`
+						: `linear-gradient(135deg, var(--background), var(--accent))`,
+					opacity: 0.85,
+					backdropFilter: 'blur(8px)',
 				}}
 			/>
+			{/* Modern minimalist patterns */}
+			<svg
+				width={width}
+				height={height}
+				viewBox={`0 0 ${width} ${height}`}
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					opacity: 0.08,
+				}}
+			>
+				{/* Abstract shapes */}
+				<path
+					d={`M${width * 0.8},${height * 0.2} Q${width * 0.9},${height * 0.15} ${width * 0.85},${height * 0.3}`}
+					stroke={accentColor1}
+					strokeWidth="3"
+					fill="none"
+				/>
+				<path
+					d={`M${width * 0.2},${height * 0.7} Q${width * 0.3},${height * 0.85} ${width * 0.1},${height * 0.8}`}
+					stroke={accentColor2}
+					strokeWidth="3"
+					fill="none"
+				/>
 
-			{/* Animated film grain texture */}
+				{/* Floating circles */}
+				<circle
+					cx={width * 0.85}
+					cy={height * 0.15}
+					r={width * 0.02}
+					fill={accentColor1}
+					opacity="0.6"
+				/>
+				<circle
+					cx={width * 0.15}
+					cy={height * 0.85}
+					r={width * 0.015}
+					fill={accentColor2}
+					opacity="0.6"
+				/>
+				<circle
+					cx={width * 0.75}
+					cy={height * 0.7}
+					r={width * 0.01}
+					fill={accentColor3}
+					opacity="0.6"
+				/>
+			</svg>
+			{/* Animated gradient bar */}
+			<div
+				style={{
+					position: 'absolute',
+					bottom: '100px',
+					left: '50%',
+					transform: 'translateX(-50%)',
+					width: '40%',
+					height: '2px',
+					background: `linear-gradient(90deg, transparent, ${accentColor1}, ${accentColor2}, transparent)`,
+					opacity: interpolate(
+						Math.sin(frame / 30),
+						[-1, 1],
+						[0.3, 0.6]
+					),
+					borderRadius: '1px',
+				}}
+			/>
+			{/* Subtle dot pattern with dynamic colors */}
 			<div
 				style={{
 					position: 'absolute',
 					inset: 0,
-					backgroundImage: `
-						radial-gradient(circle at ${25 + (frame % 50)}% ${30 + (frame % 30)}%, rgba(255,255,255,0.1) 1px, transparent 1px),
-						radial-gradient(circle at ${75 - (frame % 40)}% ${70 - (frame % 35)}%, rgba(255,255,255,0.05) 1px, transparent 1px)
-					`,
-					backgroundSize: '100px 100px, 150px 150px',
-					opacity: 0.3,
+					backgroundImage: theme
+						? `radial-gradient(${colors.onSurfaceVariant}20 1px, transparent 1px), radial-gradient(${colors.onSurface}10 1px, transparent 1px)`
+						: `radial-gradient(var(--chart-3) 1px, transparent 1px), radial-gradient(var(--chart-5) 1px, transparent 1px)`,
+					backgroundSize: '40px 40px, 30px 30px',
+					backgroundPosition: '0 0, 20px 20px',
+					opacity: 0.05,
 				}}
 			/>
-
-			{/* Vintage vignette effect */}
-			<div
-				style={{
-					position: 'absolute',
-					inset: 0,
-					background:
-						'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.3) 100%)',
-					pointerEvents: 'none',
-				}}
-			/>
-
 			{renderLyrics()}
 			{audioSrc && <Audio src={audioSrc} pauseWhenBuffering />}
 		</AbsoluteFill>
