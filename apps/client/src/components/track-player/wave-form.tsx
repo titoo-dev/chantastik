@@ -1,8 +1,44 @@
-import { useTrackPlayer } from '@/hooks/use-track-player';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { cn } from '@/lib/utils';
+import { usePlayerStore } from '@/stores/player/store';
+import { useEffect, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 export const Waveform = () => {
-	const { audioState, waveBars, handleWaveBarClick } = useTrackPlayer();
+	const { audioRef } = useAudioRefContext();
+	const [waveBars] = useState(
+		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
+	);
+
+	const { duration, isPlaying } = usePlayerStore(
+		useShallow((state) => ({
+			duration: state.duration,
+			isPlaying: state.isPlaying,
+		}))
+	);
+
+	const [position, setPosition] = useState(0);
+
+	useEffect(() => {
+		const audioElement = audioRef.current;
+
+		const onTimeUpdate = (event: Event) => {
+			const audioElement = event.target as HTMLAudioElement;
+			setPosition(audioElement.currentTime);
+		};
+
+		audioElement?.addEventListener('timeupdate', onTimeUpdate);
+
+		return () => {
+			audioElement?.removeEventListener('timeupdate', onTimeUpdate);
+		};
+	}, [audioRef]);
+
+	const handleWaveBarClick = (index: number) => {
+		if (!audioRef.current || !duration || waveBars.length === 0) return;
+		const newTime = (index / waveBars.length) * duration;
+		audioRef.current.currentTime = newTime;
+	};
 
 	return (
 		<div className="mb-4 flex h-16 items-center gap-0.5">
@@ -11,21 +47,17 @@ export const Waveform = () => {
 					key={index}
 					className={cn(
 						'h-full w-full transition-all duration-300 hover:opacity-70 cursor-pointer',
-						index <
-							waveBars.length *
-								(audioState.position / audioState.duration || 0)
+						index < waveBars.length * (position / duration || 0)
 							? 'bg-primary'
 							: 'bg-muted'
 					)}
 					style={{
 						height: `${height * 100}%`,
 						opacity:
-							audioState.isPlaying &&
+							isPlaying &&
 							index ===
 								Math.floor(
-									waveBars.length *
-										(audioState.position /
-											audioState.duration || 0)
+									waveBars.length * (position / duration || 0)
 								)
 								? '0.8'
 								: undefined,
