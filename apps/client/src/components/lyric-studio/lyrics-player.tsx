@@ -11,6 +11,7 @@ import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
 import { useTrackUploadStore } from '@/stores/track-upload/store';
+import { usePlayerStore } from '@/stores/player/store';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -29,6 +30,7 @@ export const LyricsPlayer = () => {
 	const audio = useTrackUploadStore((state) => state.audio);
 
 	const { setVideoTime } = useAppStore.getState();
+	const isPlaying = usePlayerStore((state) => state.isPlaying);
 
 	useEffect(() => {
 		if (audioRef.current) {
@@ -36,6 +38,9 @@ export const LyricsPlayer = () => {
 				timestamp: audioRef.current.currentTime,
 				videoRef: videoRef,
 			});
+			if (isPlaying) {
+				videoRef.current?.play();
+			}
 		}
 	}, [showVideoPreview]);
 

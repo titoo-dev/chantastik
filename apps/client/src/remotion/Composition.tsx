@@ -167,7 +167,7 @@ export const MyComposition: React.FC<LyricsProps> = ({
 						style={{
 							position: 'absolute',
 							opacity: 0.3, // Low opacity for next line
-							bottom: '22%', // Below the current lyric
+							bottom: '20%', // Below the current lyric
 							left: '50%',
 							transform: 'translateX(-50%)',
 							textAlign: 'center',
