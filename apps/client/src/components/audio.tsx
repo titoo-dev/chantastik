@@ -180,6 +180,10 @@ export const Audio = memo(() => {
 		{ enableOnFormTags: false }
 	);
 
+	if (!audio) {
+		return null; // Don't render audio element until track is loaded
+	}
+
 	return (
 		<audio
 			src={getAudioUrl(audio?.id ?? '')}
