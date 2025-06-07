@@ -1,9 +1,9 @@
 import type { LyricsProps } from '@/remotion/schema';
-import { RetroReel } from '@/remotion/themes/retro-reel';
 import { Player, type PlayerRef } from '@remotion/player';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Monitor, Smartphone } from 'lucide-react';
+import { RetroReel } from '@/remotion/themes/retro-reel';
 
 type AspectRatioType = 'horizontal' | 'vertical';
 
