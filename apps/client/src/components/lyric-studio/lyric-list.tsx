@@ -1,6 +1,10 @@
 import { PlusCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { LyricLineItem, type LyricLine } from './lyric-line-item';
+import { useEffect, useMemo, useState } from 'react';
+import { useAppStore } from '@/stores/app/store';
+import { Lrc, Runner } from 'lrc-kit';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 
 export function LyricList({
 	lyricLines,
@@ -8,13 +12,50 @@ export function LyricList({
 	onDeleteLine,
 	onSetCurrentTime,
 	onAddLine,
+	onAddLineBelow,
 }: {
 	lyricLines: LyricLine[];
 	onUpdateLine: (id: number, data: Partial<LyricLine>) => void;
 	onDeleteLine: (id: number) => void;
 	onSetCurrentTime: (id: number) => void;
 	onAddLine: () => void;
+	onAddLineBelow?: (afterId: number) => void;
 }) {
+	const { audioRef } = useAudioRefContext();
+
+	const { generateLRC } = useAppStore.getState();
+
+	const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+	const runner = useMemo(() => {
+		const lrcData = generateLRC();
+
+		let lrcContent = `[ti:${lrcData.metadata.title}]\n`;
+		lrcContent += `[ar:${lrcData.metadata.artist}]\n`;
+		lrcContent += `[al:${lrcData.metadata.album}]\n\n`;
+
+		lrcData.metadata.timestamps.forEach(({ time, text }) => {
+			lrcContent += `[${time}]${text}\n`;
+		});
+		return new Runner(Lrc.parse(lrcContent));
+	}, [lyricLines]);
+
+	useEffect(() => {
+		const audioElement = audioRef.current;
+
+		const handleRunnerUpdate = (event: Event) => {
+			const audioElement = event.target as HTMLAudioElement;
+			runner.timeUpdate(audioElement.currentTime);
+			setActiveIndex(runner.curIndex());
+		};
+
+		audioElement?.addEventListener('timeupdate', handleRunnerUpdate);
+
+		return () => {
+			audioElement?.removeEventListener('timeupdate', handleRunnerUpdate);
+		};
+	}, [audioRef, runner]);
+
 	return (
 		<div>
 			<div className="space-y-3">
@@ -27,6 +68,8 @@ export function LyricList({
 						onDeleteLine={onDeleteLine}
 						onSetCurrentTime={onSetCurrentTime}
 						canUseCurrentTime
+						isActive={index === activeIndex}
+						onAddLineBelow={onAddLineBelow}
 					/>
 				))}
 			</div>
