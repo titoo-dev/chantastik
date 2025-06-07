@@ -4,6 +4,9 @@ import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 import { formatLRCTimestamp } from '@/lib/utils';
 import type { PlayerRef } from '@remotion/player';
 import type { ComponentRef, RefObject } from 'react';
+import type { AudioMeta } from '@/data/types';
+import { preloadImage } from '@remotion/preload';
+import { getCoverArtUrl } from '@/data/api';
 
 // Keep original types for compatibility
 export interface LRCData {
@@ -22,6 +25,7 @@ interface AppState {
 	// State properties
 	trackLoaded: boolean;
 	projectId?: string;
+	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
 	showPreview: boolean;
@@ -34,6 +38,7 @@ interface AppActions {
 	// Basic setters
 	setTrackLoaded: (loaded: boolean) => void;
 	updateProjectId: (id?: string) => void;
+	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
 	setShowPreview: (show: boolean) => void;
@@ -84,6 +89,7 @@ export const useAppStore = create<AppStore>()(
 			// Initial state
 			trackLoaded: false,
 			projectId: undefined,
+			audio: undefined,
 			lyricLines: [],
 			externalLyrics: '',
 			showPreview: false,
@@ -95,6 +101,14 @@ export const useAppStore = create<AppStore>()(
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
 
 			updateProjectId: (id) => set({ projectId: id }),
+
+			setAudio: (audio) => {
+				set({ audio });
+				// Preload cover art when audio changes
+				if (audio) {
+					preloadImage(getCoverArtUrl(audio.id));
+				}
+			},
 
 			setLyricLines: (lines) => set({ lyricLines: lines }),
 
@@ -315,24 +329,57 @@ export const useAppStore = create<AppStore>()(
 					};
 				});
 
-				set({ lyricLines: newLines });
+				set({ lyricLines: [...lyricLines, ...newLines] });
 			},
 
 			generateLRC: () => {
-				const { lyricLines } = get();
+				const { lyricLines, audio } = get();
 				const sortedLyrics = [...lyricLines].sort(
 					(a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0)
 				);
 
+				const getMetadataFromStorage = () => {
+					if (!audio) return null;
+
+					try {
+						const storedAudioMetadata =
+							localStorage.getItem(`currentAudioMetadata`);
+						if (!storedAudioMetadata) return null;
+
+						const audioMetadata: AudioMeta =
+							JSON.parse(storedAudioMetadata);
+						return audioMetadata.metadata?.title ||
+							audioMetadata.metadata?.artist ||
+							audioMetadata.metadata?.album
+							? audioMetadata.metadata
+							: null;
+					} catch (error) {
+						console.warn(
+							'Failed to parse stored audio metadata:',
+							error
+						);
+						return null;
+					}
+				};
+
+				const createTimestamps = () =>
+					sortedLyrics.map((line) => ({
+						time: formatLRCTimestamp(line?.timestamp ?? 0),
+						text: line.text,
+					}));
+
+				const storedMetadata = getMetadataFromStorage();
+				const defaultMetadata = {
+					title: 'Untitled Song',
+					artist: 'Unknown Artist',
+					album: 'Unknown Album',
+				};
+
 				return {
 					metadata: {
-						title: 'Untitled Song',
-						artist: 'Unknown Artist',
-						album: 'Unknown Album',
-						timestamps: sortedLyrics.map((line) => ({
-							time: formatLRCTimestamp(line?.timestamp ?? 0),
-							text: line.text,
-						})),
+						...defaultMetadata,
+						...storedMetadata,
+						timestamps: createTimestamps(),
 					},
 				};
 			},
@@ -352,7 +399,7 @@ export const useAppStore = create<AppStore>()(
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = 'lyrics.lrc';
+				a.download = `${lrcData.metadata.title || 'unknown'} - ${lrcData.metadata.artist || ''}.lrc`;
 				document.body.appendChild(a);
 				a.click();
 				document.body.removeChild(a);

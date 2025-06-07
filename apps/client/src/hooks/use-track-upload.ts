@@ -12,8 +12,11 @@ export function useTrackUpload() {
 	const { audioRef } = useAudioRefContext();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { setTrackLoaded, resetAllStatesAndPlayers } = useAppStore.getState();
+	const { setTrackLoaded, resetAllStatesAndPlayers, setAudio } =
+		useAppStore.getState();
 	const { reset: resetAudioPlayer } = usePlayerStore.getState();
+
+	const audio = useAppStore((state) => state.audio);
 
 	// Use Zustand store for state management
 	const {
@@ -21,7 +24,6 @@ export function useTrackUpload() {
 		isDragging,
 		showConfirmDialog,
 		isRetracted,
-		audio,
 		isUploading,
 
 		setShowConfirmDialog,
@@ -32,7 +34,6 @@ export function useTrackUpload() {
 		handleDrop,
 		toggleRetracted,
 		reset,
-		setAudio,
 	} = useTrackUploadStore();
 
 	// Fetch audio metadata using TanStack Query

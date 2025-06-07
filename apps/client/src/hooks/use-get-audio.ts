@@ -18,9 +18,16 @@ export function useGetAudio(
 		if (query.isSuccess && query.data) {
 			// Handle success here
 			console.log('Audio metadata loaded successfully:', query.data);
+
+			// Store audio metadata to localStorage
+			localStorage.setItem(
+				'currentAudioMetadata',
+				JSON.stringify(query.data)
+			);
+
 			onSuccess?.(query.data);
 		}
-	}, [query.isSuccess, query.data, onSuccess]);
+	}, [query.isSuccess]);
 
 	return query;
 }

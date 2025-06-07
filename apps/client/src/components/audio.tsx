@@ -3,7 +3,6 @@ import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAppStore } from '@/stores/app/store';
 import { usePlayerStore } from '@/stores/player/store';
-import { useTrackUploadStore } from '@/stores/track-upload/store';
 import { useQueryClient } from '@tanstack/react-query';
 import { memo, useCallback, useEffect, type ReactEventHandler } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -15,7 +14,7 @@ export const Audio = memo(() => {
 		usePlayerStore.getState();
 	const { setTrackLoaded } = useAppStore.getState();
 
-	const audio = useTrackUploadStore((state) => state.audio);
+	const audio = useAppStore((state) => state.audio);
 
 	const { volume, position, currentTrackId, duration, isPlaying } =
 		usePlayerStore(

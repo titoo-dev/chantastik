@@ -7,10 +7,10 @@ import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import { Input } from './ui/input';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
-import { useTrackUploadStore } from '@/stores/track-upload/store';
+import { useAppStore } from '@/stores/app/store';
 
 export const Header = memo(() => {
-	const { setAudio } = useTrackUploadStore.getState();
+	const { setAudio } = useAppStore.getState();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 	const deleteProjectMutation = useDeleteProject({
