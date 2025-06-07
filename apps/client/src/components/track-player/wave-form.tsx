@@ -6,14 +6,12 @@ import { useShallow } from 'zustand/react/shallow';
 
 export const Waveform = () => {
 	const { audioRef } = useAudioRefContext();
-	const [waveBars] = useState(
-		Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2)
-	);
 
-	const { duration, isPlaying } = usePlayerStore(
+	const { duration, isPlaying, waveBars } = usePlayerStore(
 		useShallow((state) => ({
 			duration: state.duration,
 			isPlaying: state.isPlaying,
+			waveBars: state.waveBars,
 		}))
 	);
 

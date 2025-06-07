@@ -8,6 +8,7 @@ export interface PlayerStateProperties {
 	duration: number;
 	muted: boolean;
 	currentTrackId?: string;
+	waveBars: number[];
 }
 
 export interface PlayerStateActions {
@@ -32,6 +33,7 @@ const initialState: PlayerStateProperties = {
 	muted: false,
 	isPlaying: false,
 	currentTrackId: undefined,
+	waveBars: Array.from({ length: 50 }, () => Math.random() * 0.8 + 0.2),
 };
 
 export const usePlayerStore = create<PlayerState>()(
