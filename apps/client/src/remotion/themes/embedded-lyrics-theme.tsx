@@ -90,9 +90,6 @@ export const EmbeddedLyricsTheme: React.FC<LyricsProps> = ({
 	const parallaxX = interpolate(Math.sin(frame / 180), [-1, 1], [-15, 15]);
 	const parallaxY = interpolate(Math.cos(frame / 220), [-1, 1], [-8, 8]);
 
-	// Wave effect for the embedded card
-	const waveOffset = interpolate(Math.sin(frame / 60), [-1, 1], [-5, 5]);
-
 	// Floating animation for the card
 	const cardFloat = interpolate(Math.sin(frame / 90), [-1, 1], [-3, 3]);
 
@@ -120,24 +117,6 @@ export const EmbeddedLyricsTheme: React.FC<LyricsProps> = ({
 	};
 
 	const cardDimensions = getCardDimensions();
-
-	// Generate wave path for SVG
-	const generateWavePath = (
-		amplitude: number,
-		frequency: number,
-		phase: number
-	) => {
-		const points: string[] = [];
-		const step = 2;
-
-		for (let x = 0; x <= width; x += step) {
-			const y =
-				amplitude * Math.sin(x * frequency + phase) + height * 0.8;
-			points.push(`${x},${y}`);
-		}
-
-		return `M0,${height} L${points.join(' L')} L${width},${height} Z`;
-	};
 
 	const renderLyrics = () => {
 		if (currentLyricIndex === -1) return null;
