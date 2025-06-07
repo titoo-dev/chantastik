@@ -243,7 +243,7 @@ export const RetroReel: React.FC<LyricsProps> = ({
 					<p
 						style={{
 							position: 'absolute',
-							opacity: 0.25,
+							opacity: 0.5,
 							bottom: responsiveStyles.nextLyric.bottom,
 							left: '50%',
 							transform: 'translateX(-50%)',
