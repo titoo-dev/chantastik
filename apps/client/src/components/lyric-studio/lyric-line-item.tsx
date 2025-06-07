@@ -21,6 +21,8 @@ interface LyricLineItemProps {
 	onSetCurrentTime: (id: number) => void;
 	onAddLineBelow?: (afterId: number) => void;
 	isActive?: boolean;
+	isSelected?: boolean;
+	onToggleSelection?: (id: number, event: React.MouseEvent) => void;
 }
 
 export const LyricLineItem = memo(
@@ -33,15 +35,26 @@ export const LyricLineItem = memo(
 		onSetCurrentTime,
 		onAddLineBelow,
 		isActive = false,
+		isSelected = false,
+		onToggleSelection,
 	}: LyricLineItemProps) => {
+		const handleContainerClick = (event: React.MouseEvent) => {
+			if (onToggleSelection && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault();
+				onToggleSelection(line.id, event);
+			}
+		};
 		return (
 			<div
 				className={cn(
-					'group relative rounded-lg border bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all focus-within:ring-1 focus-within:ring-primary/30 overflow-hidden',
+					'group relative rounded-lg border bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all focus-within:ring-1 focus-within:ring-primary/30 overflow-hidden cursor-pointer',
 					{
-						'ring-2 ring-primary': isActive,
+						'ring-2 ring-primary ring-offset-1': isActive,
+						'ring-2 ring-primary ring-offset-2 bg-primary/5':
+							isSelected,
 					}
 				)}
+				onClick={handleContainerClick}
 			>
 				<div className="flex items-center gap-3 p-3">
 					<Badge
