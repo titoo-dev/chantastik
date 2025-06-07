@@ -73,6 +73,17 @@ export const Header = memo(() => {
 							onDeleteProject={handleProjectDelete}
 						/>
 						<ThemeModeToggle />
+						<div className="text-sm text-muted-foreground">
+							made by{' '}
+							<a
+								href="https://github.com/titoo-dev"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="font-medium text-primary hover:text-primary/80 transition-colors underline decoration-dotted underline-offset-4 hover:decoration-solid"
+							>
+								titoo-dev
+							</a>
+						</div>
 					</div>
 				</div>
 			</header>
