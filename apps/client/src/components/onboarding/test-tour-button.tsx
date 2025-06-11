@@ -13,7 +13,6 @@ export const TestTourButton = () => {
 			</div>
 			<button
 				onClick={() => {
-					console.log('Manual start clicked');
 					startOnboarding();
 				}}
 				className="block w-full px-3 py-2 bg-blue-500 text-white rounded text-sm"
@@ -22,7 +21,6 @@ export const TestTourButton = () => {
 			</button>
 			<button
 				onClick={() => {
-					console.log('Reset clicked');
 					resetOnboarding();
 				}}
 				className="block w-full px-3 py-2 bg-red-500 text-white rounded text-sm"

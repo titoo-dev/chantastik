@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Joyride from 'react-joyride';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { onboardingSteps } from './onboarding-steps';
@@ -108,26 +107,6 @@ export const OnboardingTooltip = ({
 export const OnboardingTour = () => {
 	const { run, stepIndex, handleJoyrideCallback } = useOnboarding();
 
-	console.log('OnboardingTour render:', {
-		run,
-		stepIndex,
-		stepsLength: onboardingSteps.length,
-	});
-
-	// Debug: check if target elements exist
-	useEffect(() => {
-		if (run) {
-			console.log('Tour is running, checking target elements...');
-			onboardingSteps.forEach((step, index) => {
-				const element = document.querySelector(step.target);
-				console.log(
-					`Step ${index + 1} target "${step.target}":`,
-					element ? 'FOUND' : 'NOT FOUND',
-					element
-				);
-			});
-		}
-	}, [run]);
 	return (
 		<Joyride
 			steps={onboardingSteps}

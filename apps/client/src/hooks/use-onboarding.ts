@@ -20,7 +20,6 @@ export const useOnboarding = () => {
 	const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
 		try {
 			const stored = localStorage.getItem('karaoke-onboarding-completed');
-			console.log('Reading localStorage onboarding status:', stored);
 			return stored === 'true';
 		} catch (error) {
 			console.error('Error reading localStorage:', error);
@@ -28,33 +27,27 @@ export const useOnboarding = () => {
 		}
 	});
 	const startOnboarding = useCallback(() => {
-		console.log('Starting onboarding tour...');
 		setRun(true);
 		setStepIndex(0);
 	}, []);
 
 	const stopOnboarding = useCallback(() => {
-		console.log('Stopping onboarding tour...');
 		setRun(false);
 		setStepIndex(0);
 	}, []);
 	const completeOnboarding = useCallback(() => {
-		console.log('Completing onboarding...');
 		setRun(false);
 		setHasCompletedOnboarding(true);
 		try {
 			localStorage.setItem('karaoke-onboarding-completed', 'true');
-			console.log('Saved completion status to localStorage');
 		} catch (error) {
 			console.error('Error saving to localStorage:', error);
 		}
 	}, []);
 
 	const resetOnboarding = useCallback(() => {
-		console.log('Resetting onboarding...');
 		try {
 			localStorage.removeItem('karaoke-onboarding-completed');
-			console.log('Removed completion status from localStorage');
 		} catch (error) {
 			console.error('Error removing from localStorage:', error);
 		}
@@ -64,23 +57,17 @@ export const useOnboarding = () => {
 	}, []);
 	const handleJoyrideCallback = useCallback(
 		(data: CallBackProps) => {
-			const { status, type, index, action } = data;
-			console.log('Joyride callback:', { status, type, index, action });
+			const { status, type, index } = data;
 
 			if (
 				[EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(
 					type as any
 				)
 			) {
-				console.log(
-					'Moving to next step:',
-					index + (type === EVENTS.STEP_AFTER ? 1 : 0)
-				);
 				setStepIndex(index + (type === EVENTS.STEP_AFTER ? 1 : 0));
 			}
 
 			if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
-				console.log('Tour finished or skipped');
 				completeOnboarding();
 			}
 		},

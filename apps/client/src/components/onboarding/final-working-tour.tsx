@@ -68,33 +68,15 @@ export const FinalWorkingTour = () => {
 
 		const checkForElements = () => {
 			checkCount++;
-			console.log(
-				`Checking for elements (attempt ${checkCount}/${maxChecks})...`
-			);
-
 			const uploadSection = document.querySelector(
 				'[data-onboarding="upload-section"]'
 			);
-			const lyricEditor = document.querySelector(
-				'[data-onboarding="lyric-editor"]'
-			);
-
-			console.log(
-				'Upload section:',
-				uploadSection ? 'FOUND ✓' : 'NOT FOUND ✗'
-			);
-			console.log(
-				'Lyric editor:',
-				lyricEditor ? 'FOUND ✓' : 'NOT FOUND ✗'
-			);
 
 			if (uploadSection) {
-				console.log('🎉 Required elements found! Starting tour...');
 				setElementsReady(true);
 
 				// Auto-start tour after elements are ready
 				setTimeout(() => {
-					console.log('🚀 Auto-starting final working tour');
 					setRun(true);
 				}, 1000);
 
@@ -104,7 +86,6 @@ export const FinalWorkingTour = () => {
 			if (checkCount < maxChecks) {
 				setTimeout(checkForElements, 1000);
 			} else {
-				console.log('❌ Max checks reached, elements not found');
 			}
 
 			return false;
@@ -115,19 +96,16 @@ export const FinalWorkingTour = () => {
 	}, []);
 
 	const handleJoyrideCallback = useCallback((data: CallBackProps) => {
-		const { status, type, index, action } = data;
-		console.log('Final tour callback:', { status, type, index, action });
+		const { status, type, index } = data;
 
 		if (
 			[EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type as any)
 		) {
 			const nextIndex = index + (type === EVENTS.STEP_AFTER ? 1 : 0);
-			console.log(`Moving to step ${nextIndex}`);
 			setStepIndex(nextIndex);
 		}
 
 		if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
-			console.log('Tour finished or skipped');
 			setRun(false);
 		}
 	}, []);

@@ -25,10 +25,8 @@ export const WaitForElementsTour = () => {
 			const uploadSection = document.querySelector(
 				'[data-onboarding="upload-section"]'
 			);
-			console.log('Checking for upload section:', uploadSection);
 
 			if (uploadSection) {
-				console.log('Upload section found! Elements are ready.');
 				setElementsReady(true);
 				return true;
 			}
@@ -51,7 +49,6 @@ export const WaitForElementsTour = () => {
 	// Start tour when elements are ready
 	useEffect(() => {
 		if (elementsReady) {
-			console.log('Elements ready, starting tour in 1 second...');
 			const timer = setTimeout(() => {
 				setRun(true);
 			}, 1000);
@@ -61,7 +58,6 @@ export const WaitForElementsTour = () => {
 
 	const handleJoyrideCallback = (data: any) => {
 		const { status, type, index } = data;
-		console.log('Wait tour callback:', { status, type, index });
 
 		if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
 			setStepIndex(index + (type === EVENTS.STEP_AFTER ? 1 : 0));

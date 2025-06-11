@@ -25,7 +25,6 @@ export const BasicOnboardingTour = () => {
 	// Auto-start after a delay
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			console.log('Auto-starting basic tour...');
 			setRun(true);
 		}, 2000);
 		return () => clearTimeout(timer);
@@ -33,7 +32,6 @@ export const BasicOnboardingTour = () => {
 
 	const handleJoyrideCallback = (data: any) => {
 		const { status, type, index } = data;
-		console.log('Basic tour callback:', { status, type, index });
 
 		if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
 			setStepIndex(index + (type === EVENTS.STEP_AFTER ? 1 : 0));
