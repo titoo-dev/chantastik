@@ -162,3 +162,101 @@ When generating lyrics themes for karaoke applications, follow these guidelines 
 - Support keyboard navigation for lyrics timing controls
 
 Remember: Lyrics themes should enhance the karaoke experience without overwhelming the user or degrading performance.
+
+# Implement Beautiful Onboarding Walkthrough with React Joyride
+
+## Overview
+
+Create an interactive onboarding experience for new users to help them understand the karaoke application's key features and workflow.
+
+## User Flow Analysis
+
+Based on the component analysis, the typical user journey is:
+
+1. **Upload/Load Audio** → Track Upload Wrapper
+2. **Create Lyrics** → Lyric Editor (Add lines, set timestamps)
+3. **Preview & Edit** → Lyrics Player/Preview
+4. **Export Results** → Download LRC file
+
+## Implementation Plan
+
+### 1. Install Dependencies
+
+```bash
+npm install react-joyride
+npm install @types/react-joyride --save-dev
+```
+
+### 2. Create Onboarding Hook
+
+```typescript name=apps/client/src/hooks/use-onboarding.ts
+import { useState, useCallback } from 'react';
+import { CallBackProps, STATUS, EVENTS } from 'react-joyride';
+
+export interface OnboardingStep {
+	target: string;
+	content: string;
+	title?: string;
+	placement?: 'top' | 'bottom' | 'left' | 'right' | 'center';
+	disableBeacon?: boolean;
+	hideCloseButton?: boolean;
+	hideFooter?: boolean;
+	showProgress?: boolean;
+	showSkipButton?: boolean;
+}
+
+export const useOnboarding = () => {
+	const [run, setRun] = useState(false);
+	const [stepIndex, setStepIndex] = useState(0);
+	const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(
+		() => localStorage.getItem('karaoke-onboarding-completed') === 'true'
+	);
+
+	const startOnboarding = useCallback(() => {
+		setRun(true);
+		setStepIndex(0);
+	}, []);
+
+	const stopOnboarding = useCallback(() => {
+		setRun(false);
+		setStepIndex(0);
+	}, []);
+
+	const completeOnboarding = useCallback(() => {
+		setRun(false);
+		setHasCompletedOnboarding(true);
+		localStorage.setItem('karaoke-onboarding-completed', 'true');
+	}, []);
+
+	const resetOnboarding = useCallback(() => {
+		localStorage.removeItem('karaoke-onboarding-completed');
+		setHasCompletedOnboarding(false);
+	}, []);
+
+	const handleJoyrideCallback = useCallback(
+		(data: CallBackProps) => {
+			const { status, type, index } = data;
+
+			if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
+				setStepIndex(index + (type === EVENTS.STEP_AFTER ? 1 : 0));
+			}
+
+			if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+				completeOnboarding();
+			}
+		},
+		[completeOnboarding]
+	);
+
+	return {
+		run,
+		stepIndex,
+		hasCompletedOnboarding,
+		startOnboarding,
+		stopOnboarding,
+		completeOnboarding,
+		resetOnboarding,
+		handleJoyrideCallback,
+	};
+};
+```
