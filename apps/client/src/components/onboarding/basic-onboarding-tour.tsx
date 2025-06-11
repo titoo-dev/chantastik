@@ -45,49 +45,19 @@ export const BasicOnboardingTour = () => {
 	};
 
 	return (
-		<>
-			<Joyride
-				steps={basicSteps}
-				run={run}
-				stepIndex={stepIndex}
-				callback={handleJoyrideCallback}
-				continuous={true}
-				showSkipButton={true}
-				debug={true}
-				styles={{
-					options: {
-						zIndex: 10000,
-					},
-				}}
-			/>
-
-			{/* Manual control buttons */}
-			<div className="fixed top-40 left-4 bg-purple-500 text-white border rounded p-4 z-50 space-y-2">
-				<h3 className="font-semibold">Basic Tour Control</h3>
-				<div className="text-xs">
-					<div>Run: {run ? 'YES' : 'NO'}</div>
-					<div>Step: {stepIndex}</div>
-				</div>
-				<button
-					onClick={() => {
-						console.log('Manually starting basic tour');
-						setRun(true);
-						setStepIndex(0);
-					}}
-					className="block w-full px-3 py-2 bg-white text-purple-500 rounded text-sm"
-				>
-					Start Basic Tour
-				</button>
-				<button
-					onClick={() => {
-						console.log('Stopping basic tour');
-						setRun(false);
-					}}
-					className="block w-full px-3 py-2 bg-red-500 text-white rounded text-sm"
-				>
-					Stop Tour
-				</button>
-			</div>
-		</>
+		<Joyride
+			steps={basicSteps}
+			run={run}
+			stepIndex={stepIndex}
+			callback={handleJoyrideCallback}
+			continuous={true}
+			showSkipButton={true}
+			debug={true}
+			styles={{
+				options: {
+					zIndex: 10000,
+				},
+			}}
+		/>
 	);
 };

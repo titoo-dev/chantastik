@@ -59,7 +59,7 @@ const finalSteps = [
 export const FinalWorkingTour = () => {
 	const [run, setRun] = useState(false);
 	const [stepIndex, setStepIndex] = useState(0);
-	const [elementsReady, setElementsReady] = useState(false);
+	const [, setElementsReady] = useState(false);
 
 	// Check for elements and auto-start
 	useEffect(() => {
@@ -133,82 +133,32 @@ export const FinalWorkingTour = () => {
 	}, []);
 
 	return (
-		<>
-			<Joyride
-				steps={finalSteps}
-				run={run}
-				stepIndex={stepIndex}
-				callback={handleJoyrideCallback}
-				continuous={true}
-				showSkipButton={true}
-				showProgress={true}
-				debug={false}
-				disableOverlayClose={true}
-				spotlightClicks={true}
-				styles={{
-					options: {
-						zIndex: 10000,
-						primaryColor: '#3b82f6',
-					},
-					overlay: {
-						backgroundColor: 'rgba(0, 0, 0, 0.5)',
-					},
-					spotlight: {
-						borderRadius: '8px',
-					},
-				}}
-				floaterProps={{
-					disableAnimation: false,
-				}}
-			/>
-
-			{/* Control panel */}
-			<div className="fixed bottom-4 left-4 bg-green-500 text-white border rounded p-4 z-50 space-y-2 max-w-xs">
-				<h3 className="font-semibold">Final Working Tour</h3>
-				<div className="text-xs space-y-1">
-					<div>
-						Elements Ready: {elementsReady ? '✅ YES' : '❌ NO'}
-					</div>
-					<div>Tour Running: {run ? '✅ YES' : '❌ NO'}</div>
-					<div>
-						Current Step: {stepIndex + 1} / {finalSteps.length}
-					</div>
-				</div>
-				<div className="space-y-1">
-					<button
-						onClick={() => {
-							console.log('🔧 Manual start clicked');
-							setRun(true);
-							setStepIndex(0);
-						}}
-						className="block w-full px-3 py-1 bg-white text-green-600 rounded text-sm font-medium"
-					>
-						▶️ Start Tour
-					</button>
-					<button
-						onClick={() => {
-							console.log('🛑 Stop clicked');
-							setRun(false);
-						}}
-						className="block w-full px-3 py-1 bg-red-500 text-white rounded text-sm"
-					>
-						⏹️ Stop Tour
-					</button>
-					<button
-						onClick={() => {
-							console.log('🔄 Reset clicked');
-							setRun(false);
-							setStepIndex(0);
-							setElementsReady(false);
-							// Re-trigger element check
-							window.location.reload();
-						}}
-						className="block w-full px-3 py-1 bg-yellow-500 text-white rounded text-sm"
-					>
-						🔄 Reset
-					</button>
-				</div>
-			</div>
-		</>
+		<Joyride
+			steps={finalSteps}
+			run={run}
+			stepIndex={stepIndex}
+			callback={handleJoyrideCallback}
+			continuous={true}
+			showSkipButton={true}
+			showProgress={true}
+			debug={false}
+			disableOverlayClose={true}
+			spotlightClicks={true}
+			styles={{
+				options: {
+					zIndex: 10000,
+					primaryColor: '#3b82f6',
+				},
+				overlay: {
+					backgroundColor: 'rgba(0, 0, 0, 0.5)',
+				},
+				spotlight: {
+					borderRadius: '8px',
+				},
+			}}
+			floaterProps={{
+				disableAnimation: false,
+			}}
+		/>
 	);
 };

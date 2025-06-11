@@ -11,7 +11,7 @@ import { Audio } from '@/components/audio';
 import { OnboardingTour } from '@/components/onboarding/onboarding-tour';
 import { OnboardingAutoStart } from '@/components/onboarding/onboarding-auto-start';
 import { WelcomeToast } from '@/components/onboarding/welcome-toast';
-
+import { BasicOnboardingTour } from '@/components/onboarding/basic-onboarding-tour';
 interface MyRouterContext {
 	queryClient: QueryClient;
 }
@@ -31,6 +31,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 								<OnboardingTour />
 								<OnboardingAutoStart />
 								<WelcomeToast />
+								<BasicOnboardingTour />
 							</>
 						</main>
 					</WithColorFlow>
