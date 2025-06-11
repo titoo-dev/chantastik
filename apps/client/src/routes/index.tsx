@@ -3,7 +3,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { LyricStudioHeader } from '@/components/lyric-studio/lyrics-studio-header';
 import { LyricEditor } from '@/components/lyric-studio/lyric-editor';
 import { LyricsPlayer } from '@/components/lyric-studio/lyrics-player';
-import { LyricPreviewSection } from '@/components/lyric-studio/lyric-preview-section';
 import { ExternalLyricsSection } from '@/components/lyric-studio/external-lyrics-section';
 import { TrackUploadWrapper } from '@/components/track-upload-wrapper';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -22,7 +21,6 @@ function App() {
 				<div className="grid gap-6 grid-cols-2">
 					<LyricEditor />
 					<LyricsPlayer />
-					<LyricPreviewSection />
 					<ExternalLyricsSection />
 				</div>
 

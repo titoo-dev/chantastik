@@ -16,15 +16,13 @@ export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
 	const { videoRef } = useVideoRefContext();
 
-	const { lyricLines, showVideoPreview, showExternalLyrics, showPreview } =
-		useAppStore(
-			useShallow((state) => ({
-				lyricLines: state.lyricLines,
-				showVideoPreview: state.showVideoPreview,
-				showExternalLyrics: state.showExternalLyrics,
-				showPreview: state.showPreview,
-			}))
-		);
+	const { lyricLines, showVideoPreview, showExternalLyrics } = useAppStore(
+		useShallow((state) => ({
+			lyricLines: state.lyricLines,
+			showVideoPreview: state.showVideoPreview,
+			showExternalLyrics: state.showExternalLyrics,
+		}))
+	);
 
 	const audio = useAppStore((state) => state.audio);
 
@@ -70,7 +68,7 @@ export const LyricsPlayer = () => {
 		} as LyricsProps;
 	}, [lyricsData]);
 
-	if (!showVideoPreview || showExternalLyrics || showPreview) {
+	if (!showVideoPreview || showExternalLyrics) {
 		return null; // Don't render if video preview is not shown
 	}
 

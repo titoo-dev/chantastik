@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "deploy": "pnpm --filter \"@repo/server\" run deploy",
     "studio": "pnpm --filter \"@repo/client\" run studio",
     "serve": "pnpm --filter \"@repo/client\" run serve",
     "lint": "turbo run lint",

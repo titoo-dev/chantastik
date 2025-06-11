@@ -28,7 +28,6 @@ interface AppState {
 	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
-	showPreview: boolean;
 	showExternalLyrics: boolean;
 	showVideoPreview: boolean;
 	selectedLyricLineIds: Set<number>;
@@ -41,7 +40,6 @@ interface AppActions {
 	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
-	setShowPreview: (show: boolean) => void;
 	setShowExternalLyrics: (show: boolean) => void;
 	setShowVideoPreview: (show: boolean) => void;
 
@@ -67,7 +65,6 @@ interface AppActions {
 	// Toggle actions
 	toggleShowExternalLyrics: () => void;
 	toggleShowVideoPreview: () => void;
-	toggleShowPreview: () => void;
 	// Selection actions
 	toggleLyricLineSelection: (id: number) => void;
 	clearLyricLineSelection: () => void;
@@ -92,7 +89,6 @@ export const useAppStore = create<AppStore>()(
 			audio: undefined,
 			lyricLines: [],
 			externalLyrics: '',
-			showPreview: false,
 			showExternalLyrics: false,
 			showVideoPreview: false,
 			selectedLyricLineIds: new Set(),
@@ -113,8 +109,6 @@ export const useAppStore = create<AppStore>()(
 			setLyricLines: (lines) => set({ lyricLines: lines }),
 
 			setExternalLyrics: (lyrics) => set({ externalLyrics: lyrics }),
-
-			setShowPreview: (show) => set({ showPreview: show }),
 
 			setShowExternalLyrics: (show) => set({ showExternalLyrics: show }),
 
@@ -157,22 +151,13 @@ export const useAppStore = create<AppStore>()(
 			toggleShowExternalLyrics: () =>
 				set((state) => ({
 					showExternalLyrics: !state.showExternalLyrics,
-					showPreview: false,
 					showVideoPreview: false,
 				})),
 
 			toggleShowVideoPreview: () =>
 				set((state) => ({
 					showVideoPreview: !state.showVideoPreview,
-					showPreview: false,
 					showExternalLyrics: false,
-				})),
-
-			toggleShowPreview: () =>
-				set((state) => ({
-					showPreview: !state.showPreview,
-					showExternalLyrics: false,
-					showVideoPreview: false,
 				})),
 
 			// Complex actions
@@ -198,7 +183,6 @@ export const useAppStore = create<AppStore>()(
 				}
 			},
 
-			// TODO: no audioRef in context
 			addLyricLine: (params) => {
 				const { afterId, audioRef } = params || {};
 				const { lyricLines } = get();
@@ -411,7 +395,6 @@ export const useAppStore = create<AppStore>()(
 					trackLoaded: false,
 					lyricLines: [],
 					externalLyrics: '',
-					showPreview: false,
 					showExternalLyrics: false,
 					showVideoPreview: false,
 					selectedLyricLineIds: new Set(),

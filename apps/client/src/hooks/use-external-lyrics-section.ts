@@ -4,11 +4,10 @@ import { useShallow } from 'zustand/react/shallow';
 export function useExternalLyricsSection() {
 	const { addLinesFromExternal, setExternalLyrics } = useAppStore.getState();
 
-	const { externalLyrics, showExternalLyrics, showPreview } = useAppStore(
+	const { externalLyrics, showExternalLyrics } = useAppStore(
 		useShallow((state) => ({
 			externalLyrics: state.externalLyrics,
 			showExternalLyrics: state.showExternalLyrics,
-			showPreview: state.showPreview,
 		}))
 	);
 
@@ -38,7 +37,7 @@ export function useExternalLyricsSection() {
 	};
 
 	const isConvertDisabled = !externalLyrics.trim();
-	const shouldRender = showExternalLyrics && !showPreview;
+	const shouldRender = showExternalLyrics;
 
 	return {
 		externalLyrics,

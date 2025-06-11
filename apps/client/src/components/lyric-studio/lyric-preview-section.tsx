@@ -5,16 +5,15 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/app/store';
 
 export function LyricPreviewSection() {
-	const { showPreview, showExternalLyrics, showVideoPreview } = useAppStore(
+	const { showExternalLyrics, showVideoPreview } = useAppStore(
 		useShallow((state) => ({
-			showPreview: state.showPreview,
 			showExternalLyrics: state.showExternalLyrics,
 			showVideoPreview: state.showVideoPreview,
 		}))
 	);
 
-	if (!showPreview || showExternalLyrics || showVideoPreview) {
-		return null; // Don't render if preview is not shown or external lyrics are visible
+	if (showExternalLyrics || showVideoPreview) {
+		return null; // Don't render if external lyrics or video preview are visible
 	}
 
 	return (

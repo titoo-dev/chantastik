@@ -14,21 +14,15 @@ export const LyricEditor = memo(function LyricEditor() {
 	const { updateLyricLine, deleteLyricLine, addLyricLine } =
 		useAppStore.getState();
 
-	const {
-		lyricLines,
-		showPreview,
-		showExternalLyrics,
-		showVideoPreview,
-		trackLoaded,
-	} = useAppStore(
-		useShallow((state) => ({
-			lyricLines: state.lyricLines,
-			showPreview: state.showPreview,
-			showExternalLyrics: state.showExternalLyrics,
-			showVideoPreview: state.showVideoPreview,
-			trackLoaded: state.trackLoaded,
-		}))
-	);
+	const { lyricLines, showExternalLyrics, showVideoPreview, trackLoaded } =
+		useAppStore(
+			useShallow((state) => ({
+				lyricLines: state.lyricLines,
+				showExternalLyrics: state.showExternalLyrics,
+				showVideoPreview: state.showVideoPreview,
+				trackLoaded: state.trackLoaded,
+			}))
+		);
 	const setCurrentTimeAsTimestamp = (id: number) => {
 		if (audioRef?.current) {
 			const newTimestamp = audioRef.current.currentTime;
@@ -45,7 +39,7 @@ export const LyricEditor = memo(function LyricEditor() {
 
 	return (
 		<Card
-			className={`pt-0 shadow-none ${showPreview || showExternalLyrics || showVideoPreview ? 'col-span-1' : 'col-span-2'}`}
+			className={`pt-0 shadow-none ${showExternalLyrics || showVideoPreview ? 'col-span-1' : 'col-span-2'}`}
 		>
 			<LyricHeader />
 

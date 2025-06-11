@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Eye, FileText } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import { useAppStore } from '@/stores/app/store';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -9,26 +9,19 @@ export const LyricStudioHeader = memo(() => {
 		areLyricLinesWithoutTimestamps,
 		handleDownload,
 		toggleShowExternalLyrics,
-		setShowPreview,
 		toggleShowVideoPreview,
 		isValidLyricLines,
 	} = useAppStore.getState();
 
-	const {
-		showPreview,
-		showVideoPreview,
-		lyricLines,
-		showExternalLyrics,
-		trackLoaded,
-	} = useAppStore(
-		useShallow((state) => ({
-			showPreview: state.showPreview,
-			showVideoPreview: state.showVideoPreview,
-			lyricLines: state.lyricLines,
-			showExternalLyrics: state.showExternalLyrics,
-			trackLoaded: state.trackLoaded,
-		}))
-	);
+	const { showVideoPreview, lyricLines, showExternalLyrics, trackLoaded } =
+		useAppStore(
+			useShallow((state) => ({
+				showVideoPreview: state.showVideoPreview,
+				lyricLines: state.lyricLines,
+				showExternalLyrics: state.showExternalLyrics,
+				trackLoaded: state.trackLoaded,
+			}))
+		);
 
 	return (
 		<div className="mb-6 space-y-4">
@@ -65,27 +58,12 @@ export const LyricStudioHeader = memo(() => {
 							variant="outline"
 							className="gap-2"
 							title="Import lyrics from text"
-							disabled={showPreview}
+							disabled={showVideoPreview}
 						>
 							<FileText className="h-4 w-4" />
 							{showExternalLyrics
 								? 'Hide Lyrics'
 								: 'External Lyrics'}
-						</Button>
-						<Button
-							onClick={() => setShowPreview(!showPreview)}
-							variant="outline"
-							className="gap-2"
-							title="Toggle lyrics preview"
-							disabled={
-								lyricLines.length === 0 ||
-								!isValidLyricLines() ||
-								showExternalLyrics
-							}
-							aria-label="Toggle lyrics preview"
-						>
-							<Eye className="h-4 w-4" />
-							{showPreview ? 'Hide Preview' : 'Preview'}
 						</Button>
 						<Button
 							onClick={handleDownload}
