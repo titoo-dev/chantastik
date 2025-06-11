@@ -3,13 +3,9 @@ import type { AudioMeta } from './types';
 import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 
 // API base URL - adjust based on your environment
-export const AUDIO_BASE_URL =
+export const API_BASE_URL =
 	import.meta.env.VITE_DEFAULT_REST_API_URL ||
 	'https://mp3-uploader.dev-titosy.workers.dev';
-
-export const PROJECT_BASE_URL =
-	import.meta.env.VITE_DEFAULT_PROJECT_API_URL ||
-	'https://karaoke-milay-project.dev-titosy.workers.dev';
 
 type UploadAudioResponse = {
 	message: string;
@@ -34,7 +30,7 @@ type LyricsDataToUpdate = {
 // get all projects function
 export async function getAllProjects(): Promise<Project[]> {
 	try {
-		const response = await fetch(`${PROJECT_BASE_URL}/projects`);
+		const response = await fetch(`${API_BASE_URL}/projects`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch projects');
@@ -57,7 +53,7 @@ export async function updateProject(
 	updates: LyricsDataToUpdate
 ): Promise<Project> {
 	try {
-		const response = await fetch(`${PROJECT_BASE_URL}/project/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/project/${id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -88,7 +84,7 @@ export async function updateProject(
 // delete project function
 export async function deleteProject(id: string): Promise<void> {
 	try {
-		const response = await fetch(`${PROJECT_BASE_URL}/project/${id}`, {
+		const response = await fetch(`${API_BASE_URL}/project/${id}`, {
 			method: 'DELETE',
 		});
 
@@ -111,7 +107,7 @@ export async function deleteProject(id: string): Promise<void> {
 // get audio metadata function
 export async function getAudioMetadata(id: string): Promise<AudioMeta> {
 	try {
-		const response = await fetch(`${AUDIO_BASE_URL}/audio/${id}/meta`);
+		const response = await fetch(`${API_BASE_URL}/audio/${id}/meta`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch audio metadata');
@@ -130,12 +126,12 @@ export async function getAudioMetadata(id: string): Promise<AudioMeta> {
 
 // get audio url function
 export function getAudioUrl(id: string): string {
-	return `${AUDIO_BASE_URL}/audio/${id}`;
+	return `${API_BASE_URL}/audio/${id}`;
 }
 
 // get cover art url function
 export function getCoverArtUrl(id?: string): string {
-	return `${AUDIO_BASE_URL}/audio/${id}/cover`;
+	return `${API_BASE_URL}/audio/${id}/cover`;
 }
 
 /**
@@ -147,7 +143,7 @@ export async function uploadAudioFile(
 	const formData = new FormData();
 	formData.append('audio', file);
 
-	const response = await fetch(`${AUDIO_BASE_URL}/audio`, {
+	const response = await fetch(`${API_BASE_URL}/audio`, {
 		method: 'POST',
 		body: formData,
 	});
