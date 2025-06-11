@@ -46,7 +46,7 @@ export function TrackUploadWrapper({
 	}
 
 	return (
-		<>
+		<div data-onboarding="upload-section">
 			<RetractButton
 				isRetracted={isRetracted}
 				hasAudio={!!audio?.id}
@@ -152,6 +152,6 @@ export function TrackUploadWrapper({
 					)}
 				</motion.div>
 			)}
-		</>
+		</div>
 	);
 }

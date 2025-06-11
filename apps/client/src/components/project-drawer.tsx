@@ -164,11 +164,15 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 			}
 			return <EmptyState />;
 		};
-
 		return (
 			<Drawer>
 				<DrawerTrigger asChild>
-					<Button variant="outline" size="icon" className="h-9 w-9">
+					<Button
+						data-onboarding="projects-drawer"
+						variant="outline"
+						size="icon"
+						className="h-9 w-9"
+					>
 						<FolderOpen className="h-4 w-4" />
 						<span className="sr-only">Open projects</span>
 					</Button>

@@ -17,9 +17,11 @@ export function ExternalLyricsSection() {
 	if (!shouldRender) {
 		return null;
 	}
-
 	return (
-		<Card className="pt-0 shadow-none overflow-hidden">
+		<Card
+			data-onboarding="external-lyrics"
+			className="pt-0 shadow-none overflow-hidden"
+		>
 			<CardHeader className="flex flex-row items-center justify-between border-b pt-6">
 				<CardTitle className="flex items-center gap-2 py-3">
 					<FileText className="h-5 w-5 text-primary" />

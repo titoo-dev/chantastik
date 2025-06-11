@@ -36,9 +36,9 @@ export const LyricEditor = memo(function LyricEditor() {
 			audioRef,
 		});
 	};
-
 	return (
 		<Card
+			data-onboarding="lyric-editor"
 			className={`pt-0 shadow-none ${showExternalLyrics || showVideoPreview ? 'col-span-1' : 'col-span-2'}`}
 		>
 			<LyricHeader />

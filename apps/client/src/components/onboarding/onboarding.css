@@ -1,0 +1,108 @@
+/* Onboarding Tour Custom Styles */
+
+/* Joyride overlay customization */
+.__floater__arrow {
+	border-color: hsl(var(--border)) !important;
+}
+
+.__floater__body {
+	background: hsl(var(--background)) !important;
+	border: 1px solid hsl(var(--border)) !important;
+	border-radius: 8px !important;
+	box-shadow:
+		0 10px 15px -3px rgba(0, 0, 0, 0.1),
+		0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Custom spotlight animation */
+@keyframes onboarding-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.8;
+		transform: scale(1.02);
+	}
+}
+
+/* Spotlight enhancement */
+.__floater[data-status='open'] {
+	animation: onboarding-pulse 2s ease-in-out infinite;
+}
+
+/* Progress bar animation */
+.onboarding-progress-bar {
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.onboarding-progress-bar.active {
+	background: linear-gradient(
+		90deg,
+		hsl(var(--primary)),
+		hsl(var(--primary)) 70%,
+		transparent
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+/* Tooltip content animation */
+.onboarding-content {
+	animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Button hover effects */
+.onboarding-button {
+	position: relative;
+	overflow: hidden;
+	transition: all 0.2s ease;
+}
+
+.onboarding-button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.onboarding-button:active {
+	transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.__floater__body {
+		margin: 0 16px !important;
+		max-width: calc(100vw - 32px) !important;
+	}
+}
+
+/* Dark mode specific adjustments */
+.dark .__floater__body {
+	background: hsl(var(--popover)) !important;
+	border-color: hsl(var(--border)) !important;
+}
+
+.dark .__floater__arrow {
+	border-color: hsl(var(--border)) !important;
+}

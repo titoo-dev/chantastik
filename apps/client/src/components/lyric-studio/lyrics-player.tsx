@@ -55,9 +55,11 @@ export const LyricsPlayer = () => {
 	if (!showVideoPreview || showExternalLyrics) {
 		return null; // Don't render if video preview is not shown
 	}
-
 	return (
-		<Card className="pt-0 shadow-none col-span-1">
+		<Card
+			data-onboarding="lyrics-preview"
+			className="pt-0 shadow-none col-span-1"
+		>
 			<CardHeader className="flex flex-row items-center justify-between py-8 border-b">
 				<CardTitle className="flex items-center gap-2 py-2">
 					<PlayCircle className="h-5 w-5 text-primary" />

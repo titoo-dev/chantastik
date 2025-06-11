@@ -5,6 +5,7 @@ import { ProjectsDrawer } from './project-drawer';
 import { type Project } from '@/data/api';
 import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
+import { OnboardingHelpButton } from './onboarding/onboarding-help-button';
 import { Input } from './ui/input';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 import { useAppStore } from '@/stores/app/store';
@@ -70,12 +71,12 @@ export const Header = memo(() => {
 
 					<div className="flex items-center gap-4">
 						{/* Search icon for small screens */}
-						<Search className="h-5 w-5 text-muted-foreground md:hidden cursor-pointer hover:text-foreground transition-colors" />
-
+						<Search className="h-5 w-5 text-muted-foreground md:hidden cursor-pointer hover:text-foreground transition-colors" />{' '}
 						<ProjectsDrawer
 							onProjectSelected={handleProjectSelected}
 							onDeleteProject={handleProjectDelete}
 						/>
+						<OnboardingHelpButton />
 						<ThemeModeToggle />
 						<div className="hidden sm:block text-sm text-muted-foreground">
 							made by{' '}

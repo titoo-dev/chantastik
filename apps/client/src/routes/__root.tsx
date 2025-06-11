@@ -8,6 +8,9 @@ import { WithColorFlow } from '@/components/with-color-flow';
 import { AudioRefProvider } from '@/context/audio-ref-context';
 import { VideoRefProvider } from '@/context/video-ref-context';
 import { Audio } from '@/components/audio';
+import { OnboardingTour } from '@/components/onboarding/onboarding-tour';
+import { OnboardingAutoStart } from '@/components/onboarding/onboarding-auto-start';
+import { WelcomeToast } from '@/components/onboarding/welcome-toast';
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -20,11 +23,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
 					<WithColorFlow>
 						<main className="antialiased">
-							<Header />
+							<Header />{' '}
 							<>
 								<Outlet />
 								<Toaster />
 								<Audio />
+								<OnboardingTour />
+								<OnboardingAutoStart />
+								<WelcomeToast />
 							</>
 						</main>
 					</WithColorFlow>
