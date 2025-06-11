@@ -1,9 +1,21 @@
-import { useTrackPlayer } from '@/hooks/use-track-player';
-import { memo } from 'react';
+import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
+import { usePlayerStore } from '@/stores/player/store';
+import { memo, useCallback } from 'react';
 
 export const CoverArtImage = memo(
 	({ coverArt, title }: { coverArt: string; title: string }) => {
-		const { handlePlayPause } = useTrackPlayer();
+		const { audioRef } = useAudioRefContext();
+
+		const isPlaying = usePlayerStore((state) => state.isPlaying);
+
+		const handlePlayPause = useCallback(() => {
+			if (!audioRef.current) return;
+			if (isPlaying) {
+				audioRef.current.pause();
+			} else {
+				audioRef.current.play();
+			}
+		}, [audioRef, isPlaying]);
 
 		return (
 			<div

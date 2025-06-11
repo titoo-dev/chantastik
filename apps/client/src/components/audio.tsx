@@ -3,7 +3,6 @@ import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAppStore } from '@/stores/app/store';
 import { usePlayerStore } from '@/stores/player/store';
-import { useTrackUploadStore } from '@/stores/track-upload/store';
 import { useQueryClient } from '@tanstack/react-query';
 import { memo, useCallback, useEffect, type ReactEventHandler } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -15,7 +14,7 @@ export const Audio = memo(() => {
 		usePlayerStore.getState();
 	const { setTrackLoaded } = useAppStore.getState();
 
-	const audio = useTrackUploadStore((state) => state.audio);
+	const audio = useAppStore((state) => state.audio);
 
 	const { volume, position, currentTrackId, duration, isPlaying } =
 		usePlayerStore(
@@ -50,6 +49,14 @@ export const Audio = memo(() => {
 		}
 	}, [audio?.id]);
 
+	const setVideoTime = (timestamp: number) => {
+		if (videoRef.current) {
+			const fps = 30; // Using the same FPS as in Root.tsx
+			const frame = Math.floor(timestamp * fps);
+			videoRef.current.seekTo(frame);
+		}
+	};
+
 	const onTimeUpdate: ReactEventHandler<HTMLAudioElement> = (event) => {
 		const audioElement = event.target as HTMLAudioElement;
 		setPosition(audioElement.currentTime);
@@ -76,6 +83,9 @@ export const Audio = memo(() => {
 	};
 
 	const onEnded: ReactEventHandler<HTMLAudioElement> = () => {
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+		}
 		setPosition(0);
 		setIsPlaying(false);
 		videoRef.current?.pause();
@@ -93,6 +103,19 @@ export const Audio = memo(() => {
 		videoRef.current?.pause();
 		updateNavigatorMetadata();
 	};
+
+	// on seek
+	const onSeek: ReactEventHandler<HTMLAudioElement> = useCallback(
+		(event) => {
+			const audioElement = event.target as HTMLAudioElement;
+			setPosition(audioElement.currentTime);
+			setVideoTime(audioElement.currentTime);
+			if (!audioElement.paused) {
+				videoRef.current?.play();
+			}
+		},
+		[setPosition, setVideoTime]
+	);
 
 	useEffect(() => {
 		const typedRef = audioRef;
@@ -126,14 +149,6 @@ export const Audio = memo(() => {
 		}
 	};
 
-	const setVideoTime = (timestamp: number) => {
-		if (videoRef.current) {
-			const fps = 30; // Using the same FPS as in Root.tsx
-			const frame = Math.floor(timestamp * fps);
-			videoRef.current.seekTo(frame);
-		}
-	};
-
 	// Hotkeys
 	useHotkeys(
 		'space',
@@ -164,6 +179,10 @@ export const Audio = memo(() => {
 		{ enableOnFormTags: false }
 	);
 
+	if (!audio) {
+		return null; // Don't render audio element until track is loaded
+	}
+
 	return (
 		<audio
 			src={getAudioUrl(audio?.id ?? '')}
@@ -172,6 +191,7 @@ export const Audio = memo(() => {
 			onPause={onPause}
 			onEnded={onEnded}
 			onError={onError}
+			onSeeked={onSeek}
 			title={audio?.metadata?.title}
 			onTimeUpdate={onTimeUpdate}
 			onLoadedMetadata={onLoadedMetadata}

@@ -1,8 +1,5 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { preloadImage } from '@remotion/preload';
-import { getCoverArtUrl } from '@/data/api';
-import type { AudioMeta } from '@/data/types';
 
 interface TrackUploadState {
 	// State
@@ -10,7 +7,6 @@ interface TrackUploadState {
 	isDragging: boolean;
 	showConfirmDialog: boolean;
 	isRetracted: boolean;
-	audio: AudioMeta | undefined;
 	isUploading: boolean;
 
 	// Actions
@@ -18,7 +14,6 @@ interface TrackUploadState {
 	setIsDragging: (isDragging: boolean) => void;
 	setShowConfirmDialog: (show: boolean) => void;
 	setIsRetracted: (retracted: boolean) => void;
-	setAudio: (audio: AudioMeta | undefined) => void;
 	setIsUploading: (uploading: boolean) => void;
 
 	// Complex actions
@@ -42,7 +37,6 @@ export const useTrackUploadStore = create<TrackUploadState>()(
 			isDragging: false,
 			showConfirmDialog: false,
 			isRetracted: false,
-			audio: undefined,
 			isUploading: false,
 
 			// Basic setters
@@ -51,13 +45,7 @@ export const useTrackUploadStore = create<TrackUploadState>()(
 			setShowConfirmDialog: (showConfirmDialog) =>
 				set({ showConfirmDialog }),
 			setIsRetracted: (isRetracted) => set({ isRetracted }),
-			setAudio: (audio) => {
-				set({ audio });
-				// Preload cover art when audio changes
-				if (audio) {
-					preloadImage(getCoverArtUrl(audio.id));
-				}
-			},
+
 			setIsUploading: (isUploading) => set({ isUploading }),
 
 			// Complex actions
@@ -109,7 +97,6 @@ export const useTrackUploadStore = create<TrackUploadState>()(
 					isDragging: false,
 					showConfirmDialog: false,
 					isRetracted: false,
-					audio: undefined,
 					isUploading: false,
 				});
 			},
@@ -119,15 +106,3 @@ export const useTrackUploadStore = create<TrackUploadState>()(
 		}
 	)
 );
-
-// Selector hooks for better performance
-export const useTrackUploadAudio = () =>
-	useTrackUploadStore((state) => state.audio);
-export const useTrackUploadFile = () =>
-	useTrackUploadStore((state) => state.audioFile);
-export const useTrackUploadDragging = () =>
-	useTrackUploadStore((state) => state.isDragging);
-export const useTrackUploadRetracted = () =>
-	useTrackUploadStore((state) => state.isRetracted);
-export const useTrackUploadUploading = () =>
-	useTrackUploadStore((state) => state.isUploading);

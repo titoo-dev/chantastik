@@ -115,8 +115,13 @@ const SyncedLyrics = memo(
 								isActive ? '' : 'Click to seek to this position'
 							}
 							className={cn(
-								'text-foreground/50 cursor-pointer transition-all md:leading-10',
-								{ 'text-primary md:text-2xl': isActive }
+								'text-foreground/50 cursor-pointer transition-all duration-500 ease-out md:leading-10 text-center transform',
+								{
+									'text-primary md:text-2xl scale-105 font-medium':
+										isActive,
+									'hover:text-foreground/70 hover:scale-102':
+										!isActive,
+								}
 							)}
 							onClick={() => handleLineClick(line, isActive)}
 						>

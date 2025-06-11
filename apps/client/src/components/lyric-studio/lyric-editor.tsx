@@ -29,12 +29,18 @@ export const LyricEditor = memo(function LyricEditor() {
 			trackLoaded: state.trackLoaded,
 		}))
 	);
-
 	const setCurrentTimeAsTimestamp = (id: number) => {
 		if (audioRef?.current) {
 			const newTimestamp = audioRef.current.currentTime;
 			updateLyricLine(id, { timestamp: newTimestamp });
 		}
+	};
+
+	const handleAddLineBelow = (afterId: number) => {
+		addLyricLine({
+			afterId,
+			audioRef,
+		});
 	};
 
 	return (
@@ -66,6 +72,7 @@ export const LyricEditor = memo(function LyricEditor() {
 						onUpdateLine={updateLyricLine}
 						onDeleteLine={deleteLyricLine}
 						onSetCurrentTime={setCurrentTimeAsTimestamp}
+						onAddLineBelow={handleAddLineBelow}
 						onAddLine={() =>
 							addLyricLine({
 								audioRef,

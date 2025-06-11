@@ -1,6 +1,5 @@
 import { TrackHeader } from './track-header';
 import { TrackPlayerMain } from './track-player-main';
-import { Audio } from '@/components/audio';
 
 export function TrackPlayerContent({
 	title,
@@ -27,7 +26,6 @@ export function TrackPlayerContent({
 				showDownload={showDownload}
 			/>
 			<TrackPlayerMain coverArt={coverArt} title={title} />
-			<Audio />
 		</div>
 	);
 }

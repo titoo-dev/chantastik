@@ -109,3 +109,56 @@ When migrating from React Context to Zustand, follow these guidelines to ensure 
 - Provide fallback logic in components that still use Context
 - Allow components to switch between Context and Zustand without changes
 - Maintain existing Context consumers until fully migrated
+
+## Lyrics Theme Generation Guidelines
+
+### Display Principles
+
+When generating lyrics themes for karaoke applications, follow these guidelines for optimal readability and performance:
+
+#### 1. Lyrics Line Display Rules
+
+- Display only the current active lyrics line prominently
+- Show a subtle preview of the next upcoming line
+- Never display previous lyrics lines to avoid clutter
+- Ensure current line has maximum visual prominence and contrast\*
+- Avoid adding decorative accents
+
+#### 2. Text Spacing and Readability
+
+- Maximize line spacing between current and next lyrics lines
+- Use generous padding around text elements for breathing room
+- Ensure minimum 2x line-height spacing between lyrics lines
+- Maintain consistent horizontal spacing for text alignment
+
+#### 3. Animation and Effects Constraints
+
+- Respect user's animation preferences (prefers-reduced-motion)
+- Use minimal particle effects to maintain 60fps performance
+- Limit particle count to maximum 10-15 elements on screen
+- Prefer CSS transforms over layout-triggering animations
+- Use will-change property sparingly and remove after animations
+
+#### 4. Visual Hierarchy Requirements
+
+- Current line: High contrast, larger font size, bold weight
+- Next line: Lower opacity (30-50%), smaller font, lighter weight
+- Avoid competing visual elements that distract from lyrics
+- Use subtle color coding rather than flashy effects
+
+#### 5. Performance Optimization
+
+- Debounce animation triggers to prevent excessive re-renders
+- Use requestAnimationFrame for smooth animation timing
+- Implement virtual scrolling for long song lyrics
+- Clean up animation listeners and intervals on component unmount
+- Avoid expensive CSS filters and shadows on animated elements
+
+#### 6. Accessibility Considerations
+
+- Maintain WCAG AA contrast ratios for all text
+- Provide option to disable all animations
+- Ensure text remains readable across different screen sizes
+- Support keyboard navigation for lyrics timing controls
+
+Remember: Lyrics themes should enhance the karaoke experience without overwhelming the user or degrading performance.

@@ -10,7 +10,7 @@ import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
-import { useTrackUploadStore } from '@/stores/track-upload/store';
+import { usePlayerStore } from '@/stores/player/store';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -26,9 +26,10 @@ export const LyricsPlayer = () => {
 			}))
 		);
 
-	const audio = useTrackUploadStore((state) => state.audio);
+	const audio = useAppStore((state) => state.audio);
 
 	const { setVideoTime } = useAppStore.getState();
+	const isPlaying = usePlayerStore((state) => state.isPlaying);
 
 	useEffect(() => {
 		if (audioRef.current) {
@@ -36,6 +37,9 @@ export const LyricsPlayer = () => {
 				timestamp: audioRef.current.currentTime,
 				videoRef: videoRef,
 			});
+			if (isPlaying) {
+				videoRef.current?.play();
+			}
 		}
 	}, [showVideoPreview]);
 
@@ -44,10 +48,20 @@ export const LyricsPlayer = () => {
 	}, [lyricLines])();
 
 	const totalFrames = useMemo(() => {
-		return lyricsData.length > 0
-			? lyricsData[lyricsData.length - 1].endFrame + 30
-			: 0;
-	}, [lyricsData]);
+		if (lyricsData.length === 0) return 0;
+
+		// Get audio duration in seconds
+		const audioDuration = audioRef.current?.duration || 0;
+
+		// Calculate frames based on audio duration (assuming 30 FPS)
+		const audioFrames = Math.ceil(audioDuration * 30);
+
+		// Get last lyric end frame
+		const lastLyricFrame = lyricsData[lyricsData.length - 1].endFrame;
+
+		// Use the maximum between audio duration and last lyric frame, plus buffer
+		return Math.max(audioFrames, lastLyricFrame) + 30;
+	}, [lyricsData, audioRef.current?.duration]);
 
 	const inputProps = useMemo(() => {
 		return {

@@ -4,6 +4,9 @@ import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 import { formatLRCTimestamp } from '@/lib/utils';
 import type { PlayerRef } from '@remotion/player';
 import type { ComponentRef, RefObject } from 'react';
+import type { AudioMeta } from '@/data/types';
+import { preloadImage } from '@remotion/preload';
+import { getCoverArtUrl } from '@/data/api';
 
 // Keep original types for compatibility
 export interface LRCData {
@@ -22,17 +25,20 @@ interface AppState {
 	// State properties
 	trackLoaded: boolean;
 	projectId?: string;
+	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
 	showPreview: boolean;
 	showExternalLyrics: boolean;
 	showVideoPreview: boolean;
+	selectedLyricLineIds: Set<number>;
 }
 
 interface AppActions {
 	// Basic setters
 	setTrackLoaded: (loaded: boolean) => void;
 	updateProjectId: (id?: string) => void;
+	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
 	setShowPreview: (show: boolean) => void;
@@ -51,17 +57,21 @@ interface AppActions {
 	}) => void;
 	updateLyricLine: (id: number, data: Partial<LyricLine>) => void;
 	deleteLyricLine: (id: number) => void;
+	deleteSelectedLyricLines: () => void;
 	addLinesFromExternal: (externalLines: string[]) => void;
 	setVideoTime: (params: {
 		timestamp: number;
 		videoRef?: RefObject<PlayerRef | null>;
 	}) => void;
 	resetAllStatesAndPlayers: () => void;
-
 	// Toggle actions
 	toggleShowExternalLyrics: () => void;
 	toggleShowVideoPreview: () => void;
 	toggleShowPreview: () => void;
+	// Selection actions
+	toggleLyricLineSelection: (id: number) => void;
+	clearLyricLineSelection: () => void;
+	selectAllLyricLines: () => void;
 
 	// Utility methods
 	areLyricLinesWithoutTimestamps: () => boolean;
@@ -79,16 +89,26 @@ export const useAppStore = create<AppStore>()(
 			// Initial state
 			trackLoaded: false,
 			projectId: undefined,
+			audio: undefined,
 			lyricLines: [],
 			externalLyrics: '',
 			showPreview: false,
 			showExternalLyrics: false,
 			showVideoPreview: false,
+			selectedLyricLineIds: new Set(),
 
 			// Basic setters
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
 
 			updateProjectId: (id) => set({ projectId: id }),
+
+			setAudio: (audio) => {
+				set({ audio });
+				// Preload cover art when audio changes
+				if (audio) {
+					preloadImage(getCoverArtUrl(audio.id));
+				}
+			},
 
 			setLyricLines: (lines) => set({ lyricLines: lines }),
 
@@ -249,12 +269,49 @@ export const useAppStore = create<AppStore>()(
 					),
 				});
 			},
-
 			deleteLyricLine: (id) => {
-				const { lyricLines } = get();
+				const { lyricLines, selectedLyricLineIds } = get();
+				const newSelectedIds = new Set(selectedLyricLineIds);
+				newSelectedIds.delete(id);
 				set({
 					lyricLines: lyricLines.filter((line) => line.id !== id),
+					selectedLyricLineIds: newSelectedIds,
 				});
+			},
+
+			deleteSelectedLyricLines: () => {
+				const { lyricLines, selectedLyricLineIds } = get();
+				if (selectedLyricLineIds.size === 0) return;
+				set({
+					lyricLines: lyricLines.filter(
+						(line) => !selectedLyricLineIds.has(line.id)
+					),
+					selectedLyricLineIds: new Set(),
+				});
+			},
+
+			// Selection actions
+			toggleLyricLineSelection: (id) => {
+				const { selectedLyricLineIds } = get();
+				const newSelectedIds = new Set(selectedLyricLineIds);
+
+				if (newSelectedIds.has(id)) {
+					newSelectedIds.delete(id);
+				} else {
+					newSelectedIds.add(id);
+				}
+
+				set({ selectedLyricLineIds: newSelectedIds });
+			},
+
+			clearLyricLineSelection: () => {
+				set({ selectedLyricLineIds: new Set() });
+			},
+
+			selectAllLyricLines: () => {
+				const { lyricLines } = get();
+				const allIds = lyricLines.map((line) => line.id);
+				set({ selectedLyricLineIds: new Set(allIds) });
 			},
 			addLinesFromExternal: (externalLines) => {
 				if (externalLines.length === 0) return;
@@ -272,24 +329,57 @@ export const useAppStore = create<AppStore>()(
 					};
 				});
 
-				set({ lyricLines: newLines });
+				set({ lyricLines: [...lyricLines, ...newLines] });
 			},
 
 			generateLRC: () => {
-				const { lyricLines } = get();
+				const { lyricLines, audio } = get();
 				const sortedLyrics = [...lyricLines].sort(
 					(a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0)
 				);
 
+				const getMetadataFromStorage = () => {
+					if (!audio) return null;
+
+					try {
+						const storedAudioMetadata =
+							localStorage.getItem(`currentAudioMetadata`);
+						if (!storedAudioMetadata) return null;
+
+						const audioMetadata: AudioMeta =
+							JSON.parse(storedAudioMetadata);
+						return audioMetadata.metadata?.title ||
+							audioMetadata.metadata?.artist ||
+							audioMetadata.metadata?.album
+							? audioMetadata.metadata
+							: null;
+					} catch (error) {
+						console.warn(
+							'Failed to parse stored audio metadata:',
+							error
+						);
+						return null;
+					}
+				};
+
+				const createTimestamps = () =>
+					sortedLyrics.map((line) => ({
+						time: formatLRCTimestamp(line?.timestamp ?? 0),
+						text: line.text,
+					}));
+
+				const storedMetadata = getMetadataFromStorage();
+				const defaultMetadata = {
+					title: 'Untitled Song',
+					artist: 'Unknown Artist',
+					album: 'Unknown Album',
+				};
+
 				return {
 					metadata: {
-						title: 'Untitled Song',
-						artist: 'Unknown Artist',
-						album: 'Unknown Album',
-						timestamps: sortedLyrics.map((line) => ({
-							time: formatLRCTimestamp(line?.timestamp ?? 0),
-							text: line.text,
-						})),
+						...defaultMetadata,
+						...storedMetadata,
+						timestamps: createTimestamps(),
 					},
 				};
 			},
@@ -309,13 +399,12 @@ export const useAppStore = create<AppStore>()(
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = 'lyrics.lrc';
+				a.download = `${lrcData.metadata.title || 'unknown'} - ${lrcData.metadata.artist || ''}.lrc`;
 				document.body.appendChild(a);
 				a.click();
 				document.body.removeChild(a);
 				URL.revokeObjectURL(url);
 			},
-
 			resetAllStatesAndPlayers: () => {
 				// Reset state
 				set({
@@ -325,6 +414,7 @@ export const useAppStore = create<AppStore>()(
 					showPreview: false,
 					showExternalLyrics: false,
 					showVideoPreview: false,
+					selectedLyricLineIds: new Set(),
 				});
 			},
 		}),

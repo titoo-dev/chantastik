@@ -5,13 +5,18 @@ import { useTrackUploadStore } from '@/stores/track-upload/store';
 import { useAudioRefContext } from './use-audio-ref-context';
 import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from './use-video-ref-context';
+import { usePlayerStore } from '@/stores/player/store';
 
 export function useTrackUpload() {
 	const { videoRef } = useVideoRefContext();
 	const { audioRef } = useAudioRefContext();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { setTrackLoaded, resetAllStatesAndPlayers } = useAppStore.getState();
+	const { setTrackLoaded, resetAllStatesAndPlayers, setAudio } =
+		useAppStore.getState();
+	const { reset: resetAudioPlayer } = usePlayerStore.getState();
+
+	const audio = useAppStore((state) => state.audio);
 
 	// Use Zustand store for state management
 	const {
@@ -19,7 +24,6 @@ export function useTrackUpload() {
 		isDragging,
 		showConfirmDialog,
 		isRetracted,
-		audio,
 		isUploading,
 
 		setShowConfirmDialog,
@@ -30,7 +34,6 @@ export function useTrackUpload() {
 		handleDrop,
 		toggleRetracted,
 		reset,
-		setAudio,
 	} = useTrackUploadStore();
 
 	// Fetch audio metadata using TanStack Query
@@ -70,6 +73,7 @@ export function useTrackUpload() {
 		resetAllStatesAndPlayers();
 		reset();
 		resetFileUpload();
+		resetAudioPlayer();
 	};
 
 	const handleBrowseClick = () => {
