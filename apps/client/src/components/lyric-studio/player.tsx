@@ -2,7 +2,8 @@ import type { LyricsProps } from '@/remotion/schema';
 import { Player, type PlayerRef } from '@remotion/player';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Monitor, Smartphone } from 'lucide-react';
+import { Info, Monitor, Smartphone } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 type AspectRatioType = 'horizontal' | 'vertical';
 
@@ -29,25 +30,48 @@ export const PlayerOnly: React.FC<{
 
 	return (
 		<div className="space-y-4">
-			<div className="flex gap-2">
-				<Button
-					variant={
-						aspectRatio === 'horizontal' ? 'default' : 'outline'
-					}
-					size="sm"
-					onClick={() => setAspectRatio('horizontal')}
-				>
-					<Monitor className="w-4 h-4 mr-2" />
-					YouTube
-				</Button>
-				<Button
-					variant={aspectRatio === 'vertical' ? 'default' : 'outline'}
-					size="sm"
-					onClick={() => setAspectRatio('vertical')}
-				>
-					<Smartphone className="w-4 h-4 mr-2" />
-					TikTok
-				</Button>
+			<div className="space-y-3">
+				<div className="flex gap-2 items-center">
+					<Button
+						variant={
+							aspectRatio === 'horizontal' ? 'default' : 'outline'
+						}
+						size="sm"
+						onClick={() => setAspectRatio('horizontal')}
+					>
+						<Monitor className="w-4 h-4 mr-2" />
+						YouTube
+					</Button>
+					<Button
+						variant={
+							aspectRatio === 'vertical' ? 'default' : 'outline'
+						}
+						size="sm"
+						onClick={() => setAspectRatio('vertical')}
+					>
+						<Smartphone className="w-4 h-4 mr-2" />
+						TikTok
+					</Button>
+					<div className="flex-1" />
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="h-8 w-8 p-0"
+							>
+								<Info className="w-4 h-4" />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-80">
+							<p className="text-sm">
+								If you close and reopen the video player, it may
+								lose sync with the audio or stop playing. Simply
+								restart playback.
+							</p>
+						</PopoverContent>
+					</Popover>
+				</div>
 			</div>
 			<Player
 				ref={playerRef}
