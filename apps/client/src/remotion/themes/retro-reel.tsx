@@ -7,6 +7,7 @@ import {
 	useVideoConfig,
 	Audio,
 	Img,
+	Sequence,
 } from 'remotion';
 import { useColorFlow } from '@/hooks/use-color-flow';
 import type { LyricsProps } from '../schema';
@@ -32,7 +33,7 @@ const DEFAULT_COLORS = {
 	error: '#ba1a1a',
 };
 
-export const RetroReel: React.FC<LyricsProps> = ({
+const RetroReel: React.FC<LyricsProps> = ({
 	lyrics,
 	fontFamily = 'Inter, system-ui, sans-serif',
 	backgroundColor = 'var(--background)',
@@ -291,23 +292,25 @@ export const RetroReel: React.FC<LyricsProps> = ({
 						transform: `translate(${parallaxOffset}px, ${parallaxOffset * 0.7}px) scale(1.1)`,
 					}}
 				>
-					<Img
-						src={backgroundImage}
-						alt="Background"
-						style={{
-							width: '100%',
-							height: '100%',
-							objectFit: 'cover',
-							objectPosition: 'center',
-							filter: 'brightness(0.7) contrast(1.1) sepia(0.1)',
-						}}
-						pauseWhenLoading
-						onError={(e) => {
-							console.error('Error loading image:', e);
-							e.currentTarget.src =
-								'https://example.com/default-image.jpg';
-						}}
-					/>
+					<Sequence premountFor={100}>
+						<Img
+							src={backgroundImage}
+							alt="Background"
+							style={{
+								width: '100%',
+								height: '100%',
+								objectFit: 'cover',
+								objectPosition: 'center',
+								filter: 'brightness(0.7) contrast(1.1) sepia(0.1)',
+							}}
+							pauseWhenLoading
+							onError={(e) => {
+								console.error('Error loading image:', e);
+								e.currentTarget.src =
+									'https://example.com/default-image.jpg';
+							}}
+						/>
+					</Sequence>
 				</div>
 			)}
 
@@ -354,3 +357,5 @@ export const RetroReel: React.FC<LyricsProps> = ({
 		</AbsoluteFill>
 	);
 };
+
+export default RetroReel;

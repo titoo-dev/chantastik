@@ -1,9 +1,8 @@
 import type { LyricsProps } from '@/remotion/schema';
 import { Player, type PlayerRef } from '@remotion/player';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Monitor, Smartphone } from 'lucide-react';
-import { RetroReel } from '@/remotion/themes/retro-reel';
 
 type AspectRatioType = 'horizontal' | 'vertical';
 
@@ -12,6 +11,10 @@ export const PlayerOnly: React.FC<{
 	inputProps: LyricsProps;
 	totalFrames: number;
 }> = ({ playerRef, inputProps, totalFrames }) => {
+	const lazyComponent = useCallback(() => {
+		return import('@/remotion/themes/retro-reel');
+	}, []);
+
 	const [aspectRatio, setAspectRatio] =
 		useState<AspectRatioType>('horizontal');
 
@@ -48,7 +51,7 @@ export const PlayerOnly: React.FC<{
 			</div>
 			<Player
 				ref={playerRef}
-				component={RetroReel}
+				lazyComponent={lazyComponent}
 				inputProps={{
 					...inputProps,
 				}}
@@ -60,6 +63,7 @@ export const PlayerOnly: React.FC<{
 				style={{
 					width: '100%',
 				}}
+				acknowledgeRemotionLicense
 			/>
 		</div>
 	);

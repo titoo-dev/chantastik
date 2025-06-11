@@ -2,7 +2,7 @@ import { PlayCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { parseLyrics } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
 import { getCoverArtUrl } from '@/data/api';
@@ -10,7 +10,6 @@ import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
-import { usePlayerStore } from '@/stores/player/store';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -25,21 +24,6 @@ export const LyricsPlayer = () => {
 	);
 
 	const audio = useAppStore((state) => state.audio);
-
-	const { setVideoTime } = useAppStore.getState();
-	const isPlaying = usePlayerStore((state) => state.isPlaying);
-
-	useEffect(() => {
-		if (audioRef.current) {
-			setVideoTime({
-				timestamp: audioRef.current.currentTime,
-				videoRef: videoRef,
-			});
-			if (isPlaying) {
-				videoRef.current?.play();
-			}
-		}
-	}, [showVideoPreview]);
 
 	const lyricsData = useCallback(() => {
 		return parseLyrics(lyricLines);

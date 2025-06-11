@@ -21,14 +21,12 @@ export const Header = memo(() => {
 	});
 
 	const handleProjectSelected = (project: Project) => {
-		console.log('Selected project:', project);
 		setAudio({
 			id: project.audioId,
 		});
 	};
 
 	const handleProjectDelete = (projectId: string) => {
-		console.log('Delete project with ID:', projectId);
 		setProjectToDelete(projectId);
 		setShowDeleteDialog(true);
 	};

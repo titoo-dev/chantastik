@@ -7,6 +7,7 @@ import {
 	useVideoConfig,
 	Audio,
 	Img,
+	Sequence,
 } from 'remotion';
 import type { LyricsProps } from './schema';
 import { useColorFlow } from '@/hooks/use-color-flow';
@@ -203,24 +204,26 @@ export const MyComposition: React.FC<LyricsProps> = ({
 		>
 			{/* Background image with minimal movement */}
 			{backgroundImage && (
-				<Img
-					src={backgroundImage}
-					alt="Background"
-					style={{
-						width: '100%',
-						height: '100%',
-						objectFit: 'cover',
-						objectPosition: 'center',
-						filter: 'brightness(0.9)',
-					}}
-					pauseWhenLoading
-					onError={(e) => {
-						console.error('Error loading image:', e);
-						// Fallback to a default image or color
-						e.currentTarget.src =
-							'https://example.com/default-image.jpg'; // Replace with your default image URL
-					}}
-				/>
+				<Sequence premountFor={3000}>
+					<Img
+						src={backgroundImage}
+						alt="Background"
+						style={{
+							width: '100%',
+							height: '100%',
+							objectFit: 'cover',
+							objectPosition: 'center',
+							filter: 'brightness(0.9)',
+						}}
+						pauseWhenLoading
+						onError={(e) => {
+							console.error('Error loading image:', e);
+							// Fallback to a default image or color
+							e.currentTarget.src =
+								'https://example.com/default-image.jpg'; // Replace with your default image URL
+						}}
+					/>
+				</Sequence>
 			)}
 			{/* Modern gradient overlay with dynamic colors */}
 			<div

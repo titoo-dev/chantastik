@@ -16,9 +16,6 @@ export function useGetAudio(
 
 	useEffect(() => {
 		if (query.isSuccess && query.data) {
-			// Handle success here
-			console.log('Audio metadata loaded successfully:', query.data);
-
 			// Store audio metadata to localStorage
 			localStorage.setItem(
 				'currentAudioMetadata',
