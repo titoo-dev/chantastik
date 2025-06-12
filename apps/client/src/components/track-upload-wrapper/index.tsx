@@ -1,4 +1,4 @@
-import { MoveDiagonal } from 'lucide-react';
+import { Minimize2 } from 'lucide-react';
 import { LoadingProgress } from '@/components/track-upload-wrapper/loading-progress';
 import { RetractButton } from '@/components/track-upload-wrapper/retract-button';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export function TrackUploadWrapper({
 									onClick={toggleRetracted}
 									title="Retract uploader"
 								>
-									<MoveDiagonal className="h-4 w-4 text-primary/80 rotate-180 group-hover:scale-105 transition-transform" />
+									<Minimize2 className="h-4 w-4 text-primary/80 rotate-180 group-hover:scale-105 transition-transform" />
 								</Button>
 							</div>
 
