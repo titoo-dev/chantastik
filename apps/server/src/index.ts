@@ -157,6 +157,79 @@ app.post('/audio', async (c) => {
 });
 
 /**
+ * Save or update lyrics for a project
+ * @route POST /project/:id/lyrics
+ * @param {string} request.params.id - The project ID
+ * @param {Object} request.body - Lyrics data containing text and lines
+ * @returns {Object} JSON response with lyrics ID and confirmation
+ * @throws {404} If project is not found
+ * @throws {400} If required data is missing
+ */
+app.post('/project/:id/lyrics', async (c) => {
+	const projectId = c.req.param('id');
+
+	// Verify project exists
+	const projectRaw = await c.env.PROJECT_KV.get(`project:${projectId}`);
+	if (!projectRaw) return c.text('Project not found', 404);
+
+	const { text, lines } = await c.req.json();
+
+	if (!text && !lines) {
+		return c.text('Text or lines are required', 400);
+	}
+
+	const lyricsId = uuidv4();
+	const now = new Date().toISOString();
+
+	const lyrics: Lyrics = {
+		id: lyricsId,
+		createdAt: now,
+		updatedAt: now,
+		text: text || '',
+		projectId: projectId,
+		lines: lines || [],
+	};
+
+	await c.env.LYRICS_KV.put(`lyrics:${lyricsId}`, JSON.stringify(lyrics));
+
+	// Update project with lyrics reference
+	const project = JSON.parse(projectRaw);
+	project.lyricsId = lyricsId;
+	project.updatedAt = now;
+	await saveProject(c.env.PROJECT_KV, project);
+
+	return c.json({
+		message: 'Lyrics saved successfully',
+		lyricsId: lyricsId,
+		projectId: projectId,
+	});
+});
+
+/**
+ * Get lyrics for a project
+ * @route GET /project/:id/lyrics
+ * @param {string} request.params.id - The project ID
+ * @returns {Object} JSON response with lyrics data
+ * @throws {404} If project or lyrics not found
+ */
+app.get('/project/:id/lyrics', async (c) => {
+	const projectId = c.req.param('id');
+
+	// Get project to find lyrics ID
+	const projectRaw = await c.env.PROJECT_KV.get(`project:${projectId}`);
+	if (!projectRaw) return c.text('Project not found', 404);
+
+	const project = JSON.parse(projectRaw);
+	if (!project.lyricsId)
+		return c.text('No lyrics found for this project', 404);
+
+	const lyricsRaw = await c.env.LYRICS_KV.get(`lyrics:${project.lyricsId}`);
+	if (!lyricsRaw) return c.text('Lyrics not found', 404);
+
+	return c.json(JSON.parse(lyricsRaw));
+});
+
+/**
  * Get a list of all uploaded audio files
  * @route GET /audios
  * @returns {Object} JSON response with array of audio metadata

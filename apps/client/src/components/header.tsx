@@ -10,7 +10,7 @@ import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 import { useAppStore } from '@/stores/app/store';
 
 export const Header = memo(() => {
-	const { setAudio } = useAppStore.getState();
+	const { setAudio, updateProjectId } = useAppStore.getState();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 	const deleteProjectMutation = useDeleteProject({
@@ -21,6 +21,7 @@ export const Header = memo(() => {
 	});
 
 	const handleProjectSelected = (project: Project) => {
+		updateProjectId(project.id);
 		setAudio({
 			id: project.audioId,
 		});

@@ -51,10 +51,10 @@ export async function getAllProjects(): Promise<Project[]> {
 export async function saveLyrics(
 	id: string,
 	updates: LyricsDataToUpdate
-): Promise<Project> {
+): Promise<{ lyricsId: string; projectId: string }> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/project/${id}`, {
-			method: 'PUT',
+		const response = await fetch(`${API_BASE_URL}/project/${id}/lyrics`, {
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -62,18 +62,22 @@ export async function saveLyrics(
 		});
 
 		if (!response.ok) {
-			throw new Error('Failed to update project');
+			throw new Error('Failed to save lyrics');
 		}
 
-		const updatedProject: Project = await response.json();
+		const result: { message: string; lyricsId: string; projectId: string } =
+			await response.json();
 
-		toast.success('Project updated', {
-			description: 'Project has been successfully updated',
+		toast.success('Lyrics saved', {
+			description: 'Lyrics have been successfully saved',
 		});
 
-		return updatedProject;
+		return {
+			lyricsId: result.lyricsId,
+			projectId: result.projectId,
+		};
 	} catch (error) {
-		toast.error('Project update failed', {
+		toast.error('Lyrics save failed', {
 			description:
 				error instanceof Error ? error.message : 'Unknown error',
 		});

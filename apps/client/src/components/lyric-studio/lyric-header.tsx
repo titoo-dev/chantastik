@@ -5,15 +5,50 @@ import { memo, useRef } from 'react';
 import { toast } from 'sonner';
 import type { LyricLine } from './lyric-line-item';
 import { useAppStore } from '@/stores/app/store';
+import { useSaveLyrics } from '@/hooks/use-save-lyrics';
 
 export const LyricHeader = memo(function LyricHeader() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const trackLoaded = useAppStore((state) => state.trackLoaded);
+	const currentProjectId = useAppStore((state) => state.projectId);
+	const lyricLines = useAppStore((state) => state.lyricLines);
 	const { setLyricLines } = useAppStore.getState();
+
+	const saveLyricsMutation = useSaveLyrics();
 
 	const loadFromLrcFile = () => {
 		if (fileInputRef.current) {
 			fileInputRef.current.click();
+		}
+	};
+
+	const handleSaveLyrics = async () => {
+		if (!currentProjectId) {
+			toast.error('No Project Selected', {
+				description: 'Please select a project before saving lyrics.',
+			});
+			return;
+		}
+
+		if (!lyricLines || lyricLines.length === 0) {
+			toast.error('No Lyrics to Save', {
+				description: 'Please add some lyrics before saving.',
+			});
+			return;
+		}
+
+		try {
+			// Convert lyric lines to text format
+			const text = lyricLines.map((line) => line.text).join('\n');
+
+			await saveLyricsMutation.mutateAsync({
+				projectId: currentProjectId,
+				text,
+				lines: lyricLines,
+			});
+		} catch (error) {
+			// Error handling is done in the mutation hook
+			console.error('Failed to save lyrics:', error);
 		}
 	};
 
@@ -110,6 +145,20 @@ export const LyricHeader = memo(function LyricHeader() {
 				>
 					<ArrowUpFromLine className="h-4 w-4" />
 					Load from LRC
+				</Button>
+				<Button
+					onClick={handleSaveLyrics}
+					variant="default"
+					className="gap-2"
+					disabled={
+						saveLyricsMutation.isPending ||
+						!currentProjectId ||
+						!lyricLines?.length
+					}
+					title="Save lyrics to project"
+				>
+					<ArrowUpFromLine className="h-4 w-4 rotate-180" />
+					{saveLyricsMutation.isPending ? 'Saving...' : 'Save Lyrics'}
 				</Button>
 			</div>
 		</CardHeader>
