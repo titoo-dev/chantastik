@@ -1,6 +1,6 @@
 import { CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { ArrowUpFromLine, Music } from 'lucide-react';
+import { ArrowUpFromLine, CloudDownload, Music } from 'lucide-react';
 import { memo, useRef } from 'react';
 import { toast } from 'sonner';
 import type { LyricLine } from './lyric-line-item';
@@ -157,7 +157,7 @@ export const LyricHeader = memo(function LyricHeader() {
 					}
 					title="Save lyrics to project"
 				>
-					<ArrowUpFromLine className="h-4 w-4 rotate-180" />
+					<CloudDownload className="h-4 w-4" />
 					{saveLyricsMutation.isPending ? 'Saving...' : 'Save Lyrics'}
 				</Button>
 			</div>
