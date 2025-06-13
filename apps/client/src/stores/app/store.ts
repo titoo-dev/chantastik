@@ -1,10 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
 import { formatLRCTimestamp } from '@/lib/utils';
 import type { PlayerRef } from '@remotion/player';
 import type { ComponentRef, RefObject } from 'react';
-import type { AudioMeta } from '@/data/types';
+import type { AudioMeta, LyricLine } from '@/data/types';
 import { preloadImage } from '@remotion/preload';
 import { getCoverArtUrl } from '@/data/api';
 

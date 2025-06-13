@@ -3,9 +3,9 @@ import { Button } from '../ui/button';
 import { ArrowUpFromLine, CloudDownload, Music } from 'lucide-react';
 import { memo, useRef } from 'react';
 import { toast } from 'sonner';
-import type { LyricLine } from './lyric-line-item';
 import { useAppStore } from '@/stores/app/store';
 import { useSaveLyrics } from '@/hooks/use-save-lyrics';
+import type { LyricLine } from '@/data/types';
 
 export const LyricHeader = memo(function LyricHeader() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +63,7 @@ export const LyricHeader = memo(function LyricHeader() {
 				const lines = content.split('\n');
 
 				// Extract lyric lines with timestamps
-				const lyricLines = lines
+				const parsedLyricEntries = lines
 					.filter(
 						(line) =>
 							line.trim() &&
@@ -95,10 +95,10 @@ export const LyricHeader = memo(function LyricHeader() {
 					})
 					.filter(Boolean) as LyricLine[];
 
-				if (lyricLines.length > 0) {
-					setLyricLines(lyricLines);
+				if (parsedLyricEntries.length > 0) {
+					setLyricLines(parsedLyricEntries);
 					toast.success('LRC File Loaded', {
-						description: `${lyricLines.length} lyric lines imported successfully.`,
+						description: `${parsedLyricEntries.length} lyric lines imported successfully.`,
 					});
 				} else {
 					toast.error('Invalid LRC File', {

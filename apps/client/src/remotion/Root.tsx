@@ -2,7 +2,7 @@ import './index.css';
 import { Composition } from 'remotion';
 import { MyComposition } from './Composition';
 import { type Lyrics, LyricsPropsSchema } from './schema';
-import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
+import type { LyricLine } from '@/data/types';
 
 export const RemotionRoot: React.FC = () => {
 	// Process lyrics from the text file

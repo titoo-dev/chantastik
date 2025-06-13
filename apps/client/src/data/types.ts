@@ -23,3 +23,9 @@ export interface Metadata {
 	genre?: string[]; // Genre might be unknown
 	duration: number; // Duration should typically be available
 }
+
+export type LyricLine = {
+	id: number;
+	text: string;
+	timestamp?: number;
+};

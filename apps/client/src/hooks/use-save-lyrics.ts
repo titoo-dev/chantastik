@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { saveLyrics } from '@/data/api';
-import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
+import type { LyricLine } from '@/data/types';
 
 type SaveLyricsParams = {
 	projectId: string;

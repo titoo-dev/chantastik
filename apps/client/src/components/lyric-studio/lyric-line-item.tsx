@@ -5,14 +5,9 @@ import { Input } from '../ui/input';
 import { TimestampControl } from './timestamp-control';
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
+import type { LyricLine } from '@/data/types';
 
-export interface LyricLine {
-	id: number;
-	text: string;
-	timestamp?: number;
-}
-
-interface LyricLineItemProps {
+type LyricLineItemProps = {
 	line: LyricLine;
 	index: number;
 	canUseCurrentTime: boolean;
@@ -23,7 +18,7 @@ interface LyricLineItemProps {
 	isActive?: boolean;
 	isSelected?: boolean;
 	onToggleSelection?: (id: number, event: React.MouseEvent) => void;
-}
+};
 
 export const LyricLineItem = memo(
 	({

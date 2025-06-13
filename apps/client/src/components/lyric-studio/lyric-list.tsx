@@ -1,11 +1,12 @@
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { LyricLineItem, type LyricLine } from './lyric-line-item';
+import { LyricLineItem } from './lyric-line-item';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useAppStore } from '@/stores/app/store';
 import { Lrc, Runner } from 'lrc-kit';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
+import type { LyricLine } from '@/data/types';
 
 export function LyricList({
 	lyricLines,

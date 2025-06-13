@@ -1,6 +1,5 @@
 import { toast } from 'sonner';
-import type { AudioMeta } from './types';
-import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
+import type { AudioMeta, LyricLine } from './types';
 
 // API base URL - adjust based on your environment
 export const API_BASE_URL =
@@ -78,6 +77,35 @@ export async function saveLyrics(
 		};
 	} catch (error) {
 		toast.error('Lyrics save failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
+// get lyrics for a project function
+export async function getLyrics(projectId: string): Promise<{
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	text: string;
+	projectId: string;
+	lines: LyricLine[];
+}> {
+	try {
+		const response = await fetch(
+			`${API_BASE_URL}/project/${projectId}/lyrics`
+		);
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch lyrics');
+		}
+
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		toast.error('Lyrics fetch failed', {
 			description:
 				error instanceof Error ? error.message : 'Unknown error',
 		});

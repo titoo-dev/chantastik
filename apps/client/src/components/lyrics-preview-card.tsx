@@ -6,7 +6,7 @@ import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import type { PlayerRef } from '@remotion/player';
 import { Lrc, Runner } from 'lrc-kit';
-import type { LyricLine } from './lyric-studio/lyric-line-item';
+import type { LyricLine } from '@/data/types';
 
 export function LyricsPreviewCard() {
 	const { lyricLines } = useAppStore(
