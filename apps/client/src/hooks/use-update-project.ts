@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { LyricLine } from '@/components/lyric-studio/lyric-line-item';
-import { updateProject, type Project } from '@/data/api';
+import { saveLyrics, type Project } from '@/data/api';
 
 type UpdateProjectVariables = {
 	id: string;
@@ -15,7 +15,7 @@ export function useUpdateProject() {
 
 	return useMutation({
 		mutationFn: ({ id, updates }: UpdateProjectVariables) =>
-			updateProject(id, updates),
+			saveLyrics(id, updates),
 
 		onSuccess: (updatedProject: Project) => {
 			// Invalidate and refetch projects list

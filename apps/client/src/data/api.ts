@@ -48,7 +48,7 @@ export async function getAllProjects(): Promise<Project[]> {
 }
 
 // update project function
-export async function updateProject(
+export async function saveLyrics(
 	id: string,
 	updates: LyricsDataToUpdate
 ): Promise<Project> {
