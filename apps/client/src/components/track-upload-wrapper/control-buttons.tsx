@@ -1,4 +1,4 @@
-import { MoveDiagonal, X } from 'lucide-react';
+import { Minimize2, X } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface ControlButtonsProps {
@@ -21,7 +21,7 @@ export function ControlButtons({
 				onClick={onRetract}
 				title="Retract player"
 			>
-				<MoveDiagonal className="h-4 w-4 text-muted-foreground rotate-180" />
+				<Minimize2 className="h-4 w-4 text-muted-foreground rotate-180" />
 			</Button>
 			<Button
 				size="icon"

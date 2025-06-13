@@ -1,8 +1,9 @@
-import { ArrowRightCircle, FileText } from 'lucide-react';
+import { ArrowRightCircle, FileText, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { useExternalLyricsSection } from '@/hooks/use-external-lyrics-section';
+import { useAppStore } from '@/stores/app/store';
 
 export function ExternalLyricsSection() {
 	const {
@@ -13,6 +14,19 @@ export function ExternalLyricsSection() {
 		isConvertDisabled,
 		shouldRender,
 	} = useExternalLyricsSection();
+
+	const audio = useAppStore((state) => state.audio);
+
+	const handleGoogleSearch = () => {
+		if (!audio) return;
+
+		const url = new URL('https://www.google.com/search');
+		url.searchParams.append(
+			'q',
+			`${audio?.metadata?.artist} ${audio?.metadata?.title} lyrics`
+		);
+		window.open(url.toString(), '_blank');
+	};
 
 	if (!shouldRender) {
 		return null;
@@ -25,17 +39,28 @@ export function ExternalLyricsSection() {
 					<FileText className="h-5 w-5 text-primary" />
 					External Lyrics
 				</CardTitle>
-				<Button
-					onClick={handleConvertToLines}
-					variant="outline"
-					size="sm"
-					className="gap-2"
-					disabled={isConvertDisabled}
-					title="Create lyric lines from this text"
-				>
-					<ArrowRightCircle className="h-4 w-4" />
-					Convert to Lines
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						className="p-2"
+						title="Search for lyrics online"
+						onClick={handleGoogleSearch}
+					>
+						<Globe className="h-4 w-4" />
+					</Button>
+					<Button
+						onClick={handleConvertToLines}
+						variant="outline"
+						size="sm"
+						className="gap-2"
+						disabled={isConvertDisabled}
+						title="Create lyric lines from this text"
+					>
+						<ArrowRightCircle className="h-4 w-4" />
+						Convert to Lines
+					</Button>
+				</div>
 			</CardHeader>
 			<CardContent className="px-4">
 				<Textarea
