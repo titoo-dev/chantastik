@@ -230,7 +230,6 @@ const RetroReel: React.FC<LyricsProps> = ({
 							background: theme
 								? `linear-gradient(135deg, ${colors.surface}90, ${colors.surfaceVariant}80)`
 								: 'rgba(0,0,0,0.7)',
-							backdropFilter: 'blur(20px)',
 							border: theme
 								? `2px solid ${colors.primary}40`
 								: '2px solid rgba(255,255,255,0.2)',

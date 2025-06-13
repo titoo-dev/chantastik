@@ -33,45 +33,67 @@ export interface Metadata {
 export const API_BASE_URL = 'https://mp3-uploader.dev-titosy.workers.dev';
 
 const lrc = `
-[ti:ALL MY LOVE]
-[ar:Coldplay]
-[al:Moon Music (Full Moon Edition)]
+[ti:Stand]
+[ar:Donnie McClurkin]
+[al:Donnie McClurkin]
 
-[00:07.81]We've been through low
-[00:10.02]Been through sunshine, been through snow
-[00:14.89]All the colors of the weather
-[00:21.84]We've been through high
-[00:24.20]Every corner of the sky
-[00:28.87]And still we're holding on together
-[00:35.95]You got all my love
-[00:41.13]Whether it rains or pours, I'm all yours
-[00:49.88]You've got all my love
-[00:55.13]Whether it rains, it remains
-[01:03.87]You've got all my love
-[01:24.50]Until I die
-[01:26.83]Let me hold you if you cry
-[01:31.66]Be my one, two, three, forever
-[01:38.59]'Cause you got all my love
-[01:43.88]Whether it rains or pours, I'm all yours
-[01:52.56]You've got all my love
-[01:57.63]Whether it rains, it remains
-[02:06.54]You've got all my love
-[02:28.15]La-la, la-la, la, lay
-[02:33.47]Whether it rains or pours, I'm all yours
-[02:42.12]La-la, la-la, la, lay
-[02:47.78]That's all, all I can say
-[03:07.42]Ooh, you got all my love
-[03:15.08]Oh, for now and always, 'til the end of my days
-[03:23.76]You got all my love
-[03:30.84]You've got all my love
+[00:13.82]What do you do when you've done all you can
+[00:19.66]And it seems like it's never enough?
+[00:26.06]And what do you say when your friends turn away
+[00:34.48]And you're all alone?
+[00:40.55]Tell me, what do you give when you've given your all
+[00:47.56]And it seems like you can't make it through?
+[00:53.66]Well, you just stand when there's nothing left to do
+[01:01.18]You just stand, watch the Lord see you through
+[01:09.25]Yes, after you've done all you can
+[01:15.26]You just stand
+[01:22.21]Tell me, how do you handle the guilt of your past?
+[01:30.25]Tell me, how do you deal with the shame?
+[01:35.33]And how can you smile while your heart has been broken
+[01:43.44]And filled with pain?
+[01:49.52]Tell me, what do you give when you've given your all? Yeah
+[01:57.87]Seems like you can't make it through
+[02:02.47]Child, you just stand when there's nothing left to do
+[02:09.91]You just stand, watch the Lord see you through
+[02:17.47]Yes, after you've done all you can
+[02:23.15]You just stand
+[02:27.39]Stand and be sure
+[02:30.56]Be not entangled in that bondage again
+[02:36.21]You just stand (Stand) and endure (And endure)
+[02:43.58]God has a purpose, hey
+[02:46.16]Yes, God has a plan
+[02:48.75]Tell me, what do you do when you've done all you can
+[02:56.55]And it seems like you can't make it through?
+[03:00.94]Child, you just stand (Stand)
+[03:05.07]You just stand (Stand)
+[03:08.48]Stand (Stand)
+[03:11.64]Don't you dare give up (Ooh, you just)
+[03:15.22]Through the storm (Stand), stand through the rain (Stand)
+[03:21.41]Through the hurt (Stand), jet through the pain (You just)
+[03:27.56]Don't you bow (Stand), and don't you bend (Stand)
+[03:34.02]Don't give up (Stand), no, don't give in (You just)
+[03:40.64]Hold on (Stand), just be strong (Stand)
+[03:46.74]God will step in (Stand), and it won't be long, no (You just)
+[03:54.58]After you've done all you can (After you've done all you can)
+[04:01.18]After you've done all you can (After you've done all you can)
+[04:08.26]After you've gone through the hurt (After you've done all you can)
+[04:15.44]After you've gone through the pain (After you've done all you can)
+[04:22.28]After you've gone through the storm (After you've done all you can), hallelujah
+[04:27.59]After you've gone through the rain (After you've done all you can)
+[04:35.30]Prayed and cried
+[04:38.72]Prayed and cried (After you done all you can)
+[04:41.92]Prayed and you've cried (After you've done all you can)
+[04:45.58]Prayed and cry, oh
+[04:48.88]After you've done all you can
+[04:54.33]You just stand, oh, whoa, oh, oh, mm
 `;
 
 export const RemotionRoot: React.FC = () => {
 	const COVER_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/08a193d7-0f8a-4990-b4f8-d7c6c5939830/cover';
+		'https://mp3-uploader.dev-titosy.workers.dev/audio/959bfcb9-8ef1-46f4-b174-516c24dfc015/cover';
 
 	const MP3_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/08a193d7-0f8a-4990-b4f8-d7c6c5939830';
+		'https://mp3-uploader.dev-titosy.workers.dev/audio/959bfcb9-8ef1-46f4-b174-516c24dfc015';
 
 	const [audioMeta, setAudioMeta] = useState<AudioMeta | null>(null);
 
