@@ -101,7 +101,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 					fontSize: '2.5rem',
 					padding: '1.5rem 2rem',
 					maxWidth: '90%',
-					minWidth: '250px',
+					minWidth: '400px',
 					top: '60%', // Lower position for vertical
 				},
 				nextLyric: {
@@ -201,7 +201,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 						style={{
 							fontSize: responsiveStyles.currentLyric.fontSize,
 							fontWeight: 800,
-							lineHeight: isVertical ? 1.2 : 1.3,
+							lineHeight: isVertical ? 1.4 : 1.3,
 							color: dynTextColor,
 							letterSpacing: '-0.03em',
 							margin: 0,
