@@ -397,6 +397,8 @@ export const useAppStore = create<AppStore>()(
 					showExternalLyrics: false,
 					showVideoPreview: false,
 					selectedLyricLineIds: new Set(),
+					projectId: undefined,
+					audio: undefined,
 				});
 			},
 		}),
