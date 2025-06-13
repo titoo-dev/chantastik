@@ -313,7 +313,7 @@ export const useAppStore = create<AppStore>()(
 					};
 				});
 
-				set({ lyricLines: [...lyricLines, ...newLines] });
+				set({ lyricLines: [...newLines] });
 			},
 
 			generateLRC: () => {

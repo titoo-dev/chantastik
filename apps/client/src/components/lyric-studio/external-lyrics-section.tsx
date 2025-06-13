@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import { useExternalLyricsSection } from '@/hooks/use-external-lyrics-section';
-import { useAppStore } from '@/stores/app/store';
+import type { AudioMeta } from '@/data/types';
 
 export function ExternalLyricsSection() {
 	const {
@@ -15,15 +15,17 @@ export function ExternalLyricsSection() {
 		shouldRender,
 	} = useExternalLyricsSection();
 
-	const audio = useAppStore((state) => state.audio);
-
 	const handleGoogleSearch = () => {
-		if (!audio) return;
+		const storedAudioMetadata =
+			localStorage.getItem(`currentAudioMetadata`);
+		if (!storedAudioMetadata) return null;
+
+		const audioMetadata: AudioMeta = JSON.parse(storedAudioMetadata);
 
 		const url = new URL('https://www.google.com/search');
 		url.searchParams.append(
 			'q',
-			`${audio?.metadata?.artist} ${audio?.metadata?.title} lyrics`
+			`${audioMetadata?.metadata?.artist} ${audioMetadata?.metadata?.title} lyrics`
 		);
 		window.open(url.toString(), '_blank');
 	};
@@ -55,10 +57,10 @@ export function ExternalLyricsSection() {
 						size="sm"
 						className="gap-2"
 						disabled={isConvertDisabled}
-						title="Create lyric lines from this text"
+						title="Override lyric lines from this text"
 					>
 						<ArrowRightCircle className="h-4 w-4" />
-						Convert to Lines
+						Apply new Lines
 					</Button>
 				</div>
 			</CardHeader>
