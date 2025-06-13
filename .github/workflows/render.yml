@@ -1,0 +1,30 @@
+name: Render video
+on:
+  workflow_dispatch:
+    inputs:
+      titleText:
+        description: "Quel texte doit-il être affiché ?"
+        required: true
+        default: "Bienvenue sur Remotion"
+      titleColor:
+        description: "Quelle couleur doit-il avoir ?"
+        required: true
+        default: "noir"
+jobs:
+  render:
+    name: Render video
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pnpm install
+      - run: echo $WORKFLOW_INPUT > input-props.json
+        env:
+          WORKFLOW_INPUT: ${{ toJson(github.event.inputs) }}
+      - run: npx remotion render MyComp out/video.mp4 --props="./input-props.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: out.mp4
+          path: out/video.mp4

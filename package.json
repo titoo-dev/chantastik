@@ -12,19 +12,21 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "npm-run-all2": "^6.2.6",
     "prettier": "^3.5.3",
     "turbo": "^2.5.3",
-    "typescript": "5.7.2",
-    "npm-run-all2": "^6.2.6"
+    "typescript": "5.7.2"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
     "node": ">=18"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
-      "esbuild"
+      "esbuild",
+      "sharp",
+      "workerd"
     ]
   }
 }
