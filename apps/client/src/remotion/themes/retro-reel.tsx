@@ -201,7 +201,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 						style={{
 							fontSize: responsiveStyles.currentLyric.fontSize,
 							fontWeight: 800,
-							lineHeight: isVertical ? 1.2 : 1.1,
+							lineHeight: isVertical ? 1.2 : 1.3,
 							color: dynTextColor,
 							letterSpacing: '-0.03em',
 							margin: 0,
