@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	AbsoluteFill,
 	useCurrentFrame,
@@ -8,8 +8,12 @@ import {
 	Audio,
 	Img,
 	Sequence,
+	delayRender,
+	continueRender,
+	cancelRender,
 } from 'remotion';
 import type { LyricsProps } from '../schema';
+import materialDynamicColors from 'material-dynamic-colors';
 
 // Default color palette to use if no theme is available
 const DEFAULT_COLORS = {
@@ -32,21 +36,40 @@ const DEFAULT_COLORS = {
 	error: '#ba1a1a',
 };
 
-const RetroReel: React.FC<LyricsProps> = ({
+type MDC = Awaited<ReturnType<typeof materialDynamicColors>>;
+
+const RetroReelRenderer: React.FC<LyricsProps> = ({
 	lyrics,
 	fontFamily = 'Inter, system-ui, sans-serif',
 	backgroundColor = 'var(--background)',
 	textColor = 'var(--foreground)',
 	backgroundImage,
 	audioSrc,
-	theme,
 }) => {
+	const [handle] = useState(() => delayRender('RetroReel component loaded'));
+	const [theme, setTheme] = useState<MDC | null>();
+
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
 
 	// Determine aspect ratio
 	const aspectRatio = width / height;
 	const isVertical = aspectRatio < 1; // Vertical if width < height
+
+	const fetchDynamicColors = async () => {
+		if (!backgroundImage) {
+			continueRender(handle);
+			return null;
+		}
+		try {
+			const mdc = await materialDynamicColors(backgroundImage ?? '');
+			setTheme(mdc);
+			continueRender(handle);
+		} catch (error) {
+			console.error('Error fetching dynamic colors:', error);
+			cancelRender(handle);
+		}
+	};
 
 	// Create a color scheme based on the theme or use defaults
 	const colors = React.useMemo(() => {
@@ -210,7 +233,6 @@ const RetroReel: React.FC<LyricsProps> = ({
 							border: theme
 								? `2px solid ${colors.primary}40`
 								: '2px solid rgba(255,255,255,0.2)',
-							backdropFilter: 'blur(20px)',
 							boxShadow: theme
 								? `0 20px 40px ${colors.background}60, inset 0 1px 0 ${colors.onSurface}20`
 								: '0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
@@ -268,6 +290,10 @@ const RetroReel: React.FC<LyricsProps> = ({
 			</>
 		);
 	};
+
+	useEffect(() => {
+		fetchDynamicColors();
+	}, []);
 
 	if (theme === null) {
 		// If theme is null, we are still loading the dynamic colors
@@ -360,4 +386,4 @@ const RetroReel: React.FC<LyricsProps> = ({
 	);
 };
 
-export default RetroReel;
+export default RetroReelRenderer;

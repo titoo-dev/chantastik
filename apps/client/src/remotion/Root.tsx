@@ -113,7 +113,7 @@ export const RemotionRoot: React.FC = () => {
 	}, []);
 
 	const lazyComponent = useCallback(() => {
-		return import('./themes/retro-reel');
+		return import('./renderers/retro-reel-renderer');
 	}, []);
 
 	const lyricLines = parseLrcToLines(lrc);
