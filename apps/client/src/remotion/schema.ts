@@ -1,3 +1,4 @@
+import type { IMaterialDynamicColorsTheme } from 'material-dynamic-colors/src/cdn/interfaces';
 import { z } from 'zod';
 
 export const LyricLineSchema = z.object({
@@ -20,6 +21,7 @@ export const LyricsPropsSchema = z.object({
 	highlightColor: z.string().optional().default('hsl(142.1 76.2% 36.3%)'),
 	backgroundImage: z.string().optional(),
 	audioSrc: z.string().optional(),
+	theme: z.custom<IMaterialDynamicColorsTheme>().nullable().optional(),
 });
 
 export type LyricsProps = z.infer<typeof LyricsPropsSchema>;

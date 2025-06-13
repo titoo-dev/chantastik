@@ -9,7 +9,6 @@ import {
 	Img,
 	Sequence,
 } from 'remotion';
-import { useColorFlow } from '@/hooks/use-color-flow';
 import type { LyricsProps } from '../schema';
 
 // Default color palette to use if no theme is available
@@ -40,6 +39,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 	textColor = 'var(--foreground)',
 	backgroundImage,
 	audioSrc,
+	theme,
 }) => {
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
@@ -47,9 +47,6 @@ const RetroReel: React.FC<LyricsProps> = ({
 	// Determine aspect ratio
 	const aspectRatio = width / height;
 	const isVertical = aspectRatio < 1; // Vertical if width < height
-
-	// Use the color flow hook instead of local implementation
-	const theme = useColorFlow();
 
 	// Create a color scheme based on the theme or use defaults
 	const colors = React.useMemo(() => {

@@ -10,10 +10,13 @@ import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
+import { useColorFlow } from '@/hooks/use-color-flow';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
 	const { videoRef } = useVideoRefContext();
+
+	const theme = useColorFlow();
 
 	const { lyricLines, showVideoPreview, showExternalLyrics } = useAppStore(
 		useShallow((state) => ({
@@ -49,6 +52,7 @@ export const LyricsPlayer = () => {
 		return {
 			lyrics: lyricsData,
 			backgroundImage: getCoverArtUrl(audio?.id ?? ''),
+			theme,
 		} as LyricsProps;
 	}, [lyricsData]);
 
