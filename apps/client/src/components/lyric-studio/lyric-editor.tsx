@@ -85,7 +85,7 @@ export const LyricEditor = memo(function LyricEditor() {
 				<CardContent className="p-6">
 					<div className="flex flex-col items-center justify-center py-12 text-center">
 						<div className="rounded-full bg-destructive/10 p-4 mb-4">
-							<Music className="h-10 w-10 text-destructive" />
+							<Music className="h-10 w-10 text-primary" />
 						</div>
 						<h3 className="mb-2 text-lg font-semibold text-foreground">
 							Failed to Load Lyrics

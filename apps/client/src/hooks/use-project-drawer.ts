@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useGetProjects } from '@/hooks/use-get-projects';
 import { type Project } from '@/data/api';
+import { useRemoveCurrentAudio } from './use-remove-current-audio';
 
 interface UseProjectDrawerProps {
 	onProjectSelected: (project: Project) => void;
@@ -13,6 +14,8 @@ export const useProjectDrawer = ({
 }: UseProjectDrawerProps) => {
 	const closeRef = useRef<HTMLButtonElement>(null);
 
+	const { handleRemoveAudio } = useRemoveCurrentAudio();
+
 	const {
 		data: projects,
 		isLoading,
@@ -22,6 +25,7 @@ export const useProjectDrawer = ({
 	} = useGetProjects({ enabled: true });
 
 	const handleProjectSelect = (project: Project) => {
+		handleRemoveAudio(); // Clear current audio when selecting a new project
 		onProjectSelected(project);
 		closeRef.current?.click();
 	};

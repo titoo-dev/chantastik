@@ -2,21 +2,16 @@ import { useRef } from 'react';
 import { useGetAudio } from '@/hooks/use-get-audio';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { useTrackUploadStore } from '@/stores/track-upload/store';
-import { useAudioRefContext } from './use-audio-ref-context';
 import { useAppStore } from '@/stores/app/store';
-import { useVideoRefContext } from './use-video-ref-context';
-import { usePlayerStore } from '@/stores/player/store';
+import { useRemoveCurrentAudio } from './use-remove-current-audio';
 
 export function useTrackUpload() {
-	const { videoRef } = useVideoRefContext();
-	const { audioRef } = useAudioRefContext();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { setTrackLoaded, resetAllStatesAndPlayers, setAudio } =
-		useAppStore.getState();
-	const { reset: resetAudioPlayer } = usePlayerStore.getState();
-
 	const audio = useAppStore((state) => state.audio);
+
+	// Use the extracted hook for removing audio
+	const { handleRemoveAudio } = useRemoveCurrentAudio();
 
 	// Use Zustand store for state management
 	const {
@@ -33,7 +28,6 @@ export function useTrackUpload() {
 		handleDragOver,
 		handleDrop,
 		toggleRetracted,
-		reset,
 	} = useTrackUploadStore();
 
 	// Fetch audio metadata using TanStack Query
@@ -43,11 +37,7 @@ export function useTrackUpload() {
 		});
 
 	// File upload mutation
-	const {
-		uploadFile,
-		isUploading: fileUploadLoading,
-		reset: resetFileUpload,
-	} = useFileUpload();
+	const { uploadFile, isUploading: fileUploadLoading } = useFileUpload();
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -55,25 +45,6 @@ export function useTrackUpload() {
 			handleFileChange(file);
 			uploadFile(file);
 		}
-	};
-
-	const handleRemoveAudio = () => {
-		setAudio(undefined);
-		if (audioRef?.current) {
-			audioRef.current.pause();
-			audioRef.current.src = '';
-			audioRef.current.load();
-			audioRef.current.currentTime = 0;
-		}
-		if (videoRef?.current) {
-			videoRef.current.pause();
-			videoRef.current.seekTo(0);
-		}
-		setTrackLoaded(false);
-		resetAllStatesAndPlayers();
-		reset();
-		resetFileUpload();
-		resetAudioPlayer();
 	};
 
 	const handleBrowseClick = () => {
