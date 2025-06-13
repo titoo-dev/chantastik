@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	AbsoluteFill,
 	useCurrentFrame,
@@ -8,8 +8,12 @@ import {
 	Audio,
 	Img,
 	Sequence,
+	delayRender,
+	continueRender,
+	cancelRender,
 } from 'remotion';
 import type { LyricsProps } from '../schema';
+import materialDynamicColors from 'material-dynamic-colors';
 
 // Default color palette to use if no theme is available
 const DEFAULT_COLORS = {
@@ -32,6 +36,8 @@ const DEFAULT_COLORS = {
 	error: '#ba1a1a',
 };
 
+type MDC = Awaited<ReturnType<typeof materialDynamicColors>>;
+
 const RetroReel: React.FC<LyricsProps> = ({
 	lyrics,
 	fontFamily = 'Inter, system-ui, sans-serif',
@@ -39,14 +45,31 @@ const RetroReel: React.FC<LyricsProps> = ({
 	textColor = 'var(--foreground)',
 	backgroundImage,
 	audioSrc,
-	theme,
 }) => {
+	const [handle] = useState(() => delayRender('RetroReel component loaded'));
+	const [theme, setTheme] = useState<MDC | null>();
+
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();
 
 	// Determine aspect ratio
 	const aspectRatio = width / height;
 	const isVertical = aspectRatio < 1; // Vertical if width < height
+
+	const fetchDynamicColors = async () => {
+		if (!backgroundImage) {
+			continueRender(handle);
+			return null;
+		}
+		try {
+			const mdc = await materialDynamicColors(backgroundImage ?? '');
+			setTheme(mdc);
+			continueRender(handle);
+		} catch (error) {
+			console.error('Error fetching dynamic colors:', error);
+			cancelRender(handle);
+		}
+	};
 
 	// Create a color scheme based on the theme or use defaults
 	const colors = React.useMemo(() => {
@@ -269,6 +292,15 @@ const RetroReel: React.FC<LyricsProps> = ({
 		);
 	};
 
+	useEffect(() => {
+		fetchDynamicColors();
+	}, []);
+
+	if (theme === null) {
+		// If theme is null, we are still loading the dynamic colors
+		return <AbsoluteFill style={{ backgroundColor: backgroundColor }} />;
+	}
+
 	return (
 		<AbsoluteFill
 			style={{
@@ -350,7 +382,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 			/>
 
 			{renderLyrics()}
-			{audioSrc && <Audio src={audioSrc} pauseWhenBuffering />}
+			{audioSrc && <Audio src={audioSrc} />}
 		</AbsoluteFill>
 	);
 };

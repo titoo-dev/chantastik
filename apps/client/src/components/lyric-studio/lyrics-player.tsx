@@ -1,6 +1,6 @@
 import { PlayCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { parseLyrics } from '@/remotion/Root';
+import { parseLines } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { useCallback, useMemo } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
@@ -29,7 +29,7 @@ export const LyricsPlayer = () => {
 	const audio = useAppStore((state) => state.audio);
 
 	const lyricsData = useCallback(() => {
-		return parseLyrics(lyricLines);
+		return parseLines(lyricLines);
 	}, [lyricLines])();
 
 	const totalFrames = useMemo(() => {
