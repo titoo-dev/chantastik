@@ -210,7 +210,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 							border: theme
 								? `2px solid ${colors.primary}40`
 								: '2px solid rgba(255,255,255,0.2)',
-							backdropFilter: 'blur(20px)',
+							backdropFilter: 'blur(1px)',
 							boxShadow: theme
 								? `0 20px 40px ${colors.background}60, inset 0 1px 0 ${colors.onSurface}20`
 								: '0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',

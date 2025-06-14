@@ -33,74 +33,83 @@ export interface Metadata {
 export const API_BASE_URL = 'https://mp3-uploader.dev-titosy.workers.dev';
 
 const lrc = `
-[ti:Stand]
-[ar:Donnie McClurkin]
-[al:Donnie McClurkin]
+[ti:Love]
+[ar:Keyshia Cole]
+[al:The Way It Is]
 
-[00:13.82]What do you do when you've done all you can
-[00:19.66]And it seems like it's never enough?
-[00:26.06]And what do you say when your friends turn away
-[00:34.48]And you're all alone?
-[00:40.55]Tell me, what do you give when you've given your all
-[00:47.56]And it seems like you can't make it through?
-[00:53.66]Well, you just stand when there's nothing left to do
-[01:01.18]You just stand, watch the Lord see you through
-[01:09.25]Yes, after you've done all you can
-[01:15.26]You just stand
-[01:22.21]Tell me, how do you handle the guilt of your past?
-[01:30.25]Tell me, how do you deal with the shame?
-[01:35.33]And how can you smile while your heart has been broken
-[01:43.44]And filled with pain?
-[01:49.52]Tell me, what do you give when you've given your all? Yeah
-[01:57.87]Seems like you can't make it through
-[02:02.47]Child, you just stand when there's nothing left to do
-[02:09.91]You just stand, watch the Lord see you through
-[02:17.47]Yes, after you've done all you can
-[02:23.15]You just stand
-[02:27.39]Stand and be sure
-[02:30.56]Be not entangled in that bondage again
-[02:36.21]You just stand (Stand) and endure (And endure)
-[02:43.58]God has a purpose, hey
-[02:46.16]Yes, God has a plan
-[02:48.75]Tell me, what do you do when you've done all you can
-[02:56.55]And it seems like you can't make it through?
-[03:00.94]Child, you just stand (Stand)
-[03:05.07]You just stand (Stand)
-[03:08.48]Stand (Stand)
-[03:11.64]Don't you dare give up (Ooh, you just)
-[03:15.22]Through the storm (Stand), stand through the rain (Stand)
-[03:21.41]Through the hurt (Stand), jet through the pain (You just)
-[03:27.56]Don't you bow (Stand), and don't you bend (Stand)
-[03:34.02]Don't give up (Stand), no, don't give in (You just)
-[03:40.64]Hold on (Stand), just be strong (Stand)
-[03:46.74]God will step in (Stand), and it won't be long, no (You just)
-[03:54.58]After you've done all you can (After you've done all you can)
-[04:01.18]After you've done all you can (After you've done all you can)
-[04:08.26]After you've gone through the hurt (After you've done all you can)
-[04:15.44]After you've gone through the pain (After you've done all you can)
-[04:22.28]After you've gone through the storm (After you've done all you can), hallelujah
-[04:27.59]After you've gone through the rain (After you've done all you can)
-[04:35.30]Prayed and cried
-[04:38.72]Prayed and cried (After you done all you can)
-[04:41.92]Prayed and you've cried (After you've done all you can)
-[04:45.58]Prayed and cry, oh
-[04:48.88]After you've done all you can
-[04:54.33]You just stand, oh, whoa, oh, oh, mm
+[00:24.58]I used to think that I wasn't fine enough
+[00:28.66]And I used to think that I wasn't wild enough
+[00:32.73]But I won't waste my time tryna figure out why you playin' games
+[00:38.82]What's this all about?
+[00:40.80]And I can't believe
+[00:42.74]You're hurting me
+[00:44.68]I met your girl, what a difference
+[00:49.02]What you see in her
+[00:51.03]You ain't seen in me
+[00:53.18]But I guess it was all just make-believe
+[00:56.98]Oh, love
+[01:01.26]Never knew what I was missin'
+[01:05.47]But I knew once we start kissin'
+[01:09.10]I found
+[01:14.22]Love
+[01:17.78]Never knew what I was missin'
+[01:21.98]But I knew once we start kissin'
+[01:25.49]I found, found you
+[01:33.59]Now you're gone, what am I gonna do?
+[01:37.84]So empty
+[01:39.94]My heart, my soul, can't go on
+[01:45.16]Go on, without you
+[01:48.92]My rainy days fade away when you
+[01:52.87]Come around, please tell me, baby
+[01:57.72]Why you go so far away?
+[02:02.70]Why you go?
+[02:03.61]Love
+[02:07.20]Never knew what I was missin'
+[02:11.32]But I knew once we start kissin'
+[02:14.85]I found
+[02:20.01]Love
+[02:23.62]Never knew what I was missin'
+[02:27.75]But I knew once we start kissin'
+[02:31.37]I found, I found you
+[02:38.43]Who would have known I'd find you?
+[02:46.59]Ooh
+[02:53.76]Now you're gone, what am I gonna do?
+[02:58.00]So empty
+[03:00.16]My heart, my soul, can't go on
+[03:06.50]Go on, baby, without you
+[03:11.29]Rainy days fade away
+[03:15.09]When you come around
+[03:16.65]Say you're here to stay
+[03:19.07]With me, boy
+[03:20.74]I don't want you to leave me
+[03:23.40]I, I need you
+[03:25.90]Love
+[03:29.53]Never knew what I was missin' (I never knew)
+[03:33.65]But I knew once we start kissin'
+[03:37.14]I found (found love)
+[03:42.30]Love
+[03:45.99]Never knew what (I never) I was missin' (never, never)
+[03:50.19]But I knew once we start kissin'
+[03:53.70]I found (I found, I found)
+[03:58.84]Love
+[04:02.37]Never knew what I was missin'
+[04:06.48]But I knew once we start kissin'
+[04:10.10]I found
 `;
 
 export const RemotionRoot: React.FC = () => {
 	const COVER_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/959bfcb9-8ef1-46f4-b174-516c24dfc015/cover';
+		'https://mp3-uploader.dev-titosy.workers.dev/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb/cover';
 
 	const MP3_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/959bfcb9-8ef1-46f4-b174-516c24dfc015';
+		'https://mp3-uploader.dev-titosy.workers.dev/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb';
 
 	const [audioMeta, setAudioMeta] = useState<AudioMeta | null>(null);
 
 	useEffect(() => {
 		const fetchAudioMeta = async () => {
 			// Extract audio ID from the COVER_URL or use a default ID
-			const audioId = '08a193d7-0f8a-4990-b4f8-d7c6c5939830';
+			const audioId = 'a5a73b28-5d46-49fa-b387-30cac07ea9cb';
 
 			try {
 				const metadata = await getAudioMetadata(audioId);
