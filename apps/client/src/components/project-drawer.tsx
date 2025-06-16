@@ -175,7 +175,7 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 				</DrawerTrigger>
 				<DrawerContent className="max-h-[80vh]">
 					<DrawerHeader className="container mx-auto max-w-8xl px-0">
-						<div className="flex items-center justify-between">
+						<div className="flex items-center justify-between px-4 sm:px-0">
 							<div>
 								<DrawerTitle>Projects</DrawerTitle>
 								<DrawerDescription>

@@ -49,6 +49,8 @@ export function TimestampControl({
 				</Button>
 			)}
 
+			<div className="flex-1" />
+
 			<Button
 				onClick={() => onSetCurrentTime(lineId)}
 				variant="ghost"

@@ -163,100 +163,54 @@ When generating lyrics themes for karaoke applications, follow these guidelines 
 
 Remember: Lyrics themes should enhance the karaoke experience without overwhelming the user or degrading performance.
 
-# Implement Beautiful Onboarding Walkthrough with React Joyride
+## Mobile-First Design Integration Guidelines
 
-## Overview
+### Factory Pattern for Mobile Adaptation
 
-Create an interactive onboarding experience for new users to help them understand the karaoke application's key features and workflow.
+When implementing mobile versions of existing components, use the Factory pattern to create device-specific implementations while maintaining a consistent interface:
 
-## User Flow Analysis
+#### 1. Component Factory Structure
 
-Based on the component analysis, the typical user journey is:
+- Create a factory function that returns the appropriate component based on device type
+- Maintain identical props interface between desktop and mobile versions
+- Use device detection or responsive breakpoints to determine component variant
+- Implement fallback logic for unsupported devices or edge cases
 
-1. **Upload/Load Audio** → Track Upload Wrapper
-2. **Create Lyrics** → Lyric Editor (Add lines, set timestamps)
-3. **Preview & Edit** → Lyrics Player/Preview
-4. **Export Results** → Download LRC file
+#### 2. Mobile Component Requirements
 
-## Implementation Plan
+- Design mobile-first, then enhance for larger screens
+- Optimize touch interactions with minimum 44px touch targets
+- Reduce cognitive load with simplified navigation patterns
+- Prioritize essential features and progressive disclosure
+- Adapt text size and spacing for readability on smaller screens
+- Adapt icon sizes and button placements for touch interaction
 
-### 1. Install Dependencies
+#### 3. Responsive Factory Implementation
 
-```bash
-npm install react-joyride
-npm install @types/react-joyride --save-dev
-```
+- Use CSS media queries in conjunction with component factories
+- Implement lazy loading for mobile-specific component bundles
+- Create shared base classes/hooks for common functionality
+- Maintain performance budgets specific to mobile constraints
 
-### 2. Create Onboarding Hook
+#### 4. Mobile Performance Optimization
 
-```typescript name=apps/client/src/hooks/use-onboarding.ts
-import { useState, useCallback } from 'react';
-import { CallBackProps, STATUS, EVENTS } from 'react-joyride';
+- Limit bundle size for mobile-specific components
+- Implement virtual scrolling for long lists on mobile
+- Use intersection observers for lazy loading images and content
+- Optimize animations for mobile hardware limitations (prefer transforms)
 
-export interface OnboardingStep {
-	target: string;
-	content: string;
-	title?: string;
-	placement?: 'top' | 'bottom' | 'left' | 'right' | 'center';
-	disableBeacon?: boolean;
-	hideCloseButton?: boolean;
-	hideFooter?: boolean;
-	showProgress?: boolean;
-	showSkipButton?: boolean;
-}
+#### 5. Mobile UX Patterns
 
-export const useOnboarding = () => {
-	const [run, setRun] = useState(false);
-	const [stepIndex, setStepIndex] = useState(0);
-	const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(
-		() => localStorage.getItem('karaoke-onboarding-completed') === 'true'
-	);
+- Implement swipe gestures using touch event handlers
+- Design for one-handed usage with bottom navigation
+- Use native mobile patterns (bottom sheets, pull-to-refresh)
+- Ensure proper keyboard handling for mobile text inputs
 
-	const startOnboarding = useCallback(() => {
-		setRun(true);
-		setStepIndex(0);
-	}, []);
+#### 6. Testing Mobile Components
 
-	const stopOnboarding = useCallback(() => {
-		setRun(false);
-		setStepIndex(0);
-	}, []);
+- Test on real devices across different screen sizes
+- Verify touch interactions and gesture handling
+- Test performance on low-end mobile devices
+- Validate accessibility with mobile screen readers
 
-	const completeOnboarding = useCallback(() => {
-		setRun(false);
-		setHasCompletedOnboarding(true);
-		localStorage.setItem('karaoke-onboarding-completed', 'true');
-	}, []);
-
-	const resetOnboarding = useCallback(() => {
-		localStorage.removeItem('karaoke-onboarding-completed');
-		setHasCompletedOnboarding(false);
-	}, []);
-
-	const handleJoyrideCallback = useCallback(
-		(data: CallBackProps) => {
-			const { status, type, index } = data;
-
-			if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type)) {
-				setStepIndex(index + (type === EVENTS.STEP_AFTER ? 1 : 0));
-			}
-
-			if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-				completeOnboarding();
-			}
-		},
-		[completeOnboarding]
-	);
-
-	return {
-		run,
-		stepIndex,
-		hasCompletedOnboarding,
-		startOnboarding,
-		stopOnboarding,
-		completeOnboarding,
-		resetOnboarding,
-		handleJoyrideCallback,
-	};
-};
-```
+### Example Factory Pattern Structure

@@ -46,7 +46,7 @@ export function TrackUploadWrapper({
 	}
 
 	return (
-		<>
+		<div className="container mx-auto px-4">
 			<RetractButton
 				isRetracted={isRetracted}
 				hasAudio={!!audio?.id}
@@ -152,6 +152,6 @@ export function TrackUploadWrapper({
 					)}
 				</motion.div>
 			)}
-		</>
+		</div>
 	);
 }
