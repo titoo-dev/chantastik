@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { parseLines } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { useCallback, useMemo, useState } from 'react';
-import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
 import { useAppStore } from '@/stores/app/store';
@@ -16,12 +15,16 @@ import { toast } from 'sonner';
 import { useRenderVideo } from '@/hooks/use-render-video';
 import type { AudioMeta } from '@/data/types';
 import { AnimatePresence, motion } from 'motion/react';
+import type { ExtendedLyricsProps } from '@/remotion/themes/retro-reel';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
 	const { videoRef } = useVideoRefContext();
 
 	const theme = useColorFlow();
+
+	const WELCOME_DURATION_IN_FRAMES = 120; // 4 seconds at 30 FPS
+	const ENDING_DURATION_IN_FRAMES = 120; // 4 seconds at 30 FPS
 
 	const { lyricLines, showVideoPreview, showExternalLyrics } = useAppStore(
 		useShallow((state) => ({
@@ -44,7 +47,6 @@ export const LyricsPlayer = () => {
 	const lyricsData = useCallback(() => {
 		return parseLines(lyricLines);
 	}, [lyricLines])();
-
 	const totalFrames = useMemo(() => {
 		if (lyricsData.length === 0) return 0;
 
@@ -57,25 +59,56 @@ export const LyricsPlayer = () => {
 		// Get last lyric end frame
 		const lastLyricFrame = lyricsData[lyricsData.length - 1].endFrame;
 
-		// Use the maximum between audio duration and last lyric frame, plus buffer
-		return Math.max(audioFrames, lastLyricFrame) + 30;
+		// Include welcome and ending scenes in total calculation
+		const welcomeDuration = WELCOME_DURATION_IN_FRAMES; // 4 seconds at 30 FPS
+		const endingDuration = ENDING_DURATION_IN_FRAMES; // 4 seconds at 30 FPS
+
+		// Calculate total with all scenes
+		const totalWithScenes =
+			welcomeDuration +
+			Math.max(audioFrames, lastLyricFrame) +
+			endingDuration;
+
+		return totalWithScenes;
 	}, [lyricsData, audioRef.current?.duration]);
 
 	const inputProps = useMemo(() => {
+		const storedAudioMetadata =
+			localStorage.getItem(`currentAudioMetadata`);
+
+		const audioMetadata: AudioMeta = JSON.parse(
+			storedAudioMetadata ?? '{}'
+		);
 		return {
 			lyrics: lyricsData,
 			backgroundImage: getCoverArtUrl(audio?.id ?? ''),
 			theme,
-		} as LyricsProps;
+			songTitle: audioMetadata.metadata?.title || 'Unknown Title',
+			artist: audioMetadata.metadata?.artist || 'Unknown Artist',
+			welcomeDurationInFrames: WELCOME_DURATION_IN_FRAMES, // 4 seconds at 30 FPS
+			endingDurationInFrames: ENDING_DURATION_IN_FRAMES, // 4 seconds at 30 FPS
+		} as ExtendedLyricsProps;
 	}, [lyricsData]);
 
 	const renderInputProps = useMemo(() => {
+		const storedAudioMetadata =
+			localStorage.getItem(`currentAudioMetadata`);
+
+		const audioMetadata: AudioMeta = JSON.parse(
+			storedAudioMetadata ?? '{}'
+		);
+
 		return {
 			lyrics: lyricsData,
 			backgroundImage: getCoverArtUrl(audio?.id ?? ''),
 			audioSrc: getAudioUrl(audio?.id ?? ''),
-		} as LyricsProps;
-	}, [lyricsData]);
+			theme,
+			songTitle: audioMetadata.metadata?.title || 'Unknown Title',
+			artist: audioMetadata.metadata?.artist || 'Unknown Artist',
+			welcomeDurationInFrames: WELCOME_DURATION_IN_FRAMES,
+			endingDurationInFrames: ENDING_DURATION_IN_FRAMES,
+		} as ExtendedLyricsProps;
+	}, [lyricsData, audio?.id, theme]);
 
 	const handleRenderVideo = useCallback(() => {
 		const storedAudioMetadata =

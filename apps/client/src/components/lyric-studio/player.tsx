@@ -1,15 +1,15 @@
-import type { LyricsProps } from '@/remotion/schema';
 import { Player, type PlayerRef } from '@remotion/player';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Info, Monitor, Smartphone } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import type { ExtendedLyricsProps } from '@/remotion/themes/retro-reel';
 
 type AspectRatioType = 'horizontal' | 'vertical';
 
 export const PlayerOnly: React.FC<{
 	playerRef: React.RefObject<PlayerRef | null>;
-	inputProps: LyricsProps;
+	inputProps: ExtendedLyricsProps;
 	totalFrames: number;
 }> = ({ playerRef, inputProps, totalFrames }) => {
 	const lazyComponent = useCallback(() => {
