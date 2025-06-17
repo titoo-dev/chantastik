@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { uploadAudioFile, notifications } from '@/data/api';
+import { uploadAudioFile } from '@/data/api';
 import { useAppStore } from '@/stores/app/store';
+import { notifications } from '@/lib/notifications';
 
 interface UseFileUploadOptions {
 	onSuccess?: (data: any) => void;

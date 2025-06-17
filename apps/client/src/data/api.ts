@@ -276,25 +276,3 @@ export async function downloadAudioFile(url: string): Promise<void> {
 		throw error;
 	}
 }
-
-/**
- * Handles the notification display for API operations
- */
-export const notifications = {
-	uploadSuccess: (filename: string) => {
-		toast.success('Upload successful', {
-			description: `File ${filename} uploaded successfully.`,
-		});
-	},
-	projectCreationSuccess: (projectId: string) => {
-		toast.success('Project created', {
-			description: `Project created successfully with ID: ${projectId}`,
-		});
-	},
-
-	uploadError: (error: Error) => {
-		toast.error('Upload failed', {
-			description: error.message,
-		});
-	},
-};
