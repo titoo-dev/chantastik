@@ -5,12 +5,16 @@ import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { useCallback, useMemo } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
-import { getCoverArtUrl } from '@/data/api';
+import { getAudioUrl, getCoverArtUrl } from '@/data/api';
 import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
 import { useColorFlow } from '@/hooks/use-color-flow';
+import { Button } from '../ui/button';
+import { toast } from 'sonner';
+import { useRenderVideo } from '@/hooks/use-render-video';
+import type { AudioMeta } from '@/data/types';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -27,6 +31,8 @@ export const LyricsPlayer = () => {
 	);
 
 	const audio = useAppStore((state) => state.audio);
+
+	const renderVideoMutation = useRenderVideo();
 
 	const lyricsData = useCallback(() => {
 		return parseLines(lyricLines);
@@ -56,6 +62,38 @@ export const LyricsPlayer = () => {
 		} as LyricsProps;
 	}, [lyricsData]);
 
+	const renderInputProps = useMemo(() => {
+		return {
+			lyrics: lyricsData,
+			backgroundImage: getCoverArtUrl(audio?.id ?? ''),
+			audioSrc: getAudioUrl(audio?.id ?? ''),
+		} as LyricsProps;
+	}, [lyricsData]);
+
+	const handleRenderVideo = useCallback(() => {
+		const storedAudioMetadata =
+			localStorage.getItem(`currentAudioMetadata`);
+
+		if (!storedAudioMetadata || lyricsData.length === 0) {
+			toast.error('Cannot render video', {
+				description:
+					'Please ensure audio is loaded and lyrics are added',
+			});
+			return;
+		}
+
+		const audioMetadata: AudioMeta = JSON.parse(storedAudioMetadata);
+
+		const fileName = `${audioMetadata.metadata?.title || 'lyrics'}-${audioMetadata.metadata?.artist || 'unknown'}.mp4`;
+
+		renderVideoMutation.mutate({
+			compositionId: 'LyricsPlayer',
+			inputProps: renderInputProps,
+			outputFileName: fileName,
+			totalFrames: totalFrames,
+		});
+	}, [lyricsData, renderInputProps, renderVideoMutation, totalFrames]);
+
 	if (!showVideoPreview || showExternalLyrics) {
 		return null; // Don't render if video preview is not shown
 	}
@@ -67,6 +105,19 @@ export const LyricsPlayer = () => {
 					<PlayCircle className="h-5 w-5 text-primary" />
 					Lyric Video Player
 				</CardTitle>
+				<Button
+					variant="default"
+					size="sm"
+					className="ml-auto"
+					onClick={handleRenderVideo}
+					disabled={
+						renderVideoMutation.isPending ||
+						!audio?.id ||
+						lyricsData.length === 0
+					}
+				>
+					{renderVideoMutation.isPending ? 'Rendering...' : 'Render'}
+				</Button>
 			</CardHeader>
 
 			<CardContent className="p-6">

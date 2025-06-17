@@ -6,6 +6,9 @@ export const API_BASE_URL =
 	import.meta.env.VITE_DEFAULT_REST_API_URL ||
 	'https://mp3-uploader.dev-titosy.workers.dev';
 
+const RENDERER_BASE_URL =
+	import.meta.env.VITE_DEFAULT_RENDERER_URL || 'http://localhost:3000';
+
 type UploadAudioResponse = {
 	message: string;
 	projectId: string;
@@ -106,6 +109,48 @@ export async function getLyrics(projectId: string): Promise<{
 		return data;
 	} catch (error) {
 		toast.error('Lyrics fetch failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
+// Render video function
+export async function renderVideo(params: {
+	compositionId: string;
+	inputProps?: Record<string, any>;
+	outputFileName?: string;
+	totalFrames?: number;
+}): Promise<{
+	success: boolean;
+	message: string;
+	fileName: string;
+	downloadUrl: string;
+}> {
+	try {
+		const response = await fetch(`${RENDERER_BASE_URL}/render`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(params),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.message || 'Render failed');
+		}
+
+		const result = await response.json();
+
+		toast.success('Render completed', {
+			description: `Video rendered successfully: ${result.fileName}`,
+		});
+
+		return result;
+	} catch (error) {
+		toast.error('Render failed', {
 			description:
 				error instanceof Error ? error.message : 'Unknown error',
 		});

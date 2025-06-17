@@ -25,5 +25,6 @@ export function useGetLyrics({
 		queryFn: () => getLyrics(projectId),
 		enabled: enabled && !!projectId,
 		retry: false,
+		refetchOnWindowFocus: false,
 	});
 }
