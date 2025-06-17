@@ -1,11 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { AudioWaveform, Search } from 'lucide-react';
+import { AudioWaveform } from 'lucide-react';
 import { memo, useState } from 'react';
 import { ProjectsDrawer } from './project-drawer';
 import { type Project } from '@/data/api';
 import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
-import { Input } from './ui/input';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
 import { useAppStore } from '@/stores/app/store';
 
@@ -56,7 +55,7 @@ export const Header = memo(() => {
 					</div>
 
 					{/* Search bar for medium and larger screens */}
-					<div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 max-w-xs lg:max-w-md w-full px-4">
+					{/* <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 max-w-xs lg:max-w-md w-full px-4">
 						<div className="relative">
 							<Input
 								type="text"
@@ -67,11 +66,11 @@ export const Header = memo(() => {
 								<Search className="h-4 w-4 text-muted-foreground" />
 							</div>
 						</div>
-					</div>
+					</div> */}
 
 					<div className="flex items-center gap-4">
 						{/* Search icon for small screens */}
-						<Search className="h-5 w-5 text-muted-foreground md:hidden cursor-pointer hover:text-foreground transition-colors" />
+						{/* <Search className="h-5 w-5 text-muted-foreground md:hidden cursor-pointer hover:text-foreground transition-colors" /> */}
 
 						<ProjectsDrawer
 							onProjectSelected={handleProjectSelected}
