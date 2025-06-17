@@ -46,7 +46,12 @@ const RetroReelRenderer: React.FC<LyricsProps> = ({
 	backgroundImage,
 	audioSrc,
 }) => {
-	const [handle] = useState(() => delayRender('RetroReel component loaded'));
+	const [handle] = useState(() =>
+		delayRender('RetroReel component loaded', {
+			timeoutInMilliseconds: 30 * 1000, // 30 seconds
+			retries: 3,
+		})
+	);
 	const [theme, setTheme] = useState<MDC | null>();
 
 	const frame = useCurrentFrame();

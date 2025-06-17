@@ -1,8 +1,8 @@
-import { PlayCircle } from 'lucide-react';
+import { Loader2, PlayCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { parseLines } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
 import { PlayerOnly } from './player';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
@@ -15,6 +15,7 @@ import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { useRenderVideo } from '@/hooks/use-render-video';
 import type { AudioMeta } from '@/data/types';
+import { AnimatePresence, motion } from 'motion/react';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -33,6 +34,12 @@ export const LyricsPlayer = () => {
 	const audio = useAppStore((state) => state.audio);
 
 	const renderVideoMutation = useRenderVideo();
+	const [renderProgress, setRenderProgress] = useState<{
+		type: 'bundling' | 'rendering' | 'complete' | 'error';
+		progress?: number;
+		message?: string;
+		downloadUrl?: string;
+	} | null>(null);
 
 	const lyricsData = useCallback(() => {
 		return parseLines(lyricLines);
@@ -86,6 +93,38 @@ export const LyricsPlayer = () => {
 
 		const fileName = `${audioMetadata.metadata?.title || 'lyrics'}-${audioMetadata.metadata?.artist || 'unknown'}.mp4`;
 
+		// Start SSE connection for progress updates
+		const eventSource = new EventSource(
+			'http://localhost:3000/render-progress'
+		);
+
+		eventSource.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			setRenderProgress(data);
+
+			if (data.type === 'complete') {
+				toast.success('Video rendered successfully!', {
+					description: 'Your lyric video is ready for download',
+				});
+				eventSource.close();
+				setRenderProgress(null);
+			} else if (data.type === 'error') {
+				toast.error('Render failed', {
+					description: data.message || 'Unknown error occurred',
+				});
+				eventSource.close();
+				setRenderProgress(null);
+			}
+		};
+
+		eventSource.onerror = () => {
+			toast.error('Connection error', {
+				description: 'Lost connection to render server',
+			});
+			eventSource.close();
+			setRenderProgress(null);
+		};
+
 		renderVideoMutation.mutate({
 			compositionId: 'LyricsPlayer',
 			inputProps: renderInputProps,
@@ -98,6 +137,9 @@ export const LyricsPlayer = () => {
 		return null; // Don't render if video preview is not shown
 	}
 
+	const isRendering = renderProgress !== null;
+	const progressPercentage = (renderProgress?.progress || 0) * 100;
+
 	return (
 		<Card className="pt-0 shadow-none col-span-1">
 			<CardHeader className="flex flex-row items-center justify-between py-8 border-b">
@@ -108,15 +150,52 @@ export const LyricsPlayer = () => {
 				<Button
 					variant="default"
 					size="sm"
-					className="ml-auto"
+					className="ml-auto relative overflow-hidden"
 					onClick={handleRenderVideo}
 					disabled={
-						renderVideoMutation.isPending ||
-						!audio?.id ||
-						lyricsData.length === 0
+						isRendering || !audio?.id || lyricsData.length === 0
 					}
 				>
-					{renderVideoMutation.isPending ? 'Rendering...' : 'Render'}
+					<AnimatePresence mode="wait">
+						{isRendering ? (
+							<motion.div
+								key="rendering"
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								className="flex items-center"
+							>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								<span>
+									{renderProgress?.type === 'bundling'
+										? 'Bundling...'
+										: renderProgress?.type === 'rendering'
+											? `Rendering... ${progressPercentage}%`
+											: 'Processing...'}
+								</span>
+							</motion.div>
+						) : (
+							<motion.div
+								key="idle"
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								className="flex items-center"
+							>
+								<PlayCircle className="mr-2 h-4 w-4" />
+								<span>Render</span>
+							</motion.div>
+						)}
+					</AnimatePresence>
+
+					{isRendering && (
+						<motion.div
+							className="bg-primary/10 absolute inset-0"
+							initial={{ width: '0%' }}
+							animate={{ width: `${progressPercentage}%` }}
+							transition={{ duration: 0.3, ease: 'easeInOut' }}
+						/>
+					)}
 				</Button>
 			</CardHeader>
 

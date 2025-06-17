@@ -3,9 +3,11 @@ import cors from 'cors';
 import path from 'path';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
+import SSE from 'express-sse';
 
 const app = express();
 const port = process.env.PORT || 3000;
+const sse = new SSE();
 
 // Middleware
 app.use(cors());
@@ -13,6 +15,11 @@ app.use(express.json());
 
 // Static file serving for output files
 app.use('/output', express.static(path.join(__dirname, '..', 'output')));
+
+// SSE endpoint for progress updates
+app.get('/render-progress', (req, res) => {
+	sse.init(req, res);
+});
 
 // Render endpoint
 app.post('/render', async (req: Request, res: Response): Promise<void> => {
@@ -29,7 +36,7 @@ app.post('/render', async (req: Request, res: Response): Promise<void> => {
 		const bundleLocation = await bundle({
 			entryPoint: path.resolve('../../apps/client/src/remotion/index.ts'),
 			onProgress: (progress) => {
-				console.log(`Bundling progress: ${progress.toFixed(2)}%`);
+				sse.send({ type: 'bundling', progress: progress.toFixed(2) });
 			},
 		});
 
@@ -58,9 +65,15 @@ app.post('/render', async (req: Request, res: Response): Promise<void> => {
 			outputLocation: outputPath,
 			inputProps: inputProps || {},
 			onProgress: (progress) => {
-				console.log(`Progress: ${progress.progress.toFixed(2)}%`);
+				sse.send({
+					type: 'rendering',
+					progress: progress.progress.toFixed(2),
+				});
 			},
+			timeoutInMilliseconds: 30 * 1000, // 30 seconds
 		});
+
+		sse.send({ type: 'complete', downloadUrl: `/output/${fileName}` });
 
 		res.json({
 			success: true,
@@ -70,6 +83,10 @@ app.post('/render', async (req: Request, res: Response): Promise<void> => {
 		});
 	} catch (error) {
 		console.error('Render error:', error);
+		sse.send({
+			type: 'error',
+			message: error instanceof Error ? error.message : 'Unknown error',
+		});
 		res.status(500).json({
 			error: 'Render failed',
 			message: error instanceof Error ? error.message : 'Unknown error',

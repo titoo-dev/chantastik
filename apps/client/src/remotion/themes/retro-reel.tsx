@@ -302,7 +302,7 @@ const RetroReel: React.FC<LyricsProps> = ({
 								width: '100%',
 								height: '100%',
 								objectFit: 'cover',
-								objectPosition: 'center',
+								objectPosition: 'top center',
 								filter: 'brightness(0.7) contrast(1.1) sepia(0.1)',
 							}}
 							pauseWhenLoading

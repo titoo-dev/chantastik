@@ -29,7 +29,6 @@ interface AppState {
 	externalLyrics: string;
 	showExternalLyrics: boolean;
 	showVideoPreview: boolean;
-	selectedLyricLineIds: Set<number>;
 }
 
 interface AppActions {
@@ -54,7 +53,6 @@ interface AppActions {
 	}) => void;
 	updateLyricLine: (id: number, data: Partial<LyricLine>) => void;
 	deleteLyricLine: (id: number) => void;
-	deleteSelectedLyricLines: () => void;
 	addLinesFromExternal: (externalLines: string[]) => void;
 	setVideoTime: (params: {
 		timestamp: number;
@@ -90,7 +88,6 @@ export const useAppStore = create<AppStore>()(
 			externalLyrics: '',
 			showExternalLyrics: false,
 			showVideoPreview: false,
-			selectedLyricLineIds: new Set(),
 
 			// Basic setters
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
@@ -253,48 +250,10 @@ export const useAppStore = create<AppStore>()(
 				});
 			},
 			deleteLyricLine: (id) => {
-				const { lyricLines, selectedLyricLineIds } = get();
-				const newSelectedIds = new Set(selectedLyricLineIds);
-				newSelectedIds.delete(id);
+				const { lyricLines } = get();
 				set({
 					lyricLines: lyricLines.filter((line) => line.id !== id),
-					selectedLyricLineIds: newSelectedIds,
 				});
-			},
-
-			deleteSelectedLyricLines: () => {
-				const { lyricLines, selectedLyricLineIds } = get();
-				if (selectedLyricLineIds.size === 0) return;
-				set({
-					lyricLines: lyricLines.filter(
-						(line) => !selectedLyricLineIds.has(line.id)
-					),
-					selectedLyricLineIds: new Set(),
-				});
-			},
-
-			// Selection actions
-			toggleLyricLineSelection: (id) => {
-				const { selectedLyricLineIds } = get();
-				const newSelectedIds = new Set(selectedLyricLineIds);
-
-				if (newSelectedIds.has(id)) {
-					newSelectedIds.delete(id);
-				} else {
-					newSelectedIds.add(id);
-				}
-
-				set({ selectedLyricLineIds: newSelectedIds });
-			},
-
-			clearLyricLineSelection: () => {
-				set({ selectedLyricLineIds: new Set() });
-			},
-
-			selectAllLyricLines: () => {
-				const { lyricLines } = get();
-				const allIds = lyricLines.map((line) => line.id);
-				set({ selectedLyricLineIds: new Set(allIds) });
 			},
 			addLinesFromExternal: (externalLines) => {
 				if (externalLines.length === 0) return;
@@ -396,7 +355,6 @@ export const useAppStore = create<AppStore>()(
 					externalLyrics: '',
 					showExternalLyrics: false,
 					showVideoPreview: false,
-					selectedLyricLineIds: new Set(),
 					projectId: undefined,
 					audio: undefined,
 				});
