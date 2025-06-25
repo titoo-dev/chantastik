@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mp3-uploader",
+  "name": "chantastic-worker",
   "main": "src/index.ts",
   "compatibility_date": "2025-05-21",
   // "compatibility_flags": [

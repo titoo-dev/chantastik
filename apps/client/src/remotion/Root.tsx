@@ -31,7 +31,7 @@ export type Metadata = {
 }
 
 
-export const API_BASE_URL = 'https://mp3-uploader.dev-titosy.workers.dev';
+export const API_BASE_URL = import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
 
 const lrc = `
 [ti:Love]
@@ -99,11 +99,9 @@ const lrc = `
 `;
 
 export const RemotionRoot: React.FC = () => {
-	const COVER_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb/cover';
+	const COVER_URL = `${API_BASE_URL}/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb/cover`;
 
-	const MP3_URL =
-		'https://mp3-uploader.dev-titosy.workers.dev/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb';
+	const MP3_URL = `${API_BASE_URL}/audio/a5a73b28-5d46-49fa-b387-30cac07ea9cb`;
 
 	const [audioMeta, setAudioMeta] = useState<AudioMeta | null>(null);
 
