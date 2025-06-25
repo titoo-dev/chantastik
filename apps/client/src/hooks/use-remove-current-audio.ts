@@ -10,9 +10,9 @@ export function useRemoveCurrentAudio() {
 	const { videoRef } = useVideoRefContext();
 
 	const { setAudio, setTrackLoaded, resetAllStatesAndPlayers } =
-		useAppStore();
-	const { reset: resetAudioPlayer } = usePlayerStore();
-	const { reset: resetTrackUpload } = useTrackUploadStore();
+		useAppStore.getState();
+	const { reset: resetAudioPlayer } = usePlayerStore.getState();
+	const { reset: resetTrackUpload } = useTrackUploadStore.getState();
 	const { reset: resetFileUpload } = useFileUpload();
 
 	const handleRemoveAudio = () => {
