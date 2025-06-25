@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Info, Monitor, Smartphone } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import RenderWhen from '../render-when';
 
 type AspectRatioType = 'horizontal' | 'vertical';
 
@@ -29,29 +30,31 @@ export const PlayerOnly: React.FC<{
 	const dimensions = getCompositionDimensions(aspectRatio);
 
 	return (
-		<div className="space-y-4">
+		<div>
 			<div className="space-y-3">
 				<div className="flex gap-2 items-center">
-					<Button
-						variant={
-							aspectRatio === 'horizontal' ? 'default' : 'outline'
-						}
-						size="sm"
-						onClick={() => setAspectRatio('horizontal')}
-					>
-						<Monitor className="w-4 h-4 mr-2" />
-						YouTube
-					</Button>
-					<Button
-						variant={
-							aspectRatio === 'vertical' ? 'default' : 'outline'
-						}
-						size="sm"
-						onClick={() => setAspectRatio('vertical')}
-					>
-						<Smartphone className="w-4 h-4 mr-2" />
-						TikTok
-					</Button>
+					<RenderWhen condition={import.meta.env.NODE_ENV === 'development'}>
+						<Button
+							variant={
+								aspectRatio === 'horizontal' ? 'default' : 'outline'
+							}
+							size="sm"
+							onClick={() => setAspectRatio('horizontal')}
+						>
+							<Monitor className="w-4 h-4 mr-2" />
+							YouTube
+						</Button>
+						<Button
+							variant={
+								aspectRatio === 'vertical' ? 'default' : 'outline'
+							}
+							size="sm"
+							onClick={() => setAspectRatio('vertical')}
+						>
+							<Smartphone className="w-4 h-4 mr-2" />
+							TikTok
+						</Button>
+					</RenderWhen>
 					<div className="flex-1" />
 					<Popover>
 						<PopoverTrigger asChild>

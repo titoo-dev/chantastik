@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { useRenderVideo } from '@/hooks/use-render-video';
 import type { AudioMeta } from '@/data/types';
 import { AnimatePresence, motion } from 'motion/react';
+import { RenderWhen } from '../render-when';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -147,59 +148,67 @@ export const LyricsPlayer = () => {
 					<PlayCircle className="h-5 w-5 text-primary" />
 					Lyric Video Player
 				</CardTitle>
-				<Button
-					variant="default"
-					size="sm"
-					className="ml-auto relative overflow-hidden"
-					onClick={handleRenderVideo}
-					disabled={
-						isRendering || !audio?.id || lyricsData.length === 0
-					}
+				<RenderWhen
+					condition={import.meta.env.NODE_ENV === 'development'}
 				>
-					<AnimatePresence mode="wait">
-						{isRendering ? (
-							<motion.div
-								key="rendering"
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.8 }}
-								className="flex items-center"
-							>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								<span>
-									{renderProgress?.type === 'bundling'
-										? 'Bundling...'
-										: renderProgress?.type === 'rendering'
-											? `Rendering... ${progressPercentage}%`
-											: 'Processing...'}
-								</span>
-							</motion.div>
-						) : (
-							<motion.div
-								key="idle"
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.8 }}
-								className="flex items-center"
-							>
-								<PlayCircle className="mr-2 h-4 w-4" />
-								<span>Render</span>
-							</motion.div>
-						)}
-					</AnimatePresence>
+					<Button
+						variant="default"
+						size="sm"
+						className="ml-auto relative overflow-hidden"
+						onClick={handleRenderVideo}
+						disabled={
+							isRendering || !audio?.id || lyricsData.length === 0
+						}
+					>
+						<AnimatePresence mode="wait">
+							{isRendering ? (
+								<motion.div
+									key="rendering"
+									initial={{ opacity: 0, scale: 0.8 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.8 }}
+									className="flex items-center"
+								>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<span>
+										{renderProgress?.type === 'bundling'
+											? 'Bundling...'
+											: renderProgress?.type ===
+												  'rendering'
+												? `Rendering... ${progressPercentage}%`
+												: 'Processing...'}
+									</span>
+								</motion.div>
+							) : (
+								<motion.div
+									key="idle"
+									initial={{ opacity: 0, scale: 0.8 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.8 }}
+									className="flex items-center"
+								>
+									<PlayCircle className="mr-2 h-4 w-4" />
+									<span>Render</span>
+								</motion.div>
+							)}
+						</AnimatePresence>
 
-					{isRendering && (
-						<motion.div
-							className="bg-primary/10 absolute inset-0"
-							initial={{ width: '0%' }}
-							animate={{ width: `${progressPercentage}%` }}
-							transition={{ duration: 0.3, ease: 'easeInOut' }}
-						/>
-					)}
-				</Button>
+						{isRendering && (
+							<motion.div
+								className="bg-primary/10 absolute inset-0"
+								initial={{ width: '0%' }}
+								animate={{ width: `${progressPercentage}%` }}
+								transition={{
+									duration: 0.3,
+									ease: 'easeInOut',
+								}}
+							/>
+						)}
+					</Button>
+				</RenderWhen>
 			</CardHeader>
 
-			<CardContent className="p-6">
+			<CardContent className="px-6">
 				<PlayerOnly
 					playerRef={videoRef}
 					inputProps={inputProps}
