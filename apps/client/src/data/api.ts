@@ -213,22 +213,69 @@ export function getCoverArtUrl(id?: string): string {
  * Uploads an audio file to the server
  */
 export async function uploadAudioFile(
-	file: File
+	file: File,
+	onProgress?: (progress: number) => void
 ): Promise<UploadAudioResponse> {
-	const formData = new FormData();
-	formData.append('audio', file);
+	try {
+		// Create a ReadableStream from the file to track progress
+		let uploadedBytes = 0;
+		const totalBytes = file.size;
 
-	const response = await fetch(`${API_BASE_URL}/audio`, {
-		method: 'POST',
-		body: formData,
-	});
+		const stream = new ReadableStream({
+			start(controller) {
+				const reader = file.stream().getReader();
 
-	if (!response.ok) {
-		const error = await response.json();
-		throw new Error(error.message || 'Upload failed');
+				function pump(): Promise<void> {
+					return reader.read().then(({ done, value }) => {
+						if (done) {
+							controller.close();
+							return;
+						}
+
+						uploadedBytes += value.byteLength;
+						const progress = (uploadedBytes / totalBytes) * 100;
+						console.log(`Upload progress: ${progress.toFixed(2)}%`);
+
+						onProgress?.(Math.round(progress));
+
+						controller.enqueue(value);
+						return pump();
+					});
+				}
+
+				return pump();
+			}
+		});
+
+		const response = await fetch(`${API_BASE_URL}/audio`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/octet-stream',
+				'Content-Length': file.size.toString(),
+				'X-File-Name': file.name,
+			},
+			body: stream,
+		});
+
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.message || 'Upload failed');
+		}
+
+		const result = await response.json();
+		
+		toast.success('Upload completed', {
+			description: `Audio file uploaded successfully`,
+		});
+
+		return result;
+	} catch (error) {
+		toast.error('Upload failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
 	}
-
-	return response.json();
 }
 
 /**

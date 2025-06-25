@@ -21,25 +21,65 @@ app.use('*', cors());
  */
 app.post('/audio', async (c) => {
 	const contentType = c.req.header('content-type') || '';
+	const contentLength = c.req.header('content-length');
+	const fileName = c.req.header('x-file-name');
 
-	if (!contentType.includes('multipart/form-data')) {
-		return c.text('Expected multipart/form-data', 400);
+	// Handle both multipart/form-data and application/octet-stream
+	if (contentType.includes('multipart/form-data')) {
+		// Existing multipart/form-data handling
+		const formData = await c.req.formData();
+		const file = formData.get('audio');
+
+		if (!file || typeof file === 'string') {
+			return c.text('No Audio uploaded', 400);
+		}
+
+		if (file.type !== 'audio/mpeg' && file.type !== 'audio/mp3') {
+			return c.text('Invalid file type', 400);
+		}
+
+		return await processAudioFile(c, file, file.name);
+	} else if (contentType.includes('application/octet-stream')) {
+		// Handle octet-stream upload
+		if (!fileName) {
+			return c.text('X-File-Name header is required for octet-stream uploads', 400);
+		}
+
+		if (!contentLength) {
+			return c.text('Content-Length header is required', 400);
+		}
+
+		// Validate file extension
+		const fileExtension = fileName.toLowerCase().split('.').pop();
+		if (fileExtension !== 'mp3') {
+			return c.text('Only MP3 files are supported', 400);
+		}
+
+		// Get the raw body as ArrayBuffer
+		const arrayBuffer = await c.req.arrayBuffer();
+		
+		// Create a File-like object for consistent processing
+		const fileData = {
+			name: fileName,
+			type: 'audio/mpeg',
+			size: parseInt(contentLength),
+			arrayBuffer: () => Promise.resolve(arrayBuffer),
+		};
+
+		return await processAudioFile(c, fileData, fileName);
+	} else {
+		return c.text('Expected multipart/form-data or application/octet-stream', 400);
 	}
+});
 
-	const formData = await c.req.formData();
-	const file = formData.get('audio');
-
-	if (!file || typeof file === 'string') {
-		return c.text('No Audio uploaded', 400);
-	}
-
-	if (file.type !== 'audio/mpeg' && file.type !== 'audio/mp3') {
-		return c.text('Invalid file type', 400);
-	}
-
-	// We need to clone the file for metadata extraction since we'll consume the stream later
+// Extract common audio processing logic
+async function processAudioFile(
+	c: any,
+	file: File | { name: string; type: string; size: number; arrayBuffer: () => Promise<ArrayBuffer> },
+	filename: string
+) {
+	// Get file buffer for processing
 	const fileBuffer = await file.arrayBuffer();
-	// Convert ArrayBuffer to Uint8Array for music-metadata parsing
 	const uint8Array = new Uint8Array(fileBuffer);
 
 	// Generate a hash of the file content
@@ -105,7 +145,7 @@ app.post('/audio', async (c) => {
 	}
 
 	// Save to R2
-	await c.env.AUDIO_FILES.put(key, new Uint8Array(fileBuffer), {
+	await c.env.AUDIO_FILES.put(key, uint8Array, {
 		httpMetadata: {
 			contentType: file.type,
 		},
@@ -113,10 +153,10 @@ app.post('/audio', async (c) => {
 
 	const meta: Audio = {
 		id: audioId,
-		filename: file.name,
+		filename: filename,
 		contentType: file.type,
 		size: file.size,
-		fileHash: fileHash, // Store the hash for future duplicate checks
+		fileHash: fileHash,
 		createdAt: new Date().toISOString(),
 		metadata: metadata
 			? {
@@ -154,7 +194,7 @@ app.post('/audio', async (c) => {
 		projectId: projectId,
 		audioMetadata: meta,
 	});
-});
+}
 
 /**
  * Save or update lyrics for a project
