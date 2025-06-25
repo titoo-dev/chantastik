@@ -1,7 +1,6 @@
 import { toast } from 'sonner';
 import type { AudioMeta, LyricLine } from './types';
 
-// API base URL - adjust based on your environment
 export const API_BASE_URL =
 	import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
 

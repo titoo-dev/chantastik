@@ -38,30 +38,32 @@ export const PlayerOnly: React.FC<{
 							import.meta.env.VITE_NODE_ENV === 'development'
 						}
 					>
-						<Button
-							variant={
-								aspectRatio === 'horizontal'
-									? 'default'
-									: 'outline'
-							}
-							size="sm"
-							onClick={() => setAspectRatio('horizontal')}
-						>
-							<Monitor className="w-4 h-4 mr-2" />
-							YouTube
-						</Button>
-						<Button
-							variant={
-								aspectRatio === 'vertical'
-									? 'default'
-									: 'outline'
-							}
-							size="sm"
-							onClick={() => setAspectRatio('vertical')}
-						>
-							<Smartphone className="w-4 h-4 mr-2" />
-							TikTok
-						</Button>
+						<div className='flex space-x-2 py-3'>
+							<Button
+								variant={
+									aspectRatio === 'horizontal'
+										? 'default'
+										: 'outline'
+								}
+								size="sm"
+								onClick={() => setAspectRatio('horizontal')}
+							>
+								<Monitor className="w-4 h-4 mr-2" />
+								YouTube
+							</Button>
+							<Button
+								variant={
+									aspectRatio === 'vertical'
+										? 'default'
+										: 'outline'
+								}
+								size="sm"
+								onClick={() => setAspectRatio('vertical')}
+							>
+								<Smartphone className="w-4 h-4 mr-2" />
+								TikTok
+							</Button>
+						</div>
 					</RenderWhen>
 					<div className="flex-1" />
 					<Popover>
