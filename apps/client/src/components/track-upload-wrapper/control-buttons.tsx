@@ -1,11 +1,11 @@
 import { Minimize2, X } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface ControlButtonsProps {
+type ControlButtonsProps = {
 	onRetract: () => void;
 	onRemove: () => void;
 	isUploading: boolean;
-}
+};
 
 export function ControlButtons({
 	onRetract,

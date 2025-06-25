@@ -9,9 +9,9 @@ import { AudioRefProvider } from '@/context/audio-ref-context';
 import { VideoRefProvider } from '@/context/video-ref-context';
 import { Audio } from '@/components/audio';
 
-interface MyRouterContext {
+type MyRouterContext = {
 	queryClient: QueryClient;
-}
+};
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	component: () => (

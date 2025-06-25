@@ -3,10 +3,10 @@ import { useGetProjects } from '@/hooks/use-get-projects';
 import { type Project } from '@/data/api';
 import { useRemoveCurrentAudio } from './use-remove-current-audio';
 
-interface UseProjectDrawerProps {
+type UseProjectDrawerProps = {
 	onProjectSelected: (project: Project) => void;
 	onDeleteProject: (projectId: string) => void;
-}
+};
 
 export const useProjectDrawer = ({
 	onProjectSelected,

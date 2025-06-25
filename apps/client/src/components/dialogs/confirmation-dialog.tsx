@@ -11,7 +11,7 @@ import {
 } from '../ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
-export interface ConfirmationDialogProps {
+export type ConfirmationDialogProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	title: string;
@@ -24,7 +24,7 @@ export interface ConfirmationDialogProps {
 	loadingText?: string;
 	variant?: 'default' | 'destructive';
 	children?: ReactNode;
-}
+};
 
 export function ConfirmationDialog({
 	open,

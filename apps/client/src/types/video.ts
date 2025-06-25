@@ -1,4 +1,4 @@
-export interface VideoMetadata {
+export type VideoMetadata = {
 	title: string;
 	author_name: string;
 	duration?: number;

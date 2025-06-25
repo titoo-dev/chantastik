@@ -8,7 +8,7 @@ import { preloadImage } from '@remotion/preload';
 import { getCoverArtUrl } from '@/data/api';
 
 // Keep original types for compatibility
-export interface LRCData {
+export type LRCData = {
 	metadata: {
 		title: string;
 		artist: string;
@@ -20,7 +20,7 @@ export interface LRCData {
 	};
 }
 
-interface AppState {
+type AppState = {
 	// State properties
 	trackLoaded: boolean;
 	projectId?: string;
@@ -31,7 +31,7 @@ interface AppState {
 	showVideoPreview: boolean;
 }
 
-interface AppActions {
+type AppActions = {
 	// Basic setters
 	setTrackLoaded: (loaded: boolean) => void;
 	updateProjectId: (id?: string) => void;

@@ -5,12 +5,12 @@ import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
 
 // Component for the timestamp control
-interface TimestampControlProps {
+type TimestampControlProps = {
 	timestamp?: number;
 	lineId: number;
 	canSetCurrentTime: boolean;
 	onSetCurrentTime: (id: number) => void;
-}
+};
 
 export function TimestampControl({
 	timestamp,

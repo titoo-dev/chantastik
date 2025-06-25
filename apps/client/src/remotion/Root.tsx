@@ -4,7 +4,7 @@ import { type Lyrics, type LyricsProps, LyricsPropsSchema } from './schema';
 import type { LyricLine } from '@/data/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export interface AudioMeta {
+export type AudioMeta = {
 	id?: string;
 	filename?: string;
 	contentType?: string;
@@ -15,13 +15,13 @@ export interface AudioMeta {
 	coverArt?: CoverArt; // Cover art might not always be available
 }
 
-export interface CoverArt {
+export type CoverArt = {
 	id: string;
 	format: string;
 	size: number;
 }
 
-export interface Metadata {
+export type Metadata = {
 	title: string;
 	artist?: string; // Artist might be unknown
 	album?: string; // Album might be unknown
@@ -29,6 +29,7 @@ export interface Metadata {
 	genre?: string[]; // Genre might be unknown
 	duration: number; // Duration should typically be available
 }
+
 
 export const API_BASE_URL = 'https://mp3-uploader.dev-titosy.workers.dev';
 

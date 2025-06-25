@@ -2,11 +2,11 @@ import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { MoveDiagonal, Music } from 'lucide-react';
 
-interface RetractButtonProps {
+type RetractButtonProps = {
 	isRetracted: boolean;
 	hasAudio: boolean;
 	onToggle: () => void;
-}
+};
 
 export function RetractButton({
 	isRetracted,

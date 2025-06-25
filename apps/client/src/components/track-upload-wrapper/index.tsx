@@ -9,10 +9,10 @@ import { createDeleteConfirmationDialog } from '@/components/dialogs/confirmatio
 import { useTrackUpload } from '@/hooks/use-track-upload';
 import { motion } from 'motion/react';
 
-interface TrackUploadWrapperProps {
+type TrackUploadWrapperProps = {
 	iconColor?: string;
 	showDownload?: boolean;
-}
+};
 
 export function TrackUploadWrapper({
 	iconColor = 'text-primary',

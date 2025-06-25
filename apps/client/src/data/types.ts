@@ -1,4 +1,4 @@
-export interface AudioMeta {
+export type AudioMeta = {
 	id?: string;
 	filename?: string;
 	contentType?: string;
@@ -9,13 +9,13 @@ export interface AudioMeta {
 	coverArt?: CoverArt; // Cover art might not always be available
 }
 
-export interface CoverArt {
+export type CoverArt = {
 	id: string;
 	format: string;
 	size: number;
 }
 
-export interface Metadata {
+export type Metadata = {
 	title: string;
 	artist?: string; // Artist might be unknown
 	album?: string; // Album might be unknown

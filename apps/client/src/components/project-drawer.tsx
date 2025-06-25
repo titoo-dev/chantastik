@@ -17,10 +17,10 @@ import { getCoverArtUrl, type Project } from '@/data/api';
 import { ScrollArea } from './ui/scroll-area';
 import { useProjectDrawer } from '@/hooks/use-project-drawer';
 
-interface ProjectsDrawerProps {
+type ProjectsDrawerProps = {
 	onProjectSelected: (project: Project) => void;
 	onDeleteProject: (projectId: string) => void;
-}
+};
 
 // Atomic components
 const ProjectCard = memo<{

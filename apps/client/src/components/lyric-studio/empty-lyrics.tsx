@@ -1,9 +1,9 @@
 import { Music, PlusCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface EmptyLyricsProps {
+type EmptyLyricsProps = {
 	onAddLine: () => void;
-}
+};
 
 export function EmptyLyrics({ onAddLine }: EmptyLyricsProps) {
 	return (

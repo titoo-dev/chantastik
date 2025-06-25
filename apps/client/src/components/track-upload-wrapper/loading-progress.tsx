@@ -1,6 +1,6 @@
-interface LoadingProgressProps {
+type LoadingProgressProps = {
 	audioFileName?: string;
-}
+};
 
 export function LoadingProgress({ audioFileName }: LoadingProgressProps) {
 	return (

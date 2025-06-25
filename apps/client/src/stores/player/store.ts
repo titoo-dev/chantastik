@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-
-export interface PlayerStateProperties {
+export type PlayerStateProperties = {
 	volume: number;
 	position: number;
 	isPlaying: boolean;
@@ -9,9 +8,9 @@ export interface PlayerStateProperties {
 	muted: boolean;
 	currentTrackId?: string;
 	waveBars: number[];
-}
+};
 
-export interface PlayerStateActions {
+export type PlayerStateActions = {
 	setPosition: (position: number) => void;
 	setIsPlaying: (isPlaying: boolean) => void;
 	setDuration: (duration: number) => void;
@@ -22,7 +21,7 @@ export interface PlayerStateActions {
 	setMuted: (muted: boolean) => void;
 	setCurrentTrackId?: (id: string) => void;
 	reset: () => void;
-}
+};
 
 export type PlayerState = PlayerStateProperties & PlayerStateActions;
 

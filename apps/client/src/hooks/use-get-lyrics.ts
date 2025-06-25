@@ -11,10 +11,10 @@ export type Lyrics = {
 	lines: LyricLine[];
 };
 
-export interface UseGetLyricsOptions {
+export type UseGetLyricsOptions = {
 	projectId: string;
 	enabled?: boolean;
-}
+};
 
 export function useGetLyrics({
 	projectId,

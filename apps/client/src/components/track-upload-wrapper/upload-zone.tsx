@@ -2,14 +2,14 @@ import { cn } from '@/lib/utils';
 import { Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 
-interface UploadZoneProps {
+type UploadZoneProps = {
 	isDragging: boolean;
 	isUploading: boolean;
 	fileInputRef: React.RefObject<HTMLInputElement | null>;
 	onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	onBrowseClick: () => void;
 	dragHandlers: Record<string, (e: any) => void>;
-}
+};
 
 export function UploadZone({
 	isDragging,

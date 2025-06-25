@@ -7,7 +7,7 @@ type DeviceType =
 	| 'large-desktop'
 	| 'small-mobile';
 
-interface ResponsiveState {
+type ResponsiveState = {
 	deviceType: DeviceType;
 	isMobile: boolean;
 	isSmallMobile: boolean;
@@ -16,7 +16,7 @@ interface ResponsiveState {
 	isLargeDesktop: boolean;
 	screenWidth: number;
 	screenHeight: number;
-}
+};
 
 const BREAKPOINTS = {
 	smallMobile: 480,

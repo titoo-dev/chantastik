@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-
-interface TrackUploadState {
+type TrackUploadState = {
 	// State
 	audioFile: File | null;
 	isDragging: boolean;
@@ -27,7 +26,7 @@ interface TrackUploadState {
 	) => void;
 	toggleRetracted: () => void;
 	reset: () => void;
-}
+};
 
 export const useTrackUploadStore = create<TrackUploadState>()(
 	devtools(

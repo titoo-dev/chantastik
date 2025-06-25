@@ -3,10 +3,10 @@ import { uploadAudioFile } from '@/data/api';
 import { useAppStore } from '@/stores/app/store';
 import { notifications } from '@/lib/notifications';
 
-interface UseFileUploadOptions {
+type UseFileUploadOptions = {
 	onSuccess?: (data: any) => void;
 	onError?: (error: Error) => void;
-}
+};
 
 export function useFileUpload(options?: UseFileUploadOptions) {
 	const { updateProjectId, setAudio } = useAppStore.getState();

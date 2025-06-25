@@ -2,13 +2,13 @@ import { Music } from 'lucide-react';
 import { TrackPlayer } from '../track-player';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
 
-interface PlayerSectionProps {
+type PlayerSectionProps = {
 	audio: any;
 	audioFile: File | null;
 	audioMetadata: any;
 	iconColor: string;
 	showDownload: boolean;
-}
+};
 
 export function PlayerSection({
 	audio,
