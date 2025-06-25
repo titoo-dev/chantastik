@@ -3,8 +3,7 @@ import type { AudioMeta, LyricLine } from './types';
 
 // API base URL - adjust based on your environment
 export const API_BASE_URL =
-	import.meta.env.VITE_DEFAULT_REST_API_URL ||
-	'https://mp3-uploader.dev-titosy.workers.dev';
+	import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
 
 const RENDERER_BASE_URL =
 	import.meta.env.VITE_DEFAULT_RENDERER_URL || 'http://localhost:3000';

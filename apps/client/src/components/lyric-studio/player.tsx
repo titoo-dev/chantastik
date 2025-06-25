@@ -33,10 +33,16 @@ export const PlayerOnly: React.FC<{
 		<div>
 			<div className="space-y-3">
 				<div className="flex gap-2 items-center">
-					<RenderWhen condition={import.meta.env.NODE_ENV === 'development'}>
+					<RenderWhen
+						condition={
+							import.meta.env.VITE_NODE_ENV === 'development'
+						}
+					>
 						<Button
 							variant={
-								aspectRatio === 'horizontal' ? 'default' : 'outline'
+								aspectRatio === 'horizontal'
+									? 'default'
+									: 'outline'
 							}
 							size="sm"
 							onClick={() => setAspectRatio('horizontal')}
@@ -46,7 +52,9 @@ export const PlayerOnly: React.FC<{
 						</Button>
 						<Button
 							variant={
-								aspectRatio === 'vertical' ? 'default' : 'outline'
+								aspectRatio === 'vertical'
+									? 'default'
+									: 'outline'
 							}
 							size="sm"
 							onClick={() => setAspectRatio('vertical')}

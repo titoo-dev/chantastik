@@ -149,7 +149,7 @@ export const LyricsPlayer = () => {
 					Lyric Video Player
 				</CardTitle>
 				<RenderWhen
-					condition={import.meta.env.NODE_ENV === 'development'}
+					condition={import.meta.env.VITE_NODE_ENV === 'development'}
 				>
 					<Button
 						variant="default"
