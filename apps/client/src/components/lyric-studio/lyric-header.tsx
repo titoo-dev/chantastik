@@ -1,6 +1,6 @@
 import { CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { ArrowUpFromLine, CloudDownload, Music } from 'lucide-react';
+import { ArrowUpFromLine, CloudDownload, Download, Music } from 'lucide-react';
 import { memo, useRef } from 'react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/stores/app/store';
@@ -12,7 +12,12 @@ export const LyricHeader = memo(function LyricHeader() {
 	const trackLoaded = useAppStore((state) => state.trackLoaded);
 	const currentProjectId = useAppStore((state) => state.projectId);
 	const lyricLines = useAppStore((state) => state.lyricLines);
-	const { setLyricLines } = useAppStore.getState();
+	const {
+		areLyricLinesWithoutTimestamps,
+		handleDownload,
+		isValidLyricLines,
+		setLyricLines,
+	} = useAppStore.getState();
 
 	const saveLyricsMutation = useSaveLyrics();
 
@@ -146,6 +151,27 @@ export const LyricHeader = memo(function LyricHeader() {
 					>
 						<ArrowUpFromLine className="h-4 w-4" />
 						Load from LRC
+					</Button>
+					<Button
+						onClick={handleDownload}
+						disabled={
+							!isValidLyricLines() ||
+							lyricLines.length === 0 ||
+							areLyricLinesWithoutTimestamps()
+						}
+						variant={
+							!isValidLyricLines() || lyricLines.length === 0
+								? 'outline'
+								: 'default'
+						}
+						title={
+							!isValidLyricLines()
+								? 'Fill in all lyric lines before downloading'
+								: 'Download lyrics in LRC format'
+						}
+					>
+						<Download className="h-4 w-4" />
+						Download LRC
 					</Button>
 					<Button
 						onClick={handleSaveLyrics}

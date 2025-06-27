@@ -1,14 +1,12 @@
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { useAppStore } from '@/stores/app/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 
 export const LyricStudioHeader = memo(() => {
 	const {
-		areLyricLinesWithoutTimestamps,
-		handleDownload,
 		toggleShowExternalLyrics,
 		toggleShowVideoPreview,
 		isValidLyricLines,
@@ -69,29 +67,6 @@ export const LyricStudioHeader = memo(() => {
 								{showExternalLyrics ? 'Hide Lyrics' : 'Lyrics'}
 							</Button>
 						</div>
-						<Button
-							onClick={handleDownload}
-							disabled={
-								!isValidLyricLines() ||
-								lyricLines.length === 0 ||
-								areLyricLinesWithoutTimestamps()
-							}
-							variant={
-								!isValidLyricLines() || lyricLines.length === 0
-									? 'outline'
-									: 'default'
-							}
-							size="sm"
-							className="w-full min-h-[44px]"
-							title={
-								!isValidLyricLines()
-									? 'Fill in all lyric lines before downloading'
-									: 'Download lyrics in LRC format'
-							}
-						>
-							<Download className="h-4 w-4" />
-							Download LRC
-						</Button>
 					</div>
 				)}
 			</div>
@@ -139,27 +114,6 @@ export const LyricStudioHeader = memo(() => {
 							{showExternalLyrics
 								? 'Hide Lyrics'
 								: 'External Lyrics'}
-						</Button>
-						<Button
-							onClick={handleDownload}
-							disabled={
-								!isValidLyricLines() ||
-								lyricLines.length === 0 ||
-								areLyricLinesWithoutTimestamps()
-							}
-							variant={
-								!isValidLyricLines() || lyricLines.length === 0
-									? 'outline'
-									: 'default'
-							}
-							title={
-								!isValidLyricLines()
-									? 'Fill in all lyric lines before downloading'
-									: 'Download lyrics in LRC format'
-							}
-						>
-							<Download className="h-4 w-4" />
-							Download LRC
 						</Button>
 					</div>
 				)}
