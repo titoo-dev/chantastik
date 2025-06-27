@@ -29,3 +29,8 @@ export type LyricLine = {
 	text: string;
 	timestamp?: number;
 };
+
+export type ServerLyrics = {
+	id: string;
+	lines: LyricLine[];
+};
