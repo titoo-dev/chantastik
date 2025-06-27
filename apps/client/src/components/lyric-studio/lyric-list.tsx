@@ -8,6 +8,15 @@ import { useAudioRefContext } from '@/hooks/use-audio-ref-context';
 import { useShallow } from 'zustand/react/shallow';
 import type { LyricLine } from '@/data/types';
 
+type Props = {
+	lyricLines: LyricLine[];
+	onUpdateLine: (id: number, data: Partial<LyricLine>) => void;
+	onDeleteLine: (id: number) => void;
+	onSetCurrentTime: (id: number) => void;
+	onAddLine: () => void;
+	onAddLineBelow?: (afterId: number) => void;
+};
+
 export function LyricList({
 	lyricLines,
 	onUpdateLine,
@@ -15,14 +24,7 @@ export function LyricList({
 	onSetCurrentTime,
 	onAddLine,
 	onAddLineBelow,
-}: {
-	lyricLines: LyricLine[];
-	onUpdateLine: (id: number, data: Partial<LyricLine>) => void;
-	onDeleteLine: (id: number) => void;
-	onSetCurrentTime: (id: number) => void;
-	onAddLine: () => void;
-	onAddLineBelow?: (afterId: number) => void;
-}) {
+}: Props) {
 	const { audioRef } = useAudioRefContext();
 	const { generateLRC } = useAppStore(
 		useShallow((state) => ({

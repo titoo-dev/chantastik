@@ -1,9 +1,14 @@
+import { cn } from '@/lib/utils';
 import { Card, CardContent } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 
-export function LyricsListSkeleton() {
+type LyricsListSkeletonProps = {
+	className?: string;
+};
+
+export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
 	return (
-		<Card className="pt-0 shadow-none">
+		<Card className={cn("pt-0 shadow-none", className)}>
 			{/* Header Skeleton */}
 			<div className="border-b bg-muted/30 px-6 py-4">
 				<div className="flex items-center justify-between">

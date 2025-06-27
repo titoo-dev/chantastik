@@ -7,7 +7,7 @@ import { memo } from 'react';
 import { cn } from '@/lib/utils';
 import type { LyricLine } from '@/data/types';
 
-type LyricLineItemProps = {
+type Props = {
 	line: LyricLine;
 	index: number;
 	canUseCurrentTime: boolean;
@@ -28,7 +28,7 @@ export const LyricLineItem = memo(
 		onSetCurrentTime,
 		onAddLineBelow,
 		isActive = false,
-	}: LyricLineItemProps) => {
+	}: Props) => {
 		return (
 			<div
 				className={cn(

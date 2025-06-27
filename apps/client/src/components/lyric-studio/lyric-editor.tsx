@@ -80,7 +80,7 @@ export const LyricEditor = memo(function LyricEditor() {
 	);
 
 	if (lyricLines.length === 0 && isLoadingLyrics && trackLoaded) {
-		return <LyricsListSkeleton />;
+		return <LyricsListSkeleton className={cardClassName} />;
 	}
 
 	if (lyricLines.length === 0 && lyricsError && trackLoaded) {
