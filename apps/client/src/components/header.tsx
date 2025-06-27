@@ -1,47 +1,20 @@
 import { Link } from '@tanstack/react-router';
 import { AudioWaveform } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { ProjectsDrawer } from './project-drawer';
-import { type Project } from '@/data/api';
-import { useDeleteProject } from '@/hooks/use-delete-project';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import { createDeleteConfirmationDialog } from './dialogs/confirmation-dialog';
-import { useAppStore } from '@/stores/app/store';
+import { useHeaderProjectActions } from '@/hooks/use-header-project-actions';
 
-export const Header = memo(() => {
-	const { setAudio, updateProjectId } = useAppStore.getState();
-	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-	const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
-	const deleteProjectMutation = useDeleteProject({
-		onSuccess: () => {
-			setShowDeleteDialog(false);
-			setProjectToDelete(null);
-		},
-	});
-
-	const handleProjectSelected = (project: Project) => {
-		updateProjectId(project.id);
-		setAudio({
-			id: project.audioId,
-		});
-	};
-
-	const handleProjectDelete = (projectId: string) => {
-		setProjectToDelete(projectId);
-		setShowDeleteDialog(true);
-	};
-
-	const confirmDelete = (e: { preventDefault: () => void }) => {
-		e.preventDefault();
-		if (projectToDelete) {
-			deleteProjectMutation.mutate(projectToDelete);
-		}
-	};
-
-	const cancelDelete = () => {
-		setShowDeleteDialog(false);
-		setProjectToDelete(null);
-	};
+const HeaderContent = memo(() => {
+	const {
+		handleProjectSelected,
+		handleProjectDelete,
+		confirmDelete,
+		cancelDelete,
+		showDeleteDialog,
+		isDeleting,
+	} = useHeaderProjectActions();
 
 	return (
 		<>
@@ -54,24 +27,7 @@ export const Header = memo(() => {
 						</h1>
 					</div>
 
-					{/* Search bar for medium and larger screens */}
-					{/* <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 max-w-xs lg:max-w-md w-full px-4">
-						<div className="relative">
-							<Input
-								type="text"
-								placeholder="Search available lyrics..."
-								className="w-full h-10 pr-10"
-							/>
-							<div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-								<Search className="h-4 w-4 text-muted-foreground" />
-							</div>
-						</div>
-					</div> */}
-
 					<div className="flex items-center gap-4">
-						{/* Search icon for small screens */}
-						{/* <Search className="h-5 w-5 text-muted-foreground md:hidden cursor-pointer hover:text-foreground transition-colors" /> */}
-
 						<ProjectsDrawer
 							onProjectSelected={handleProjectSelected}
 							onDeleteProject={handleProjectDelete}
@@ -94,12 +50,14 @@ export const Header = memo(() => {
 
 			{createDeleteConfirmationDialog({
 				open: showDeleteDialog,
-				onOpenChange: setShowDeleteDialog,
+				onOpenChange: (open) => !open && cancelDelete(),
 				onConfirm: confirmDelete,
 				onCancel: cancelDelete,
-				isLoading: deleteProjectMutation.isPending,
+				isLoading: isDeleting,
 				itemName: 'project',
 			})}
 		</>
 	);
 });
+
+export const Header = memo(() => <HeaderContent />);
