@@ -18,11 +18,5 @@ export type RenderVideoResult = {
 export const useRenderVideo = () => {
 	return useMutation<RenderVideoResult, Error, RenderVideoParams>({
 		mutationFn: renderVideo,
-		onSuccess: (data) => {
-			console.log('Video render completed:', data.fileName);
-		},
-		onError: (error) => {
-			console.error('Video render failed:', error.message);
-		},
 	});
 };

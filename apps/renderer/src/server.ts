@@ -96,5 +96,5 @@ app.post('/render', async (req: Request, res: Response): Promise<void> => {
 
 // Start server
 app.listen(port, () => {
-	console.log(`Server running at http://localhost:${port}`);
+	console.info(`Server running at http://localhost:${port}`);
 });
