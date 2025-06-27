@@ -4,7 +4,7 @@ import { parseLines } from '@/remotion/Root';
 import { LyricsPreviewCard } from '../lyrics-preview-card';
 import { useCallback, useMemo, useState } from 'react';
 import type { LyricsProps } from '@/remotion/schema';
-import { PlayerOnly } from './player';
+import { VideoPlayer } from './video-player';
 import { getAudioUrl, getCoverArtUrl } from '@/data/api';
 import { useAppStore } from '@/stores/app/store';
 import { useVideoRefContext } from '@/hooks/use-video-ref-context';
@@ -14,9 +14,10 @@ import { useColorFlow } from '@/hooks/use-color-flow';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { useRenderVideo } from '@/hooks/use-render-video';
-import type { AudioMeta } from '@/data/types';
+import type { AspectRatioType, AudioMeta } from '@/data/types';
 import { AnimatePresence, motion } from 'motion/react';
 import { RenderWhen } from '../render-when';
+import { PlayerToolbar } from './player-toolbar';
 
 export const LyricsPlayer = () => {
 	const { audioRef } = useAudioRefContext();
@@ -33,6 +34,9 @@ export const LyricsPlayer = () => {
 	);
 
 	const audio = useAppStore((state) => state.audio);
+	const [aspectRatio, setAspectRatio] =
+		useState<AspectRatioType>('horizontal');
+ 
 
 	const renderVideoMutation = useRenderVideo();
 	const [renderProgress, setRenderProgress] = useState<{
@@ -209,10 +213,15 @@ export const LyricsPlayer = () => {
 			</CardHeader>
 
 			<CardContent className="px-6">
-				<PlayerOnly
+				<PlayerToolbar
+					aspectRatio={aspectRatio}
+					onAspectRatioChange={setAspectRatio}
+				/>
+				<VideoPlayer
 					playerRef={videoRef}
 					inputProps={inputProps}
 					totalFrames={totalFrames}
+					aspectRatio={aspectRatio}
 				/>
 				<LyricsPreviewCard />
 			</CardContent>

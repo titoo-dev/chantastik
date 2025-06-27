@@ -34,3 +34,5 @@ export type ServerLyrics = {
 	id: string;
 	lines: LyricLine[];
 };
+
+export type AspectRatioType = 'horizontal' | 'vertical';
