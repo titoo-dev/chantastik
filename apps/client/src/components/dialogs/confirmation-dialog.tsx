@@ -47,7 +47,10 @@ export function ConfirmationDialog({
 
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
-			<AlertDialogContent className="sm:max-w-[425px]">
+			<AlertDialogContent
+				className="sm:max-w-[425px]"
+				data-testid="confirmation-dialog"
+			>
 				<AlertDialogHeader>
 					<AlertDialogTitle className="text-lg font-semibold leading-none tracking-tight">
 						{title}
@@ -62,6 +65,7 @@ export function ConfirmationDialog({
 						onClick={handleCancel}
 						disabled={isLoading}
 						className="mt-2 sm:mt-0"
+						data-testid="confirmation-dialog-cancel"
 					>
 						{cancelText}
 					</AlertDialogCancel>
@@ -73,6 +77,7 @@ export function ConfirmationDialog({
 								'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 							isLoading && 'opacity-50 cursor-not-allowed'
 						)}
+						data-testid="confirmation-dialog-confirm"
 					>
 						{isLoading ? loadingText || 'Loading...' : confirmText}
 					</AlertDialogAction>

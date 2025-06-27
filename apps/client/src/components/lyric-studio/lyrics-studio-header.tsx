@@ -29,7 +29,7 @@ export const LyricStudioHeader = memo(() => {
 			<div className="mb-6 space-y-4">
 				<div className="text-center">
 					<h1
-						data-testId="title"
+						data-testid="title"
 						className="text-2xl font-bold tracking-tight leading-relaxed"
 					>
 						Create Amazing Lyrics
@@ -83,7 +83,7 @@ export const LyricStudioHeader = memo(() => {
 			<div className="flex flex-row items-center justify-between">
 				<div>
 					<h1
-						data-testId="title"
+						data-testid="title"
 						className="text-3xl font-bold tracking-tight leading-relaxed"
 					>
 						Create Amazing Lyrics
