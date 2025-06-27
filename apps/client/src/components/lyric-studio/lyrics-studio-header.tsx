@@ -28,7 +28,10 @@ export const LyricStudioHeader = memo(() => {
 		return (
 			<div className="mb-6 space-y-4">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold tracking-tight leading-relaxed">
+					<h1
+						data-testId="title"
+						className="text-2xl font-bold tracking-tight leading-relaxed"
+					>
 						Create Amazing Lyrics
 					</h1>
 					<p className="text-muted-foreground leading-relaxed text-sm">
@@ -47,6 +50,7 @@ export const LyricStudioHeader = memo(() => {
 								size="sm"
 								className="flex-1 gap-1 min-h-[44px]"
 								title="Toggle video preview"
+								data-testid="video-preview-button"
 								disabled={
 									lyricLines.length === 0 ||
 									!isValidLyricLines()
@@ -61,6 +65,7 @@ export const LyricStudioHeader = memo(() => {
 								size="sm"
 								className="flex-1 gap-1 min-h-[44px]"
 								title="Toggle external lyrics"
+								data-testid="external-lyrics-button"
 								disabled={showVideoPreview}
 							>
 								<FileText className="h-4 w-4" />
@@ -77,7 +82,10 @@ export const LyricStudioHeader = memo(() => {
 		<div className="mb-6 space-y-4">
 			<div className="flex flex-row items-center justify-between">
 				<div>
-					<h1 className="text-3xl font-bold tracking-tight leading-relaxed">
+					<h1
+						data-testId="title"
+						className="text-3xl font-bold tracking-tight leading-relaxed"
+					>
 						Create Amazing Lyrics
 					</h1>
 					<p className="text-muted-foreground leading-relaxed">
@@ -94,6 +102,7 @@ export const LyricStudioHeader = memo(() => {
 							variant="outline"
 							className="gap-2"
 							title="Import lyrics from text"
+							data-testid="video-preview-button"
 							disabled={
 								lyricLines.length === 0 || !isValidLyricLines()
 							}
@@ -108,6 +117,7 @@ export const LyricStudioHeader = memo(() => {
 							variant="outline"
 							className="gap-2"
 							title="Import lyrics from text"
+							data-testid="external-lyrics-button"
 							disabled={showVideoPreview}
 						>
 							<FileText className="h-4 w-4" />

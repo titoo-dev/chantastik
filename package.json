@@ -7,6 +7,7 @@
     "deploy": "pnpm --filter \"@repo/server\" run deploy",
     "studio": "pnpm --filter \"@repo/client\" run studio",
     "serve": "pnpm --filter \"@repo/client\" run serve",
+    "test": "pnpm --filter \"@repo/client\" run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"

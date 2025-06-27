@@ -22,7 +22,10 @@ const HeaderContent = memo(() => {
 				<div className="container mx-auto flex h-16 items-center justify-between relative">
 					<div className="flex items-center gap-2">
 						<AudioWaveform className="h-6 w-6 text-primary" />
-						<h1 className="text-xl font-bold text-foreground">
+						<h1
+							data-test-id="title"
+							className="text-xl font-bold text-foreground"
+						>
 							<Link to="/">Chantastik</Link>
 						</h1>
 					</div>

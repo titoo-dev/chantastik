@@ -9,8 +9,9 @@ import { resolve } from "node:path";
 export default defineConfig({
   plugins: [TanStackRouterVite({ autoCodeSplitting: true }), viteReact(), tailwindcss()],
   test: {
-    globals: true,
-    environment: "jsdom",
+    environment: "happy-dom",
+    setupFiles: ['./src/tests/setup.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}']
   },
   resolve: {
     alias: {
