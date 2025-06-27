@@ -17,53 +17,12 @@ import { ScrollArea } from './ui/scroll-area';
 import { useProjectDrawer } from '@/hooks/use-project-drawer';
 import { ProjectCard } from './project-card';
 
-type ProjectsDrawerProps = {
+type Props = {
 	onProjectSelected: (project: Project) => void;
 	onDeleteProject: (projectId: string) => void;
 };
 
-const Empty = memo(() => (
-	<div className="text-center py-12">
-		<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-			<FolderOpen className="h-6 w-6 text-muted-foreground" />
-		</div>
-		<p className="text-muted-foreground text-sm">
-			No projects yet. Create your first project to get started.
-		</p>
-	</div>
-));
-
-const Error = memo(() => (
-	<div className="text-center py-12">
-		<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
-			<FolderOpen className="h-6 w-6 text-destructive" />
-		</div>
-		<p className="text-destructive text-sm">
-			Failed to load projects. Please try again.
-		</p>
-	</div>
-));
-
-const Grid = memo<{
-	projects: Project[];
-	onProjectSelect: (project: Project) => void;
-	onProjectDelete: (projectId: string) => void;
-	formatDate: (date: string) => string;
-}>(({ projects, onProjectSelect, onProjectDelete, formatDate }) => (
-	<div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr container mx-auto max-w-8xl">
-		{projects.map((project) => (
-			<ProjectCard
-				key={project.id}
-				project={project}
-				onSelect={onProjectSelect}
-				onDelete={onProjectDelete}
-				formatDate={formatDate}
-			/>
-		))}
-	</div>
-));
-
-export const ProjectsDrawer = memo<ProjectsDrawerProps>(
+export const ProjectsDrawer = memo<Props>(
 	({ onProjectSelected, onDeleteProject }) => {
 		const {
 			closeRef,
@@ -145,3 +104,44 @@ export const ProjectsDrawer = memo<ProjectsDrawerProps>(
 		);
 	}
 );
+
+const Empty = memo(() => (
+	<div className="text-center py-12">
+		<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+			<FolderOpen className="h-6 w-6 text-muted-foreground" />
+		</div>
+		<p className="text-muted-foreground text-sm">
+			No projects yet. Create your first project to get started.
+		</p>
+	</div>
+));
+
+const Error = memo(() => (
+	<div className="text-center py-12">
+		<div className="w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
+			<FolderOpen className="h-6 w-6 text-destructive" />
+		</div>
+		<p className="text-destructive text-sm">
+			Failed to load projects. Please try again.
+		</p>
+	</div>
+));
+
+const Grid = memo<{
+	projects: Project[];
+	onProjectSelect: (project: Project) => void;
+	onProjectDelete: (projectId: string) => void;
+	formatDate: (date: string) => string;
+}>(({ projects, onProjectSelect, onProjectDelete, formatDate }) => (
+	<div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr container mx-auto max-w-8xl">
+		{projects.map((project) => (
+			<ProjectCard
+				key={project.id}
+				project={project}
+				onSelect={onProjectSelect}
+				onDelete={onProjectDelete}
+				formatDate={formatDate}
+			/>
+		))}
+	</div>
+));
