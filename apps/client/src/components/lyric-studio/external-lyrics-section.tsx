@@ -35,19 +35,32 @@ export function ExternalLyricsSection() {
 	}
 
 	return (
-		<Card className="pt-0 shadow-none overflow-hidden">
-			<CardHeader className="flex flex-row items-center justify-between border-b pt-6">
-				<CardTitle className="flex items-center gap-2 py-3">
+		<Card
+			className="pt-0 shadow-none overflow-hidden"
+			data-testid="external-lyrics-section"
+		>
+			<CardHeader
+				className="flex flex-row items-center justify-between border-b pt-6"
+				data-testid="external-lyrics-header"
+			>
+				<CardTitle
+					className="flex items-center gap-2 py-3"
+					data-testid="external-lyrics-title"
+				>
 					<FileText className="h-5 w-5 text-primary" />
 					External Lyrics
 				</CardTitle>
-				<div className="flex items-center gap-2">
+				<div
+					className="flex items-center gap-2"
+					data-testid="external-lyrics-actions"
+				>
 					<Button
 						variant="outline"
 						size="sm"
 						className="p-2"
 						title="Search for lyrics online"
 						onClick={handleGoogleSearch}
+						data-testid="search-lyrics-button"
 					>
 						<Globe className="h-4 w-4" />
 					</Button>
@@ -58,13 +71,14 @@ export function ExternalLyricsSection() {
 						className="gap-2"
 						disabled={isConvertDisabled}
 						title="Override lyric lines from this text"
+						data-testid="apply-lyrics-button"
 					>
 						<ArrowRightCircle className="h-4 w-4" />
 						Apply new Lines
 					</Button>
 				</div>
 			</CardHeader>
-			<CardContent className="px-4">
+			<CardContent className="px-4" data-testid="external-lyrics-content">
 				<Textarea
 					placeholder="Paste lyrics here, one line per lyric..."
 					className="min-h-[200px] w-full resize-none border-muted text-foreground/90 focus:border-primary transition-colors scrollbar-hide overflow-hidden"
@@ -72,8 +86,12 @@ export function ExternalLyricsSection() {
 					onChange={handleTextareaChange}
 					onFocus={handleTextareaFocus}
 					spellCheck={false}
+					data-testid="external-lyrics-textarea"
 				/>
-				<div className="mt-2 text-sm text-muted-foreground">
+				<div
+					className="mt-2 text-sm text-muted-foreground"
+					data-testid="external-lyrics-help-text"
+				>
 					Paste or type song lyrics. Each line will be converted to a
 					separate lyric line.
 				</div>

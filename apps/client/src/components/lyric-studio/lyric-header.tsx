@@ -35,25 +35,36 @@ export const LyricHeader = memo(function LyricHeader() {
 	}
 
 	return (
-		<CardHeader className="p-4 border-b">
+		<CardHeader
+			className="p-4 border-b"
+			data-testid="lyric-header-container"
+		>
 			<div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-center">
-				<CardTitle className="flex items-center gap-2 min-w-0">
+				<CardTitle
+					className="flex items-center gap-2 min-w-0"
+					data-testid="lyric-header-title"
+				>
 					<Music className="h-5 w-5 text-primary flex-shrink-0" />
 					<span className="truncate">Lyric Editor</span>
 				</CardTitle>
-				<div className="flex flex-col md:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+				<div
+					className="flex flex-col md:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto"
+					data-testid="lyric-header-actions"
+				>
 					<input
 						type="file"
 						ref={fileInputRef}
 						className="hidden"
 						accept=".lrc,.txt"
 						onChange={handleLrcFileChange}
+						data-testid="lrc-file-input"
 					/>
 					<Button
 						onClick={loadFromLrcFile}
 						variant="outline"
 						className="gap-2 w-full md:w-auto"
 						title="Import lyrics from LRC file"
+						data-testid="load-from-lrc-button"
 					>
 						<ArrowUpFromLine className="h-4 w-4" />
 						Load from LRC
@@ -71,6 +82,7 @@ export const LyricHeader = memo(function LyricHeader() {
 								? 'Fill in all lyric lines before downloading'
 								: 'Download lyrics in LRC format'
 						}
+						data-testid="download-lrc-button"
 					>
 						<Download className="h-4 w-4" />
 						Download LRC
@@ -81,6 +93,7 @@ export const LyricHeader = memo(function LyricHeader() {
 						className="gap-2 w-full md:w-auto"
 						disabled={isSaveLyricsButtonDisabled}
 						title="Save lyrics to project"
+						data-testid="save-lyrics-button"
 					>
 						<CloudDownload className="h-4 w-4" />
 						{saveLyricsMutation.isPending

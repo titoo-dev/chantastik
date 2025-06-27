@@ -11,7 +11,10 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: ['./src/tests/setup.ts'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}']
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    coverage: {
+      provider: 'v8'
+    }
   },
   resolve: {
     alias: {
