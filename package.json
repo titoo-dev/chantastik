@@ -1,5 +1,5 @@
 {
-  "name": "monorepo-karaoke-milay",
+  "name": "chantastik",
   "private": true,
   "scripts": {
     "build": "turbo run build",
