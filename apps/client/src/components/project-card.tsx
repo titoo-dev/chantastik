@@ -57,25 +57,28 @@ export const ProjectCard = memo<{
     };
     
     return (
-        <Card
-            className="hover:shadow-none shadow-none transition-all duration-200 cursor-pointer group h-full flex flex-col relative"
-            onClick={() => onSelect(project)}
-        >
-            <Button
-                variant="outline"
-                size="icon"
-                className="absolute bottom-3 right-3 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
-                onClick={handleTrashClick}
-            >
-                <Trash2 className="h-9 w-9" />
-                <span className="sr-only">Delete project</span>
-            </Button>
-            <CardHeader className="flex-shrink-0">
-                <div className="flex items-center gap-6">
-                    <CoverArt project={project} />
-                    <Info project={project} formatDate={formatDate} />
-                </div>
-            </CardHeader>
-        </Card>
+		<Card
+			className="hover:shadow-none shadow-none transition-all duration-200 cursor-pointer group h-full flex flex-col relative"
+			onClick={() => onSelect(project)}
+			data-testid="project-card"
+		>
+			<Button
+				variant="outline"
+				size="icon"
+				className="absolute bottom-3 right-3 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+				onClick={handleTrashClick}
+				data-testid="delete-project-button"
+				aria-label='Delete project'
+			>
+				<Trash2 className="h-9 w-9" />
+				<span className="sr-only">Delete project</span>
+			</Button>
+			<CardHeader className="flex-shrink-0" data-testid="project-card-header">
+				<div className="flex items-center gap-6" data-testid="project-card-content">
+					<CoverArt project={project} />
+					<Info project={project} formatDate={formatDate} />
+				</div>
+			</CardHeader>
+		</Card>
     );
 });
