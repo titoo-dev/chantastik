@@ -7,7 +7,7 @@ import { ExternalLyricsSection } from '@/components/lyric-studio/external-lyrics
 import { TrackUploadWrapper } from '@/components/track-upload-wrapper';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 export const Route = createFileRoute('/')({
 	component: App,
