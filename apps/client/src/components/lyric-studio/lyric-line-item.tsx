@@ -6,6 +6,7 @@ import { TimestampControl } from './timestamp-control';
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
 import type { LyricLine } from '@/data/types';
+import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 
 type Props = {
 	line: LyricLine;
@@ -29,6 +30,8 @@ export const LyricLineItem = memo(
 		onAddLineBelow,
 		isActive = false,
 	}: Props) => {
+		const { isMobile, isSmallMobile } = useResponsiveMobile();
+
 		return (
 			<div
 				className={cn(
@@ -38,46 +41,97 @@ export const LyricLineItem = memo(
 					}
 				)}
 			>
-				<div className="flex items-center gap-3 p-3">
-					<Badge
-						variant="outline"
-						className="w-8 h-8 flex items-center justify-center rounded-full text-primary font-semibold text-sm shrink-0"
-					>
-						{index + 1}
-					</Badge>
-					<div className="flex-1">
-						<Input
-							id={`text-${line.id}`}
-							value={line.text}
-							onChange={(e) =>
-								onUpdateLine(line.id, { text: e.target.value })
-							}
-							className="w-full bg-transparent border-none text-base focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
-							placeholder="Enter lyrics..."
-							autoComplete="off"
-						/>
-					</div>{' '}
-					<div className="flex items-center gap-3 shrink-0">
-						<TimestampControl
-							timestamp={line.timestamp}
-							lineId={line.id}
-							canSetCurrentTime={canUseCurrentTime}
-							onSetCurrentTime={onSetCurrentTime}
-						/>
-
-						{onAddLineBelow && (
-							<AddLineBelowButton
-								lineId={line.id}
-								onAddLineBelow={onAddLineBelow}
+				{isMobile || isSmallMobile ? (
+					// Mobile layout: input on top, controls below
+					<div className="p-3 space-y-3">
+						<div className="w-full">
+							<Input
+								id={`text-${line.id}`}
+								value={line.text}
+								onChange={(e) =>
+									onUpdateLine(line.id, {
+										text: e.target.value,
+									})
+								}
+								className="w-full bg-transparent border-none text-base focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
+								placeholder="Enter lyrics..."
+								autoComplete="off"
 							/>
-						)}
+						</div>
+						<div className="flex gap-2 items-center justify-between">
+							<Badge
+								variant="outline"
+								className="w-8 h-8 flex items-center justify-center rounded-full text-primary font-semibold text-sm shrink-0"
+							>
+								{index + 1}
+							</Badge>
+							<div className="flex items-center gap-3 shrink-0">
+								<TimestampControl
+									timestamp={line.timestamp}
+									lineId={line.id}
+									canSetCurrentTime={canUseCurrentTime}
+									onSetCurrentTime={onSetCurrentTime}
+								/>
 
-						<RemoveLyricLineButton
-							lineId={line.id}
-							onDeleteLine={onDeleteLine}
-						/>
+								{onAddLineBelow && (
+									<AddLineBelowButton
+										lineId={line.id}
+										onAddLineBelow={onAddLineBelow}
+									/>
+								)}
+
+								<RemoveLyricLineButton
+									lineId={line.id}
+									onDeleteLine={onDeleteLine}
+								/>
+							</div>
+						</div>
 					</div>
-				</div>
+				) : (
+					// Desktop layout: horizontal arrangement
+					<div className="flex items-center gap-3 p-3">
+						<Badge
+							variant="outline"
+							className="w-8 h-8 flex items-center justify-center rounded-full text-primary font-semibold text-sm shrink-0"
+						>
+							{index + 1}
+						</Badge>
+						<div className="flex-1">
+							<Input
+								id={`text-${line.id}`}
+								value={line.text}
+								onChange={(e) =>
+									onUpdateLine(line.id, {
+										text: e.target.value,
+									})
+								}
+								className="w-full bg-transparent border-none text-base focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60 shadow-none focus-visible:ring-0"
+								placeholder="Enter lyrics..."
+								autoComplete="off"
+							/>
+						</div>
+						<div className="flex items-center gap-3 shrink-0">
+							<TimestampControl
+								timestamp={line.timestamp}
+								lineId={line.id}
+								canSetCurrentTime={canUseCurrentTime}
+								onSetCurrentTime={onSetCurrentTime}
+							/>
+
+							{onAddLineBelow && (
+								<AddLineBelowButton
+									lineId={line.id}
+									onAddLineBelow={onAddLineBelow}
+								/>
+							)}
+
+							<RemoveLyricLineButton
+								lineId={line.id}
+								onDeleteLine={onDeleteLine}
+							/>
+						</div>
+					</div>
+				)}
 			</div>
 		);
 	}
