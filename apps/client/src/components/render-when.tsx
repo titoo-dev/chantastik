@@ -11,6 +11,9 @@ export const RenderWhen: React.FC<RenderWhenProps> = ({
     children,
     fallback = null,
 }) => {
+    if (condition === false && !fallback) {
+        return <div></div>;
+    }
     return condition ? <>{children}</> : <>{fallback}</>;
 };
 
