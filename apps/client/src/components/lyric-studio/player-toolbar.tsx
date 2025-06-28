@@ -15,11 +15,17 @@ export const PlayerToolbar: React.FC<Props> = ({
 }) => {
 	return (
 		<div className="space-y-3" data-testid="player-toolbar-container">
-			<div className="flex gap-2 items-center" data-testid="toolbar-controls">
+			<div
+				className="flex gap-2 items-center"
+				data-testid="toolbar-controls"
+			>
 				<RenderWhen
 					condition={import.meta.env.VITE_NODE_ENV === 'development'}
 				>
-					<div className="flex space-x-2 py-3" data-testid="aspect-ratio-controls">
+					<div
+						className="flex space-x-2 py-3"
+						data-testid="aspect-ratio-controls"
+					>
 						<Button
 							variant={
 								aspectRatio === 'horizontal'
@@ -60,7 +66,10 @@ export const PlayerToolbar: React.FC<Props> = ({
 							<Info className="w-4 h-4" />
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-80" data-testid="info-popover-content">
+					<PopoverContent
+						className="w-80"
+						data-testid="info-popover-content"
+					>
 						<p className="text-sm" data-testid="info-message">
 							If you close and reopen the video player, it may
 							lose sync with the audio or stop playing. Simply
