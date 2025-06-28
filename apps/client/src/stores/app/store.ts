@@ -27,8 +27,6 @@ type AppState = {
 	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
-	showExternalLyrics: boolean;
-	showVideoPreview: boolean;
 }
 
 type AppActions = {
@@ -38,7 +36,6 @@ type AppActions = {
 	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
-	setShowExternalLyrics: (show: boolean) => void;
 	setShowVideoPreview: (show: boolean) => void;
 
 	// Complex actions
@@ -59,9 +56,6 @@ type AppActions = {
 		videoRef?: RefObject<PlayerRef | null>;
 	}) => void;
 	resetAllStatesAndPlayers: () => void;
-	// Toggle actions
-	toggleShowExternalLyrics: () => void;
-	toggleShowVideoPreview: () => void;
 	// Selection actions
 	toggleLyricLineSelection: (id: number) => void;
 	clearLyricLineSelection: () => void;
@@ -86,8 +80,6 @@ export const useAppStore = create<AppStore>()(
 			audio: undefined,
 			lyricLines: [],
 			externalLyrics: '',
-			showExternalLyrics: false,
-			showVideoPreview: false,
 
 			// Basic setters
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
@@ -105,10 +97,6 @@ export const useAppStore = create<AppStore>()(
 			setLyricLines: (lines) => set({ lyricLines: lines }),
 
 			setExternalLyrics: (lyrics) => set({ externalLyrics: lyrics }),
-
-			setShowExternalLyrics: (show) => set({ showExternalLyrics: show }),
-
-			setShowVideoPreview: (show) => set({ showVideoPreview: show }),
 
 			// Utility methods
 			areLyricLinesWithoutTimestamps: () => {
@@ -142,20 +130,6 @@ export const useAppStore = create<AppStore>()(
 						line.text.trim() !== '' && line.timestamp !== undefined
 				);
 			},
-
-			// Toggle actions
-			toggleShowExternalLyrics: () =>
-				set((state) => ({
-					showExternalLyrics: !state.showExternalLyrics,
-					showVideoPreview: false,
-				})),
-
-			toggleShowVideoPreview: () =>
-				set((state) => ({
-					showVideoPreview: !state.showVideoPreview,
-					showExternalLyrics: false,
-				})),
-
 			// Complex actions
 			jumpToLyricLine: (params) => {
 				const { id, audioRef, videoRef } = params;
@@ -353,8 +327,6 @@ export const useAppStore = create<AppStore>()(
 					trackLoaded: false,
 					lyricLines: [],
 					externalLyrics: '',
-					showExternalLyrics: false,
-					showVideoPreview: false,
 					projectId: undefined,
 					audio: undefined,
 				});

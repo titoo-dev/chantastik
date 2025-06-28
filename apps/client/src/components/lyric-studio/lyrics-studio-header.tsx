@@ -1,26 +1,9 @@
 import { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import { FileText } from 'lucide-react';
 import { useAppStore } from '@/stores/app/store';
-import { useShallow } from 'zustand/react/shallow';
 import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 
 export const LyricStudioHeader = memo(() => {
-	const {
-		toggleShowExternalLyrics,
-		toggleShowVideoPreview,
-		isValidLyricLines,
-	} = useAppStore.getState();
-
-	const { showVideoPreview, lyricLines, showExternalLyrics, trackLoaded } =
-		useAppStore(
-			useShallow((state) => ({
-				showVideoPreview: state.showVideoPreview,
-				lyricLines: state.lyricLines,
-				showExternalLyrics: state.showExternalLyrics,
-				trackLoaded: state.trackLoaded,
-			}))
-		);
+	const trackLoaded = useAppStore((state) => state.trackLoaded);
 
 	const { isMobile, isSmallMobile } = useResponsiveMobile();
 
@@ -40,40 +23,6 @@ export const LyricStudioHeader = memo(() => {
 							: 'Upload an audio track to get started'}
 					</p>
 				</div>
-
-				{trackLoaded && (
-					<div className="flex flex-col gap-3 w-full">
-						<div className="flex flex-row gap-2">
-							<Button
-								onClick={toggleShowVideoPreview}
-								variant="outline"
-								size="sm"
-								className="flex-1 gap-1 min-h-[44px]"
-								title="Toggle video preview"
-								data-testid="video-preview-button"
-								disabled={
-									lyricLines.length === 0 ||
-									!isValidLyricLines()
-								}
-							>
-								<FileText className="h-4 w-4" />
-								{showVideoPreview ? 'Hide Video' : 'Video'}
-							</Button>
-							<Button
-								onClick={toggleShowExternalLyrics}
-								variant="outline"
-								size="sm"
-								className="flex-1 gap-1 min-h-[44px]"
-								title="Toggle external lyrics"
-								data-testid="external-lyrics-button"
-								disabled={showVideoPreview}
-							>
-								<FileText className="h-4 w-4" />
-								{showExternalLyrics ? 'Hide Lyrics' : 'Lyrics'}
-							</Button>
-						</div>
-					</div>
-				)}
 			</div>
 		);
 	}
@@ -94,39 +43,6 @@ export const LyricStudioHeader = memo(() => {
 							: 'Upload an audio track to get started'}
 					</p>
 				</div>
-
-				{trackLoaded && (
-					<div className="flex items-center gap-3">
-						<Button
-							onClick={toggleShowVideoPreview}
-							variant="outline"
-							className="gap-2"
-							title="Import lyrics from text"
-							data-testid="video-preview-button"
-							disabled={
-								lyricLines.length === 0 || !isValidLyricLines()
-							}
-						>
-							<FileText className="h-4 w-4" />
-							{showVideoPreview
-								? 'Hide Video Preview'
-								: 'Video Preview'}
-						</Button>
-						<Button
-							onClick={toggleShowExternalLyrics}
-							variant="outline"
-							className="gap-2"
-							title="Import lyrics from text"
-							data-testid="external-lyrics-button"
-							disabled={showVideoPreview}
-						>
-							<FileText className="h-4 w-4" />
-							{showExternalLyrics
-								? 'Hide Notes'
-								: 'Notes'}
-						</Button>
-					</div>
-				)}
 			</div>
 		</div>
 	);

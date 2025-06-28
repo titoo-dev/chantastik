@@ -12,7 +12,6 @@ export function ExternalLyricsSection() {
 		handleTextareaChange,
 		handleTextareaFocus,
 		isConvertDisabled,
-		shouldRender,
 	} = useExternalLyricsSection();
 
 	const handleGoogleSearch = () => {
@@ -29,10 +28,6 @@ export function ExternalLyricsSection() {
 		);
 		window.open(url.toString(), '_blank');
 	};
-
-	if (!shouldRender) {
-		return null;
-	}
 
 	return (
 		<Card

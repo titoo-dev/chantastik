@@ -9,12 +9,10 @@ export const useLyricEditor = () => {
     const { updateLyricLine, deleteLyricLine, addLyricLine, projectId } =
         useAppStore.getState();
 
-    const { lyricLines, showExternalLyrics, showVideoPreview, trackLoaded } =
+    const { lyricLines, trackLoaded } =
         useAppStore(
             useShallow((state) => ({
                 lyricLines: state.lyricLines,
-                showExternalLyrics: state.showExternalLyrics,
-                showVideoPreview: state.showVideoPreview,
                 trackLoaded: state.trackLoaded,
                 projectId: state.projectId,
             }))
@@ -32,8 +30,6 @@ export const useLyricEditor = () => {
     return {
         audioRef,
         lyricLines,
-        showExternalLyrics,
-        showVideoPreview,
         trackLoaded,
         serverLyrics,
         isLoadingLyrics,

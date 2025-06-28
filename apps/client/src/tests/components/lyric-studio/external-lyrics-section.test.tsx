@@ -42,7 +42,6 @@ describe('ExternalLyricsSection component', () => {
             handleTextareaChange: mockHandleTextareaChange,
             handleTextareaFocus: mockHandleTextareaFocus,
             isConvertDisabled: false,
-            shouldRender: true,
         });
 
         // Mock localStorage with valid audio metadata
@@ -59,21 +58,6 @@ describe('ExternalLyricsSection component', () => {
         
         expect(screen.getByTestId('external-lyrics-section')).toBeInTheDocument();
         expect(screen.getByTestId('external-lyrics-title')).toHaveTextContent('Notes');
-    });
-
-    it('should not render when shouldRender is false', () => {
-        vi.mocked(useExternalLyricsSection).mockReturnValue({
-            externalLyrics: '',
-            handleConvertToLines: mockHandleConvertToLines,
-            handleTextareaChange: mockHandleTextareaChange,
-            handleTextareaFocus: mockHandleTextareaFocus,
-            isConvertDisabled: false,
-            shouldRender: false,
-        });
-
-        render(<ExternalLyricsSection />);
-        
-        expect(screen.queryByTestId('external-lyrics-section')).not.toBeInTheDocument();
     });
 
     it('should render all necessary UI elements', () => {
@@ -143,7 +127,6 @@ describe('ExternalLyricsSection component', () => {
             handleTextareaChange: mockHandleTextareaChange,
             handleTextareaFocus: mockHandleTextareaFocus,
             isConvertDisabled: true,
-            shouldRender: true,
         });
 
         render(<ExternalLyricsSection />);
@@ -186,7 +169,6 @@ describe('ExternalLyricsSection component', () => {
             handleTextareaChange: mockHandleTextareaChange,
             handleTextareaFocus: mockHandleTextareaFocus,
             isConvertDisabled: false,
-            shouldRender: true,
         });
 
         render(<ExternalLyricsSection />);

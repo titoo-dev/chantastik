@@ -4,10 +4,9 @@ import { useShallow } from 'zustand/react/shallow';
 export function useExternalLyricsSection() {
 	const { addLinesFromExternal, setExternalLyrics } = useAppStore.getState();
 
-	const { externalLyrics, showExternalLyrics } = useAppStore(
+	const { externalLyrics } = useAppStore(
 		useShallow((state) => ({
 			externalLyrics: state.externalLyrics,
-			showExternalLyrics: state.showExternalLyrics,
 		}))
 	);
 
@@ -37,7 +36,6 @@ export function useExternalLyricsSection() {
 	};
 
 	const isConvertDisabled = !externalLyrics.trim();
-	const shouldRender = showExternalLyrics;
 
 	return {
 		externalLyrics,
@@ -45,6 +43,5 @@ export function useExternalLyricsSection() {
 		handleTextareaChange,
 		handleTextareaFocus,
 		isConvertDisabled,
-		shouldRender,
 	};
 }

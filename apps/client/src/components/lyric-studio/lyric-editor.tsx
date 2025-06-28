@@ -11,10 +11,9 @@ import { createLineAdder, createTimestampSetter } from '@/lib/utils';
 import { useLyricSync } from '@/hooks/use-lyric-sync';
 
 const getCardClassName = (
-	showExternalLyrics: boolean,
 	trackLoaded: boolean
 ) => {
-	return `pt-0 shadow-none ${showExternalLyrics || trackLoaded ? 'col-span-1' : 'col-span-2'}`;
+	return `pt-0 shadow-none ${trackLoaded ? 'col-span-1' : 'col-span-2'}`;
 };
 
 const Error = ({ cardClassName }: { cardClassName: string }) => (
@@ -56,7 +55,6 @@ export const LyricEditor = memo(function LyricEditor() {
 	const {
 		audioRef,
 		lyricLines,
-		showExternalLyrics,
 		trackLoaded,
 		serverLyrics,
 		isLoadingLyrics,
@@ -74,7 +72,6 @@ export const LyricEditor = memo(function LyricEditor() {
 	);
 	const handleAddLineBelow = createLineAdder(addLyricLine, audioRef);
 	const cardClassName = getCardClassName(
-		showExternalLyrics,
 		trackLoaded
 	);
 

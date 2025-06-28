@@ -28,7 +28,6 @@ export const LyricsPlayer = () => {
 	const { lyricLines, trackLoaded } = useAppStore(
 		useShallow((state) => ({
 			lyricLines: state.lyricLines,
-			showExternalLyrics: state.showExternalLyrics,
 			trackLoaded: state.trackLoaded,
 		}))
 	);

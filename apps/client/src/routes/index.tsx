@@ -8,6 +8,10 @@ import { TrackUploadWrapper } from '@/components/track-upload-wrapper';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { FileText } from 'lucide-react';
+import RenderWhen from '@/components/render-when';
+import { useAppStore } from '@/stores/app/store';
 
 export const Route = createFileRoute('/')({
 	component: App,
@@ -15,6 +19,8 @@ export const Route = createFileRoute('/')({
 
 function App() {
 	const { isMobile, isSmallMobile, isTablet } = useResponsiveMobile();
+	const trackLoaded = useAppStore((state) => state.trackLoaded);
+
 
 	return (
 		<ScrollArea className="h-[calc(100vh-65px)]">
@@ -35,18 +41,62 @@ function App() {
 								<LyricEditor />
 							</CarouselItem>
 							<CarouselItem className="basis-[100%]">
-								<LyricsPlayer />
-							</CarouselItem>
-							<CarouselItem className="basis-[100%]">
-								<ExternalLyricsSection />
+								<Tabs defaultValue="video" className="w-full">
+									<TabsList className="grid w-full grid-cols-2">
+										<TabsTrigger
+											value="video"
+											className="gap-2"
+										>
+											<FileText className="h-4 w-4" />
+											Video Preview
+										</TabsTrigger>
+										<TabsTrigger
+											value="notes"
+											className="gap-2"
+										>
+											<FileText className="h-4 w-4" />
+											Notes
+										</TabsTrigger>
+									</TabsList>
+									<TabsContent value="video" className="mt-4">
+										<LyricsPlayer />
+									</TabsContent>
+									<TabsContent value="notes" className="mt-4">
+										<ExternalLyricsSection />
+									</TabsContent>
+								</Tabs>
 							</CarouselItem>
 						</CarouselContent>
 					</Carousel>
 				) : (
 					<div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
 						<LyricEditor />
-						<LyricsPlayer />
-						<ExternalLyricsSection />
+						<RenderWhen condition={trackLoaded}>
+							<Tabs defaultValue="video" className="w-full">
+								<TabsList className="grid w-full grid-cols-2">
+									<TabsTrigger
+										value="video"
+										className="gap-2"
+									>
+										<FileText className="h-4 w-4" />
+										Video Preview
+									</TabsTrigger>
+									<TabsTrigger
+										value="notes"
+										className="gap-2"
+									>
+										<FileText className="h-4 w-4" />
+										Notes
+									</TabsTrigger>
+								</TabsList>
+								<TabsContent value="video" className="mt-4">
+									<LyricsPlayer />
+								</TabsContent>
+								<TabsContent value="notes" className="mt-4">
+									<ExternalLyricsSection />
+								</TabsContent>
+							</Tabs>
+						</RenderWhen>
 					</div>
 				)}
 
