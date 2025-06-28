@@ -29,7 +29,7 @@ export const LyricHeader = memo(function LyricHeader() {
 		saveLyricsMutation.isPending ||
 		!currentProjectId ||
 		!lyricLines?.length;
-
+	
 	if (!trackLoaded) {
 		return null;
 	}

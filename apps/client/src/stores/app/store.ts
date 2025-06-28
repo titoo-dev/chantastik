@@ -7,6 +7,19 @@ import type { AudioMeta, LyricLine } from '@/data/types';
 import { preloadImage } from '@remotion/preload';
 import { getCoverArtUrl } from '@/data/api';
 
+// Command interface for implementing command pattern
+type Command<T = any> = {
+    execute: () => T
+    undo?: () => void
+    canExecute?: () => boolean
+}
+
+// Command history for undo functionality
+type CommandHistory = {
+    commands: Array<{ command: Command; timestamp: number }>
+    currentIndex: number
+}
+
 // Keep original types for compatibility
 export type LRCData = {
 	metadata: {
@@ -27,6 +40,7 @@ type AppState = {
 	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
+	commandHistory: CommandHistory;
 }
 
 type AppActions = {
@@ -36,7 +50,6 @@ type AppActions = {
 	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
-	setShowVideoPreview: (show: boolean) => void;
 
 	// Complex actions
 	jumpToLyricLine: (params: {
@@ -56,10 +69,10 @@ type AppActions = {
 		videoRef?: RefObject<PlayerRef | null>;
 	}) => void;
 	resetAllStatesAndPlayers: () => void;
-	// Selection actions
-	toggleLyricLineSelection: (id: number) => void;
-	clearLyricLineSelection: () => void;
-	selectAllLyricLines: () => void;
+
+	// Command pattern methods
+	executeCommand: <T>(command: Command<T>) => T;
+	undo: () => void;
 
 	// Utility methods
 	areLyricLinesWithoutTimestamps: () => boolean;
@@ -80,6 +93,10 @@ export const useAppStore = create<AppStore>()(
 			audio: undefined,
 			lyricLines: [],
 			externalLyrics: '',
+			commandHistory: {
+				commands: [],
+				currentIndex: -1
+			},
 
 			// Basic setters
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
@@ -156,96 +173,174 @@ export const useAppStore = create<AppStore>()(
 			addLyricLine: (params) => {
 				const { afterId, audioRef } = params || {};
 				const { lyricLines } = get();
-				const newId =
-					Math.max(0, ...lyricLines.map((line) => line.id)) + 1;
+				const newId = Math.max(0, ...lyricLines.map((line) => line.id)) + 1;
 				const currentTimestamp = audioRef?.current?.currentTime || 0;
 
-				if (afterId) {
-					const index = lyricLines.findIndex(
-						(line) => line.id === afterId
-					);
-					const newLines = [...lyricLines];
+				const command: Command = {
+					execute: () => {
+						if (afterId) {
+							const index = lyricLines.findIndex((line) => line.id === afterId);
+							const newLines = [...lyricLines];
 
-					let newTimestamp = currentTimestamp;
-					const prevTimestamp = newLines[index]?.timestamp || 0;
-					const nextTimestamp =
-						index < newLines.length - 1
-							? newLines[index + 1].timestamp
-							: Infinity;
+							let newTimestamp = currentTimestamp;
+							const prevTimestamp = newLines[index]?.timestamp || 0;
+							const nextTimestamp = index < newLines.length - 1 ? newLines[index + 1].timestamp : Infinity;
 
-					if (
-						prevTimestamp !== undefined &&
-						newTimestamp <= prevTimestamp
-					) {
-						newTimestamp = prevTimestamp + 0.5;
-					}
-					if (
-						nextTimestamp !== undefined &&
-						nextTimestamp !== Infinity &&
-						newTimestamp >= nextTimestamp
-					) {
-						newTimestamp = (prevTimestamp + nextTimestamp) / 2;
-					}
+							if (prevTimestamp !== undefined && newTimestamp <= prevTimestamp) {
+								newTimestamp = prevTimestamp + 0.5;
+							}
+							if (nextTimestamp !== undefined && nextTimestamp !== Infinity && newTimestamp >= nextTimestamp) {
+								newTimestamp = (prevTimestamp + nextTimestamp) / 2;
+							}
 
-					newLines.splice(index + 1, 0, {
-						id: newId,
-						text: '',
-						timestamp: newTimestamp,
-					});
-					set({ lyricLines: newLines });
-				} else {
-					let newTimestamp = currentTimestamp;
-					if (lyricLines.length > 0) {
-						const lastTimestamp =
-							lyricLines[lyricLines.length - 1].timestamp;
-						if (
-							lastTimestamp !== undefined &&
-							newTimestamp <= lastTimestamp
-						) {
-							newTimestamp = lastTimestamp + 0.5;
+							newLines.splice(index + 1, 0, {
+								id: newId,
+								text: '',
+								timestamp: newTimestamp,
+							});
+							set({ lyricLines: newLines });
+							return newLines;
+						} else {
+							let newTimestamp = currentTimestamp;
+							if (lyricLines.length > 0) {
+								const lastTimestamp = lyricLines[lyricLines.length - 1].timestamp;
+								if (lastTimestamp !== undefined && newTimestamp <= lastTimestamp) {
+									newTimestamp = lastTimestamp + 0.5;
+								}
+							}
+
+							const newLines = [
+								...lyricLines,
+								{ id: newId, text: '', timestamp: newTimestamp },
+							];
+							set({ lyricLines: newLines });
+							return newLines;
 						}
+					},
+					undo: () => {
+						set({ lyricLines });
 					}
+				};
 
-					set({
-						lyricLines: [
-							...lyricLines,
-							{ id: newId, text: '', timestamp: newTimestamp },
-						],
-					});
-				}
+				get().executeCommand(command);
 			},
 
 			updateLyricLine: (id, data) => {
 				const { lyricLines } = get();
-				set({
-					lyricLines: lyricLines.map((line) =>
-						line.id === id ? { ...line, ...data } : line
-					),
-				});
+				const oldLine = lyricLines.find(line => line.id === id);
+				
+				if (!oldLine) return;
+
+				const command: Command = {
+					execute: () => {
+						const newLines = lyricLines.map((line) =>
+							line.id === id ? { ...line, ...data } : line
+						);
+						set({ lyricLines: newLines });
+						return newLines;
+					},
+					undo: () => {
+						const restoredLines = lyricLines.map((line) =>
+							line.id === id ? oldLine : line
+						);
+						set({ lyricLines: restoredLines });
+					}
+				};
+
+				get().executeCommand(command);
 			},
+
 			deleteLyricLine: (id) => {
 				const { lyricLines } = get();
-				set({
-					lyricLines: lyricLines.filter((line) => line.id !== id),
-				});
+				const lineToDelete = lyricLines.find(line => line.id === id);
+				const lineIndex = lyricLines.findIndex(line => line.id === id);
+				
+				if (!lineToDelete || lineIndex === -1) return;
+
+				const command: Command = {
+					execute: () => {
+						const newLines = lyricLines.filter((line) => line.id !== id);
+						set({ lyricLines: newLines });
+						return newLines;
+					},
+					undo: () => {
+						const restoredLines = [...lyricLines];
+						restoredLines.splice(lineIndex, 0, lineToDelete);
+						set({ lyricLines: restoredLines });
+					}
+				};
+
+				get().executeCommand(command);
 			},
+
 			addLinesFromExternal: (externalLines) => {
 				if (externalLines.length === 0) return;
 
 				const { lyricLines } = get();
-				const newLines = externalLines.map((text, index) => {
-					const newId =
-						Math.max(0, ...lyricLines.map((line) => line.id)) +
-						index +
-						1;
-					return {
-						id: newId,
-						text,
-						timestamp: undefined,
-					};
-				});
+				const command: Command = {
+					execute: () => {
+						const newLines = externalLines.map((text, index) => {
+							const newId = Math.max(0, ...lyricLines.map((line) => line.id)) + index + 1;
+							return {
+								id: newId,
+								text,
+								timestamp: undefined,
+							};
+						});
 
-				set({ lyricLines: [...newLines] });
+						const updatedLines = [...newLines];
+						set({ lyricLines: updatedLines });
+						return updatedLines;
+					},
+					undo: () => {
+						set({ lyricLines });
+					}
+				};
+
+				get().executeCommand(command);
+			},
+
+			// Command pattern implementation
+			executeCommand: <T>(command: Command<T>): T => {
+				if (command.canExecute && !command.canExecute()) {
+					throw new Error('Command cannot be executed');
+				}
+
+				const result = command.execute();
+				
+				// Add to command history if undo is supported
+				if (command.undo) {
+					set((state) => {
+						const newCommands = [
+							...state.commandHistory.commands.slice(0, state.commandHistory.currentIndex + 1),
+							{ command, timestamp: Date.now() }
+						];
+						return {
+							commandHistory: {
+								commands: newCommands,
+								currentIndex: newCommands.length - 1
+							}
+						};
+					});
+				}
+
+				return result;
+			},
+
+			undo: () => {
+				const { commandHistory } = get();
+				if (commandHistory.currentIndex >= 0) {
+					const { command } = commandHistory.commands[commandHistory.currentIndex];
+					if (command.undo) {
+						command.undo();
+						set((state) => ({
+							commandHistory: {
+								...state.commandHistory,
+								currentIndex: state.commandHistory.currentIndex - 1
+							}
+						}));
+					}
+				}
 			},
 
 			generateLRC: () => {
@@ -321,6 +416,7 @@ export const useAppStore = create<AppStore>()(
 				document.body.removeChild(a);
 				URL.revokeObjectURL(url);
 			},
+
 			resetAllStatesAndPlayers: () => {
 				// Reset state
 				set({
@@ -329,6 +425,10 @@ export const useAppStore = create<AppStore>()(
 					externalLyrics: '',
 					projectId: undefined,
 					audio: undefined,
+					commandHistory: {
+						commands: [],
+						currentIndex: -1
+					}
 				});
 			},
 		}),
@@ -337,3 +437,24 @@ export const useAppStore = create<AppStore>()(
 		}
 	)
 );
+
+// Selector hooks for better performance
+export const useAppLyricLines = () => useAppStore((state) => state.lyricLines);
+export const useAppAudio = () => useAppStore((state) => state.audio);
+export const useAppTrackLoaded = () => useAppStore((state) => state.trackLoaded);
+export const useAppProjectId = () => useAppStore((state) => state.projectId);
+export const useAppExternalLyrics = () => useAppStore((state) => state.externalLyrics);
+export const useAppCommandHistory = () => useAppStore((state) => state.commandHistory);
+export const useAppActions = () => useAppStore((state) => ({
+	addLyricLine: state.addLyricLine,
+	updateLyricLine: state.updateLyricLine,
+	deleteLyricLine: state.deleteLyricLine,
+	addLinesFromExternal: state.addLinesFromExternal,
+	undo: state.undo,
+	setTrackLoaded: state.setTrackLoaded,
+	setAudio: state.setAudio,
+	setLyricLines: state.setLyricLines,
+	setExternalLyrics: state.setExternalLyrics,
+	jumpToLyricLine: state.jumpToLyricLine,
+	resetAllStatesAndPlayers: state.resetAllStatesAndPlayers,
+}));
