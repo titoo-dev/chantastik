@@ -12,9 +12,9 @@ import { useLyricSync } from '@/hooks/use-lyric-sync';
 
 const getCardClassName = (
 	showExternalLyrics: boolean,
-	showVideoPreview: boolean
+	trackLoaded: boolean
 ) => {
-	return `pt-0 shadow-none ${showExternalLyrics || showVideoPreview ? 'col-span-1' : 'col-span-2'}`;
+	return `pt-0 shadow-none ${showExternalLyrics || trackLoaded ? 'col-span-1' : 'col-span-2'}`;
 };
 
 const Error = ({ cardClassName }: { cardClassName: string }) => (
@@ -57,7 +57,6 @@ export const LyricEditor = memo(function LyricEditor() {
 		audioRef,
 		lyricLines,
 		showExternalLyrics,
-		showVideoPreview,
 		trackLoaded,
 		serverLyrics,
 		isLoadingLyrics,
@@ -76,7 +75,7 @@ export const LyricEditor = memo(function LyricEditor() {
 	const handleAddLineBelow = createLineAdder(addLyricLine, audioRef);
 	const cardClassName = getCardClassName(
 		showExternalLyrics,
-		showVideoPreview
+		trackLoaded
 	);
 
 	if (lyricLines.length === 0 && isLoadingLyrics && trackLoaded) {

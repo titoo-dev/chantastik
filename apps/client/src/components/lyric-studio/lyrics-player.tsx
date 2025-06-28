@@ -25,11 +25,11 @@ export const LyricsPlayer = () => {
 
 	const theme = useColorFlow();
 
-	const { lyricLines, showVideoPreview, showExternalLyrics } = useAppStore(
+	const { lyricLines, trackLoaded } = useAppStore(
 		useShallow((state) => ({
 			lyricLines: state.lyricLines,
-			showVideoPreview: state.showVideoPreview,
 			showExternalLyrics: state.showExternalLyrics,
+			trackLoaded: state.trackLoaded,
 		}))
 	);
 
@@ -138,7 +138,7 @@ export const LyricsPlayer = () => {
 		});
 	}, [lyricsData, renderInputProps, renderVideoMutation, totalFrames]);
 
-	if (!showVideoPreview || showExternalLyrics) {
+	if (!trackLoaded) {
 		return null; // Don't render if video preview is not shown
 	}
 
@@ -213,16 +213,18 @@ export const LyricsPlayer = () => {
 			</CardHeader>
 
 			<CardContent className="px-6">
-				<PlayerToolbar
-					aspectRatio={aspectRatio}
-					onAspectRatioChange={setAspectRatio}
-				/>
-				<VideoPlayer
-					playerRef={videoRef}
-					inputProps={inputProps}
-					totalFrames={totalFrames}
-					aspectRatio={aspectRatio}
-				/>
+				<RenderWhen condition={lyricLines.length > 1}>
+					<PlayerToolbar
+						aspectRatio={aspectRatio}
+						onAspectRatioChange={setAspectRatio}
+					/>
+					<VideoPlayer
+						playerRef={videoRef}
+						inputProps={inputProps}
+						totalFrames={totalFrames}
+						aspectRatio={aspectRatio}
+					/>
+				</RenderWhen>
 				<LyricsPreviewCard />
 			</CardContent>
 		</Card>
