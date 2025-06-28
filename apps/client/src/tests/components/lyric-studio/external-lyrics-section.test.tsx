@@ -58,7 +58,7 @@ describe('ExternalLyricsSection component', () => {
         render(<ExternalLyricsSection />);
         
         expect(screen.getByTestId('external-lyrics-section')).toBeInTheDocument();
-        expect(screen.getByTestId('external-lyrics-title')).toHaveTextContent('External Lyrics');
+        expect(screen.getByTestId('external-lyrics-title')).toHaveTextContent('Notes');
     });
 
     it('should not render when shouldRender is false', () => {

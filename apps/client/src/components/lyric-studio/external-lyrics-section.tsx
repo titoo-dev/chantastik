@@ -48,7 +48,7 @@ export function ExternalLyricsSection() {
 					data-testid="external-lyrics-title"
 				>
 					<FileText className="h-5 w-5 text-primary" />
-					External Lyrics
+					Notes
 				</CardTitle>
 				<div
 					className="flex items-center gap-2"

@@ -233,7 +233,7 @@ describe('LyricStudioHeader components', () => {
         
         // Check for desktop-specific button text
         expect(screen.getByText('Video Preview')).toBeInTheDocument();
-        expect(screen.getByText('External Lyrics')).toBeInTheDocument();
+        expect(screen.getByText('Notes')).toBeInTheDocument();
     });
 
     it('should toggle button text based on state', () => {
@@ -250,6 +250,6 @@ describe('LyricStudioHeader components', () => {
         render(<LyricStudioHeader />);
         
         expect(screen.getByText('Hide Video Preview')).toBeInTheDocument();
-        expect(screen.getByText('Hide Lyrics')).toBeInTheDocument();
+        expect(screen.getByText('Hide Notes')).toBeInTheDocument();
     });
 });

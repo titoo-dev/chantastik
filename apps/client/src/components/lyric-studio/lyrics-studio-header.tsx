@@ -122,8 +122,8 @@ export const LyricStudioHeader = memo(() => {
 						>
 							<FileText className="h-4 w-4" />
 							{showExternalLyrics
-								? 'Hide Lyrics'
-								: 'External Lyrics'}
+								? 'Hide Notes'
+								: 'Notes'}
 						</Button>
 					</div>
 				)}
