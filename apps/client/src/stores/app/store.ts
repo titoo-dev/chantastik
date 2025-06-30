@@ -7,20 +7,17 @@ import type { AudioMeta, LyricLine } from '@/data/types';
 import { preloadImage } from '@remotion/preload';
 import { getCoverArtUrl } from '@/data/api';
 
-// Command interface for implementing command pattern
 type Command<T = any> = {
     execute: () => T
     undo?: () => void
     canExecute?: () => boolean
 }
 
-// Command history for undo functionality
 type CommandHistory = {
     commands: Array<{ command: Command; timestamp: number }>
     currentIndex: number
 }
 
-// Keep original types for compatibility
 export type LRCData = {
 	metadata: {
 		title: string;
@@ -34,7 +31,6 @@ export type LRCData = {
 }
 
 type AppState = {
-	// State properties
 	trackLoaded: boolean;
 	projectId?: string;
 	audio: AudioMeta | undefined;
@@ -44,14 +40,12 @@ type AppState = {
 }
 
 type AppActions = {
-	// Basic setters
 	setTrackLoaded: (loaded: boolean) => void;
 	updateProjectId: (id?: string) => void;
 	setAudio: (audio: AudioMeta | undefined) => void;
 	setLyricLines: (lines: LyricLine[]) => void;
 	setExternalLyrics: (lyrics: string) => void;
 
-	// Complex actions
 	jumpToLyricLine: (params: {
 		id: number;
 		audioRef: RefObject<ComponentRef<'audio'> | null>;
@@ -70,11 +64,9 @@ type AppActions = {
 	}) => void;
 	resetAllStatesAndPlayers: () => void;
 
-	// Command pattern methods
 	executeCommand: <T>(command: Command<T>) => T;
 	undo: () => void;
 
-	// Utility methods
 	areLyricLinesWithoutTimestamps: () => boolean;
 	isLyricLinesInOrder: () => boolean;
 	isValidLyricLines: () => boolean;
