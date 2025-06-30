@@ -1,12 +1,15 @@
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
+import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 
 type LyricsListSkeletonProps = {
 	className?: string;
 };
 
 export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
+	const { isMobile, isSmallMobile } = useResponsiveMobile();
+
 	return (
 		<Card className={cn("pt-0 shadow-none", className)}>
 			{/* Header Skeleton */}
@@ -42,32 +45,62 @@ export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
 							key={index}
 							className="group relative rounded-lg border bg-card/50 overflow-hidden"
 						>
-							<div className="flex items-center gap-3 p-3">
-								{/* Line number badge */}
-								<Skeleton className="w-8 h-8 rounded-full shrink-0" />
+							{isMobile || isSmallMobile ? (
+								// Mobile layout: input on top, controls below
+								<div className="p-3 space-y-3">
+									<div className="w-full">
+										<Skeleton
+											className="h-10 w-full"
+											style={{
+												width: `${Math.random() * 40 + 60}%`,
+											}}
+										/>
+									</div>
+									<div className="flex gap-2 items-center justify-between">
+										{/* Line number badge */}
+										<Skeleton className="w-8 h-8 rounded-full shrink-0" />
+										
+										<div className="flex items-center gap-3 shrink-0">
+											{/* Timestamp control */}
+											<Skeleton className="h-8 w-16" />
 
-								{/* Text input area */}
-								<div className="flex-1">
-									<Skeleton
-										className="h-10 w-full"
-										style={{
-											width: `${Math.random() * 40 + 60}%`,
-										}}
-									/>
+											{/* Add line button */}
+											<Skeleton className="h-8 w-8 rounded-full" />
+
+											{/* Delete button */}
+											<Skeleton className="h-8 w-8 rounded-full" />
+										</div>
+									</div>
 								</div>
+							) : (
+								// Desktop layout: horizontal arrangement
+								<div className="flex items-center gap-3 p-3">
+									{/* Line number badge */}
+									<Skeleton className="w-8 h-8 rounded-full shrink-0" />
 
-								{/* Control buttons */}
-								<div className="flex items-center gap-3 shrink-0">
-									{/* Timestamp control */}
-									<Skeleton className="h-8 w-16" />
+									{/* Text input area */}
+									<div className="flex-1">
+										<Skeleton
+											className="h-10 w-full"
+											style={{
+												width: `${Math.random() * 40 + 60}%`,
+											}}
+										/>
+									</div>
 
-									{/* Add line button */}
-									<Skeleton className="h-8 w-8 rounded-full" />
+									{/* Control buttons */}
+									<div className="flex items-center gap-3 shrink-0">
+										{/* Timestamp control */}
+										<Skeleton className="h-8 w-16" />
 
-									{/* Delete button */}
-									<Skeleton className="h-8 w-8 rounded-full" />
+										{/* Add line button */}
+										<Skeleton className="h-8 w-8 rounded-full" />
+
+										{/* Delete button */}
+										<Skeleton className="h-8 w-8 rounded-full" />
+									</div>
 								</div>
-							</div>
+							)}
 						</div>
 					))}
 				</div>
