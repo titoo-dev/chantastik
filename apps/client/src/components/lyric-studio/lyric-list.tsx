@@ -29,9 +29,6 @@ export function LyricList({
 	const { generateLRC } = useAppStore(
 		useShallow((state) => ({
 			generateLRC: state.generateLRC,
-			toggleLyricLineSelection: state.toggleLyricLineSelection,
-			clearLyricLineSelection: state.clearLyricLineSelection,
-			selectAllLyricLines: state.selectAllLyricLines,
 		}))
 	);
 
