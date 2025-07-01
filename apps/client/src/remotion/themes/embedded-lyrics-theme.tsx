@@ -336,9 +336,7 @@ export const EmbeddedLyricsTheme: React.FC<LyricsProps> = ({
 							filter: 'brightness(0.4) blur(1px) contrast(1.1)',
 						}}
 						pauseWhenLoading
-						onError={(e) => {
-							console.error('Error loading image:', e);
-						}}
+						onError={console.error}
 					/>
 				</div>
 			)}

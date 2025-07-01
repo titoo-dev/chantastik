@@ -308,9 +308,7 @@ const MinimalZen: React.FC<LyricsProps> = ({
 								filter: 'grayscale(100%) contrast(0.3)',
 							}}
 							pauseWhenLoading
-							onError={(e) => {
-								console.error('Error loading image:', e);
-							}}
+							onError={console.error}
 						/>
 					</Sequence>
 				</div>
