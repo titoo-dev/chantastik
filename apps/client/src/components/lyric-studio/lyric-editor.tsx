@@ -6,10 +6,101 @@ import { memo } from 'react';
 import { Music, Undo2 } from 'lucide-react';
 import { LyricsListSkeleton } from './lyrics-list-skeleton';
 import RenderWhen from '../render-when';
-import { useLyricEditor } from '@/hooks/use-lyric-editor';
 import { createLineAdder, createTimestampSetter } from '@/lib/utils';
 import { useLyricSync } from '@/hooks/use-lyric-sync';
 import { Button } from '../ui/button';
+import { useGetLyrics } from '@/hooks/use-get-lyrics';
+import { useLyricEditor } from '@/hooks/use-lyric-editor';
+
+export const LyricEditor = memo(function LyricEditor() {
+	
+	const {
+		audioRef,
+		updateLyricLine,
+		deleteLyricLine,
+		addLyricLine,
+		undo,
+		editorLines,
+		commandHistory,
+		projectId,
+		trackLoaded,
+	} = useLyricEditor();
+
+	const {
+		data: serverLyrics,
+		isLoading: isLoadingLyrics,
+		error: lyricsError,
+	} = useGetLyrics({
+		projectId: projectId || '',
+		enabled: !!projectId && trackLoaded,
+	});
+
+	useLyricSync(serverLyrics, editorLines);
+
+	const setCurrentTimeAsTimestamp = createTimestampSetter(
+		audioRef,
+		updateLyricLine
+	);
+	const handleAddLineBelow = createLineAdder(addLyricLine, audioRef);
+	const cardClassName = getCardClassName(trackLoaded);
+
+	if (editorLines.length === 0 && isLoadingLyrics && trackLoaded) {
+		return <LyricsListSkeleton className={cardClassName} />;
+	}
+
+	if (editorLines.length === 0 && lyricsError && trackLoaded) {
+		return <Error cardClassName={cardClassName} />;
+	}
+
+	const handleUndo = () => {
+		if (commandHistory.commands.length > 0) {
+			undo();
+		}
+	};
+
+	console.log('Command history', commandHistory.commands);
+
+	return (
+		<Card className={cardClassName}>
+			<LyricHeader />
+			<CardContent className="px-6">
+				<RenderWhen condition={commandHistory.commands.length > 0}>
+					<div className="flex items-center justify-end mb-4">
+						<Button
+							variant="outline"
+							size="icon"
+							className="h-9 w-9"
+							onClick={handleUndo}
+						>
+							<Undo2 className="h-4 w-4" />
+							<span className="sr-only">Undo Action</span>
+						</Button>
+					</div>
+				</RenderWhen>
+				<RenderWhen condition={!trackLoaded}>
+					<NoTrack />
+				</RenderWhen>
+				<RenderWhen
+					condition={trackLoaded && editorLines.length === 0}
+					fallback={
+						<RenderWhen condition={trackLoaded}>
+							<LyricList
+								lyricLines={editorLines}
+								onUpdateLine={updateLyricLine}
+								onDeleteLine={deleteLyricLine}
+								onSetCurrentTime={setCurrentTimeAsTimestamp}
+								onAddLineBelow={handleAddLineBelow}
+								onAddLine={() => addLyricLine({ audioRef })}
+							/>
+						</RenderWhen>
+					}
+				>
+					<EmptyLyrics onAddLine={() => addLyricLine()} />
+				</RenderWhen>
+			</CardContent>
+		</Card>
+	);
+});
 
 const getCardClassName = (trackLoaded: boolean) => {
 	return `pt-0 shadow-none ${trackLoaded ? 'col-span-1' : 'col-span-2'}`;
@@ -49,83 +140,3 @@ const NoTrack = () => (
 		</p>
 	</div>
 );
-
-export const LyricEditor = memo(function LyricEditor() {
-	const {
-		audioRef,
-		lyricLines,
-		trackLoaded,
-		serverLyrics,
-		isLoadingLyrics,
-		lyricsError,
-		updateLyricLine,
-		deleteLyricLine,
-		addLyricLine,
-		commandHistory,
-		undo,
-	} = useLyricEditor();
-
-	useLyricSync(serverLyrics, lyricLines);
-
-	const setCurrentTimeAsTimestamp = createTimestampSetter(
-		audioRef,
-		updateLyricLine
-	);
-	const handleAddLineBelow = createLineAdder(addLyricLine, audioRef);
-	const cardClassName = getCardClassName(trackLoaded);
-
-	if (lyricLines.length === 0 && isLoadingLyrics && trackLoaded) {
-		return <LyricsListSkeleton className={cardClassName} />;
-	}
-
-	if (lyricLines.length === 0 && lyricsError && trackLoaded) {
-		return <Error cardClassName={cardClassName} />;
-	}
-
-	const handleUndo = () => {
-		if (commandHistory.commands.length > 0) {
-			undo();
-		}
-	}
-
-	return (
-		<Card className={cardClassName}>
-			<LyricHeader />
-			<CardContent className="px-6">
-				<RenderWhen condition={commandHistory.commands.length > 0}>
-					<div className="flex items-center justify-end mb-4">
-						<Button
-							variant="outline"
-							size="icon"
-							className="h-9 w-9"
-							onClick={handleUndo}
-						>
-							<Undo2 className="h-4 w-4" />
-							<span className="sr-only">Undo Action</span>
-						</Button>
-					</div>
-				</RenderWhen>
-				<RenderWhen condition={!trackLoaded}>
-					<NoTrack />
-				</RenderWhen>
-				<RenderWhen
-					condition={trackLoaded && lyricLines.length === 0}
-					fallback={
-						<RenderWhen condition={trackLoaded}>
-							<LyricList
-								lyricLines={lyricLines}
-								onUpdateLine={updateLyricLine}
-								onDeleteLine={deleteLyricLine}
-								onSetCurrentTime={setCurrentTimeAsTimestamp}
-								onAddLineBelow={handleAddLineBelow}
-								onAddLine={() => addLyricLine({ audioRef })}
-							/>
-						</RenderWhen>
-					}
-				>
-					<EmptyLyrics onAddLine={() => addLyricLine()} />
-				</RenderWhen>
-			</CardContent>
-		</Card>
-	);
-});
