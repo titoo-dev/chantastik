@@ -77,7 +77,7 @@ export const SyncedLyrics = memo(
 								isActive ? '' : 'Click to seek to this position'
 							}
 							className={cn(
-								'text-foreground/50 cursor-pointer transition-all duration-500 ease-out md:leading-10 text-center transform',
+								'text-foreground/50 cursor-pointer transition-all duration-500 ease-out leading-8 md:leading-10 text-center transform',
 								{
 									'text-primary md:text-2xl scale-105 font-medium':
 										isActive,
