@@ -39,7 +39,7 @@ export const LyricHeader = memo(function LyricHeader() {
 			className="p-4 border-b"
 			data-testid="lyric-header-container"
 		>
-			<div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-center">
+			<div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-center pt-4 px-2">
 				<CardTitle
 					className="flex items-center gap-2 min-w-0"
 					data-testid="lyric-header-title"
