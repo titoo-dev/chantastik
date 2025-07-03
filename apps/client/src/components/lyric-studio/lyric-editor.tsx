@@ -119,14 +119,14 @@ const getCardClassName = (trackLoaded: boolean) => {
 };
 
 const Error = () => (
-	<div className="flex flex-col items-center justify-center py-12 text-center">
-		<div className="rounded-full bg-destructive/10 p-4 mb-4">
-			<Music className="h-10 w-10 text-primary" />
+	<div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
+		<div className="rounded-full bg-destructive/10 p-3 sm:p-4 mb-3 sm:mb-4">
+			<Music className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
 		</div>
-		<h3 className="mb-2 text-lg font-semibold text-foreground">
+		<h3 className="mb-2 text-base sm:text-lg font-semibold text-foreground">
 			Failed to Load Lyrics
 		</h3>
-		<p className="text-sm text-muted-foreground max-w-md">
+		<p className="text-xs sm:text-sm text-muted-foreground max-w-xs sm:max-w-md">
 			There was an error loading the lyrics for this project. You can
 			still create new lyrics manually.
 		</p>

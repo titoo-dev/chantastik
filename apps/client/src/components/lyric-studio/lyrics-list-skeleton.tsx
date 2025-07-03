@@ -9,15 +9,17 @@ export function LyricsListSkeleton() {
 		<div className={cn('pt-0 shadow-none')}>
 			<div className="p-6">
 				{/* Selection banner skeleton */}
-				<div className="mb-4 p-3 bg-muted/20 border border-muted rounded-lg">
-					<div className="flex items-center justify-between">
-						<Skeleton className="h-4 w-32" />
-						<div className="flex items-center gap-2">
-							<Skeleton className="h-6 w-40" />
-							<Skeleton className="h-8 w-28" />
+				{!isMobile && !isSmallMobile && (
+					<div className="mb-4 p-3 bg-muted/20 border border-muted rounded-lg">
+						<div className="flex items-center justify-between">
+							<Skeleton className="h-4 w-32" />
+							<div className="flex items-center gap-2">
+								<Skeleton className="h-6 w-40" />
+								<Skeleton className="h-8 w-28" />
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 
 				{/* Lyric lines skeleton */}
 				<div className="space-y-3">
@@ -33,7 +35,7 @@ export function LyricsListSkeleton() {
 										<Skeleton
 											className="h-10 w-full"
 											style={{
-												width: `${Math.random() * 40 + 60}%`,
+												width: '100%',
 											}}
 										/>
 									</div>
