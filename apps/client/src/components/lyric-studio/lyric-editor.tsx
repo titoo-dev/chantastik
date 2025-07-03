@@ -11,9 +11,15 @@ import { useLyricSync } from '@/hooks/use-lyric-sync';
 import { Button } from '../ui/button';
 import { useGetLyrics } from '@/hooks/use-get-lyrics';
 import { useLyricEditor } from '@/hooks/use-lyric-editor';
+import { useAppStore } from '@/stores/app/store';
 
-export const LyricEditor = memo(function LyricEditor() {
-	
+type LyricEditorContentProps = {
+	trackLoaded: boolean;
+};
+
+const LyricEditorContent = memo(function LyricEditorContent({
+	trackLoaded,
+}: LyricEditorContentProps) {
 	const {
 		audioRef,
 		updateLyricLine,
@@ -23,7 +29,6 @@ export const LyricEditor = memo(function LyricEditor() {
 		editorLines,
 		commandHistory,
 		projectId,
-		trackLoaded,
 	} = useLyricEditor();
 
 	const {
@@ -49,7 +54,7 @@ export const LyricEditor = memo(function LyricEditor() {
 	}
 
 	if (editorLines.length === 0 && lyricsError && trackLoaded) {
-		return <Error cardClassName={cardClassName} />;
+		return <Error />;
 	}
 
 	const handleUndo = () => {
@@ -58,46 +63,54 @@ export const LyricEditor = memo(function LyricEditor() {
 		}
 	};
 
-	console.log('Command history', commandHistory.commands);
+	return (
+		<CardContent className="px-6">
+			<RenderWhen condition={commandHistory.commands.length > 0}>
+				<div className="flex items-center justify-end mb-4">
+					<Button
+						variant="outline"
+						size="icon"
+						className="h-9 w-9"
+						onClick={handleUndo}
+					>
+						<Undo2 className="h-4 w-4" />
+						<span className="sr-only">Undo Action</span>
+					</Button>
+				</div>
+			</RenderWhen>
+			<RenderWhen condition={!trackLoaded}>
+				<NoTrack />
+			</RenderWhen>
+			<RenderWhen
+				condition={trackLoaded && editorLines.length === 0}
+				fallback={
+					<RenderWhen condition={trackLoaded}>
+						<LyricList
+							lyricLines={editorLines}
+							onUpdateLine={updateLyricLine}
+							onDeleteLine={deleteLyricLine}
+							onSetCurrentTime={setCurrentTimeAsTimestamp}
+							onAddLineBelow={handleAddLineBelow}
+							onAddLine={() => addLyricLine({ audioRef })}
+						/>
+					</RenderWhen>
+				}
+			>
+				<EmptyLyrics onAddLine={() => addLyricLine()} />
+			</RenderWhen>
+		</CardContent>
+	);
+});
+
+export const LyricEditor = memo(function LyricEditor() {
+	const trackLoaded = useAppStore((state) => state.trackLoaded);
+
+	const cardClassName = getCardClassName(trackLoaded);
 
 	return (
 		<Card className={cardClassName}>
 			<LyricHeader />
-			<CardContent className="px-6">
-				<RenderWhen condition={commandHistory.commands.length > 0}>
-					<div className="flex items-center justify-end mb-4">
-						<Button
-							variant="outline"
-							size="icon"
-							className="h-9 w-9"
-							onClick={handleUndo}
-						>
-							<Undo2 className="h-4 w-4" />
-							<span className="sr-only">Undo Action</span>
-						</Button>
-					</div>
-				</RenderWhen>
-				<RenderWhen condition={!trackLoaded}>
-					<NoTrack />
-				</RenderWhen>
-				<RenderWhen
-					condition={trackLoaded && editorLines.length === 0}
-					fallback={
-						<RenderWhen condition={trackLoaded}>
-							<LyricList
-								lyricLines={editorLines}
-								onUpdateLine={updateLyricLine}
-								onDeleteLine={deleteLyricLine}
-								onSetCurrentTime={setCurrentTimeAsTimestamp}
-								onAddLineBelow={handleAddLineBelow}
-								onAddLine={() => addLyricLine({ audioRef })}
-							/>
-						</RenderWhen>
-					}
-				>
-					<EmptyLyrics onAddLine={() => addLyricLine()} />
-				</RenderWhen>
-			</CardContent>
+			<LyricEditorContent trackLoaded={trackLoaded} />
 		</Card>
 	);
 });
@@ -106,10 +119,7 @@ const getCardClassName = (trackLoaded: boolean) => {
 	return `pt-0 shadow-none ${trackLoaded ? 'col-span-1' : 'col-span-2'}`;
 };
 
-const Error = ({ cardClassName }: { cardClassName: string }) => (
-	<Card className={cardClassName}>
-		<LyricHeader />
-		<CardContent className="p-6">
+const Error = () => (
 			<div className="flex flex-col items-center justify-center py-12 text-center">
 				<div className="rounded-full bg-destructive/10 p-4 mb-4">
 					<Music className="h-10 w-10 text-primary" />
@@ -122,8 +132,6 @@ const Error = ({ cardClassName }: { cardClassName: string }) => (
 					can still create new lyrics manually.
 				</p>
 			</div>
-		</CardContent>
-	</Card>
 );
 
 const NoTrack = () => (
