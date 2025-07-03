@@ -1,32 +1,13 @@
 import { cn } from '@/lib/utils';
-import { Card, CardContent } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 import { useResponsiveMobile } from '@/hooks/use-responsive-mobile';
 
-type LyricsListSkeletonProps = {
-	className?: string;
-};
-
-export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
+export function LyricsListSkeleton() {
 	const { isMobile, isSmallMobile } = useResponsiveMobile();
 
 	return (
-		<Card className={cn("pt-0 shadow-none", className)}>
-			{/* Header Skeleton */}
-			<div className="border-b bg-muted/30 px-6 py-4">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-3">
-						<Skeleton className="h-6 w-6 rounded-full" />
-						<Skeleton className="h-5 w-24" />
-					</div>
-					<div className="flex items-center gap-2">
-						<Skeleton className="h-8 w-20" />
-						<Skeleton className="h-8 w-24" />
-					</div>
-				</div>
-			</div>
-
-			<CardContent className="p-6">
+		<div className={cn('pt-0 shadow-none')}>
+			<div className="p-6">
 				{/* Selection banner skeleton */}
 				<div className="mb-4 p-3 bg-muted/20 border border-muted rounded-lg">
 					<div className="flex items-center justify-between">
@@ -59,7 +40,7 @@ export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
 									<div className="flex gap-2 items-center justify-between">
 										{/* Line number badge */}
 										<Skeleton className="w-8 h-8 rounded-full shrink-0" />
-										
+
 										<div className="flex items-center gap-3 shrink-0">
 											{/* Timestamp control */}
 											<Skeleton className="h-8 w-16" />
@@ -109,7 +90,7 @@ export function LyricsListSkeleton({ className }: LyricsListSkeletonProps) {
 				<div className="flex justify-center mt-6">
 					<Skeleton className="h-10 w-24" />
 				</div>
-			</CardContent>
-		</Card>
+			</div>
+		</div>
 	);
 }

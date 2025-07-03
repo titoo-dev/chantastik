@@ -47,10 +47,9 @@ const LyricEditorContent = memo(function LyricEditorContent({
 		updateLyricLine
 	);
 	const handleAddLineBelow = createLineAdder(addLyricLine, audioRef);
-	const cardClassName = getCardClassName(trackLoaded);
 
 	if (editorLines.length === 0 && isLoadingLyrics && trackLoaded) {
-		return <LyricsListSkeleton className={cardClassName} />;
+		return <LyricsListSkeleton />;
 	}
 
 	if (editorLines.length === 0 && lyricsError && trackLoaded) {
