@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { LyricStudioHeader } from '@/components/lyric-studio/lyrics-studio-header';
 import { LyricEditor } from '@/components/lyric-studio/lyric-editor';
 import { LyricsPlayer } from '@/components/lyric-studio/lyrics-player';
 import { ExternalLyricsSection } from '@/components/lyric-studio/external-lyrics-section';
@@ -25,8 +24,6 @@ function App() {
 	return (
 		<ScrollArea className="h-[calc(100vh-65px)]">
 			<main className="container mx-auto relative py-6 px-4 md:px-0">
-				<LyricStudioHeader />
-
 				{/* Main content area */}
 				{isMobile || isSmallMobile || isTablet ? (
 					<Carousel
