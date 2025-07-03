@@ -42,9 +42,6 @@ describe('LyricStudioHeader components', () => {
             setLyricLines: vi.fn(),
             setExternalLyrics: vi.fn(),
             jumpToLyricLine: vi.fn(),
-            addLyricLine: vi.fn(),
-            updateLyricLine: vi.fn(),
-            deleteLyricLine: vi.fn(),
             addLinesFromExternal: vi.fn(),
             setVideoTime: vi.fn(),
             resetAllStatesAndPlayers: vi.fn(),
@@ -52,12 +49,6 @@ describe('LyricStudioHeader components', () => {
             isLyricLinesInOrder: vi.fn(),
             generateLRC: vi.fn(),
             handleDownload: vi.fn(),
-            commandHistory: {
-                commands: [],
-                currentIndex: 0
-            },
-            executeCommand: vi.fn(),
-            undo: vi.fn()
         });
 
         // Mock useResponsiveMobile
