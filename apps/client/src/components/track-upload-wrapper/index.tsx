@@ -8,6 +8,7 @@ import { PlayerSection } from '@/components/track-upload-wrapper/player-section'
 import { createDeleteConfirmationDialog } from '@/components/dialogs/confirmation-dialog';
 import { useTrackUpload } from '@/hooks/use-track-upload';
 import { motion } from 'motion/react';
+import { YouTubeSearch } from './youtube-search';
 
 type TrackUploadWrapperProps = {
 	iconColor?: string;
@@ -87,7 +88,7 @@ export function TrackUploadWrapper({
 									<Minimize2 className="h-4 w-4 text-primary/80 rotate-180 group-hover:scale-105 transition-transform" />
 								</Button>
 							</div>
-
+							<YouTubeSearch />
 							<UploadZone
 								isDragging={isDragging}
 								isUploading={isUploading}

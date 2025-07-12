@@ -4,13 +4,16 @@ import { v4 as uuidv4 } from 'uuid';
 import * as mm from 'music-metadata';
 import { cors } from 'hono/cors';
 import { Audio, Bindings, Lyrics, Project } from './types';
-import { findFileByHash, generateFileHash, saveProject } from './utils';
+import { findFileByHash, generateFileHash, saveProject, sanitizeSearchQuery, checkRateLimit, sanitizeYouTubeResponse, calculateTitleMatchScore } from './utils';
 
 const app = new Hono<{
 	Bindings: Bindings;
 }>();
 
-app.use('*', cors());
+app.use('*', cors({
+	origin: ['http://localhost:3000', 'http://localhost:5173', 'https://your-production-domain.com'],
+	credentials: true
+}));
 
 /**
  * Upload a new MP3 audio file
@@ -527,4 +530,361 @@ app.delete('/audio/:id', async (c) => {
 	return c.json({ message: 'Deleted', id });
 });
 
-export default app;
+/**
+ * Search YouTube for videos with security measures
+ * @route GET /youtube/search
+ * @param {string} request.query.q - The search query
+ * @param {string} request.query.title - Optional: Search specifically in video titles
+ * @param {string} request.query.type - Optional: Search type ('general' or 'title'), defaults to 'general'
+ * @returns {Object} JSON response with search results
+ * @throws {400} If query parameter is missing or invalid
+ * @throws {429} If rate limit exceeded
+ * @throws {500} If YouTube API key is not configured or API request fails
+ */
+app.get('/youtube/search', async (c) => {
+	const query = c.req.query('q');
+	const titleQuery = c.req.query('title');
+	const searchType = c.req.query('type') || 'general';
+	
+	// Determine which query to use
+	const searchQuery = titleQuery || query;
+	
+	// Input validation and sanitization
+	const { isValid, sanitized, error } = sanitizeSearchQuery(searchQuery || '');
+	if (!isValid) {
+		return c.text(error || 'Invalid query', 400);
+	}
+
+	// Rate limiting
+	const clientIP = c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown';
+	const { allowed } = await checkRateLimit(c.env.AUDIO_KV, `youtube:${clientIP}`, 10, 60);
+	
+	if (!allowed) {
+		return c.text('Rate limit exceeded. Please try again later.', 429);
+	}
+
+	try {
+		const apiKey = c.env.YOUTUBE_API_KEY;
+		if (!apiKey) {
+			return c.text('YouTube API key not configured', 500);
+		}
+
+		// Search for videos with different strategies based on search type
+		let searchQueryString = `part=snippet&type=video&maxResults=10&key=${apiKey}`;
+		
+		if (titleQuery || searchType === 'title') {
+			// For title search, prioritize title matches but don't require exact match
+			// Use a combination of strategies for better title-focused results
+			const titleSearchTerms = sanitized.split(' ').filter(term => term.length > 2);
+			if (titleSearchTerms.length > 0) {
+				// Search for terms that are likely to appear in titles
+				const titleQuery = titleSearchTerms.map(term => `"${term}"`).join(' ');
+				searchQueryString += `&q=${encodeURIComponent(titleQuery)}`;
+			} else {
+				searchQueryString += `&q=${encodeURIComponent(sanitized)}`;
+			}
+			// Add relevance ordering to prioritize title matches
+			searchQueryString += '&order=relevance';
+		} else {
+			// For general search, use standard query
+			searchQueryString += `&q=${encodeURIComponent(sanitized)}`;
+			searchQueryString += '&order=relevance';
+		}
+		
+		// Add additional filters for better results
+		searchQueryString += '&videoEmbeddable=true&videoSyndicated=true';
+		
+		const searchUrl = `https://www.googleapis.com/youtube/v3/search?${searchQueryString}`;
+		
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 10000);
+		
+		const response = await fetch(searchUrl, { 
+			signal: controller.signal,
+			headers: { 'User-Agent': 'Chantastik/1.0', 'Accept': 'application/json' }
+		});
+		
+		clearTimeout(timeoutId);
+		
+		if (!response.ok) {
+			console.error('YouTube API error:', response.status);
+			return c.text('YouTube search temporarily unavailable', 503);
+		}
+
+		const data = await response.json();
+		let results = sanitizeYouTubeResponse(data);
+		
+		// For title search, re-rank results to prioritize title matches
+		if (titleQuery || searchType === 'title') {
+			results = results.sort((a, b) => {
+				const searchTerms = sanitized.toLowerCase().split(' ').filter(term => term.length > 1);
+				
+				// Calculate title match score
+				const scoreA = calculateTitleMatchScore(a.title, searchTerms);
+				const scoreB = calculateTitleMatchScore(b.title, searchTerms);
+				
+				return scoreB - scoreA; // Higher score first
+			});
+		}
+		
+		if (results.length === 0) {
+			return c.json({ results: [] });
+		}
+		
+		// Get video details for duration
+		const videoIds = results.map(r => r.id).join(',');
+		const detailsQuery = `part=contentDetails&id=${encodeURIComponent(videoIds)}&key=${apiKey}`;
+		const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?${detailsQuery}`;
+
+		const detailsController = new AbortController();
+		const detailsTimeoutId = setTimeout(() => detailsController.abort(), 10000);
+
+		const detailsResponse = await fetch(detailsUrl, { 
+			signal: detailsController.signal,
+			headers: { 'User-Agent': 'Chantastik/1.0', 'Accept': 'application/json' }
+		});
+		
+		clearTimeout(detailsTimeoutId);
+		
+		// Add duration to results
+		if (detailsResponse.ok) {
+			const detailsData = await detailsResponse.json();
+			const durationMap = new Map();
+			
+			detailsData.items?.forEach((item: any) => {
+				if (item.id && item.contentDetails?.duration) {
+					durationMap.set(item.id, item.contentDetails.duration);
+				}
+			});
+			
+			results.forEach(result => {
+				result.duration = durationMap.get(result.id) || 'PT0S';
+			});
+		}
+
+		return c.json({ results });
+	} catch (error) {
+		console.error('YouTube search error:', error);
+		
+		if (error instanceof Error && error.name === 'AbortError') {
+			return c.text('Request timeout', 408);
+		}
+		
+		return c.text('Search failed. Please try again later.', 500);
+	}
+});
+
+/**
+ * Create a project from YouTube video metadata without downloading audio
+ * @route POST /project/from-youtube
+ * @param {Object} request.body - YouTube video metadata
+ * @returns {Object} JSON response with project ID
+ */
+app.post('/project/from-youtube', async (c) => {
+	try {
+		const { videoId, title, channelTitle, duration, thumbnail, url, description } = await c.req.json();
+
+		if (!videoId || !title) {
+			return c.json({ error: 'Video ID and title are required' }, 400);
+		}
+
+		// Create simplified project without audio dependency
+		const projectId = uuidv4();
+		const now = new Date().toISOString();
+
+		const project: Project = {
+			id: projectId,
+			name: `${title.substring(0, 100)} - ${channelTitle.substring(0, 50)}`,
+			createdAt: now,
+			updatedAt: now,
+			audioId: `youtube-virtual-${videoId}`, // Use a virtual audio ID
+			metadata: {
+				tags: ['youtube', 'playlist', 'virtual'],
+				category: 'youtube-import',
+			},
+		};
+
+		// Store YouTube metadata separately in project KV with a special key
+		const youtubeMetadata = {
+			videoId,
+			title,
+			channelTitle,
+			duration,
+			thumbnail,
+			url,
+			description: description?.substring(0, 500) || '',
+			parsedDuration: parseDurationToSeconds(duration),
+			isVirtual: true,
+			importedAt: now,
+		};
+
+		await saveProject(c.env.PROJECT_KV, project);
+		
+		// Store YouTube metadata with special key
+		await c.env.PROJECT_KV.put(`youtube-meta:${projectId}`, JSON.stringify(youtubeMetadata));
+
+		return c.json({
+			message: 'Project created from YouTube video',
+			projectId: projectId,
+			youtubeMetadata: youtubeMetadata,
+		});
+	} catch (error) {
+		console.error('Error creating YouTube project:', error);
+		return c.json({ error: 'Failed to create project' }, 500);
+	}
+});
+
+/**
+ * Extract lyrics from YouTube video metadata
+ * @route POST /lyrics/extract
+ * @param {Object} request.body - Video metadata for lyrics extraction
+ * @returns {Object} JSON response with extracted lyrics
+ */
+app.post('/lyrics/extract', async (c) => {
+	const { videoId, title, channelTitle } = await c.req.json();
+
+	if (!videoId || !title) {
+		return c.text('Video ID and title are required', 400);
+	}
+
+	// Simple lyrics extraction from title patterns
+	const extractedLyrics = extractLyricsFromTitle(title, channelTitle);
+
+	return c.json({
+		lyrics: extractedLyrics.lyrics,
+		source: extractedLyrics.source,
+		confidence: extractedLyrics.confidence,
+	});
+});
+
+/**
+ * Get YouTube metadata for a project
+ * @route GET /project/:id/youtube-metadata
+ * @param {string} id - Project ID
+ * @returns {Object} YouTube metadata
+ */
+app.get('/project/:id/youtube-metadata', async (c) => {
+	try {
+		const projectId = c.req.param('id');
+		
+		const metadataJson = await c.env.PROJECT_KV.get(`youtube-meta:${projectId}`);
+		if (!metadataJson) {
+			return c.json({ error: 'YouTube metadata not found for this project' }, 404);
+		}
+
+		const metadata = JSON.parse(metadataJson);
+		return c.json(metadata);
+	} catch (error) {
+		console.error('Error getting YouTube metadata:', error);
+		return c.json({ error: 'Failed to get YouTube metadata' }, 500);
+	}
+});
+
+/**
+ * Helper function to parse YouTube duration to seconds
+ */
+function parseDurationToSeconds(duration: string): number {
+	if (!duration) return 0;
+	
+	// Parse ISO 8601 duration format (PT4M13S)
+	const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+	if (!match) return 0;
+
+	const hours = parseInt(match[1] || '0');
+	const minutes = parseInt(match[2] || '0');
+	const seconds = parseInt(match[3] || '0');
+
+	return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Helper function to extract lyrics from video title
+ */
+function extractLyricsFromTitle(title: string, channelTitle: string): {
+	lyrics: string[];
+	source: 'title' | 'description' | 'external' | 'none';
+	confidence: number;
+} {
+	// Common patterns in music video titles
+	const lyricsPatterns = [
+		/lyrics/i,
+		/lyric video/i,
+		/official lyric/i,
+		/with lyrics/i,
+		/\(lyrics\)/i,
+		/\[lyrics\]/i,
+	];
+
+	const hasLyricsPattern = lyricsPatterns.some(pattern => pattern.test(title));
+	
+	if (hasLyricsPattern) {
+		// Extract potential song structure from title
+		const cleanTitle = title
+			.replace(/\(.*lyrics.*\)/gi, '')
+			.replace(/\[.*lyrics.*\]/gi, '')
+			.replace(/- lyrics/gi, '')
+			.replace(/lyrics -/gi, '')
+			.replace(/official lyric video/gi, '')
+			.trim();
+
+		// Create basic lyric structure based on title
+		const potentialLyrics = [
+			"[Verse 1]",
+			cleanTitle,
+			"",
+			"[Chorus]",
+			cleanTitle,
+			"",
+			"[Verse 2]",
+			"(Add lyrics here)",
+			"",
+			"[Chorus]",
+			cleanTitle,
+		];
+
+		return {
+			lyrics: potentialLyrics,
+			source: 'title',
+			confidence: 0.7,
+		};
+	}
+
+	// Check if it's likely a music video
+	const musicPatterns = [
+		/official music video/i,
+		/official video/i,
+		/music video/i,
+		/(song|track|single|album)/i,
+	];
+
+	const isMusicVideo = musicPatterns.some(pattern => pattern.test(title));
+	
+	if (isMusicVideo) {
+		const songTitle = title
+			.replace(/official music video/gi, '')
+			.replace(/official video/gi, '')
+			.replace(/music video/gi, '')
+			.trim();
+
+		return {
+			lyrics: [
+				"[Verse 1]",
+				songTitle,
+				"",
+				"[Chorus]",
+				"(Add lyrics here)",
+				"",
+				"[Verse 2]",
+				"(Add lyrics here)",
+			],
+			source: 'title',
+			confidence: 0.5,
+		};
+	}
+
+	return {
+		lyrics: [],
+		source: 'none',
+		confidence: 0,
+	};
+}
