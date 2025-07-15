@@ -176,3 +176,128 @@ export function calculateTitleMatchScore(title: string, searchTerms: string[]): 
   return score;
 }
 
+
+/**
+ * Helper function to parse YouTube duration to seconds
+ */
+export function parseDurationToSeconds(duration: string): number {
+	if (!duration) return 0;
+	
+	// Parse ISO 8601 duration format (PT4M13S)
+	const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+	if (!match) return 0;
+
+	const hours = parseInt(match[1] || '0');
+	const minutes = parseInt(match[2] || '0');
+	const seconds = parseInt(match[3] || '0');
+
+	return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Helper function to extract lyrics from video title
+ */
+export function extractLyricsFromTitle(title: string, channelTitle: string): {
+	lyrics: string[];
+	source: 'title' | 'description' | 'external' | 'none';
+	confidence: number;
+} {
+	// Common patterns in music video titles
+	const lyricsPatterns = [
+		/lyrics/i,
+		/lyric video/i,
+		/official lyric/i,
+		/with lyrics/i,
+		/\(lyrics\)/i,
+		/\[lyrics\]/i,
+	];
+
+	const hasLyricsPattern = lyricsPatterns.some(pattern => pattern.test(title));
+	
+	if (hasLyricsPattern) {
+		// Extract potential song structure from title
+		const cleanTitle = title
+			.replace(/\(.*lyrics.*\)/gi, '')
+			.replace(/\[.*lyrics.*\]/gi, '')
+			.replace(/- lyrics/gi, '')
+			.replace(/lyrics -/gi, '')
+			.replace(/official lyric video/gi, '')
+			.trim();
+
+		// Create basic lyric structure based on title
+		const potentialLyrics = [
+			"[Verse 1]",
+			cleanTitle,
+			"",
+			"[Chorus]",
+			cleanTitle,
+			"",
+			"[Verse 2]",
+			"(Add lyrics here)",
+			"",
+			"[Chorus]",
+			cleanTitle,
+		];
+
+		return {
+			lyrics: potentialLyrics,
+			source: 'title',
+			confidence: 0.7,
+		};
+	}
+
+	// Check if it's likely a music video
+	const musicPatterns = [
+		/official music video/i,
+		/official video/i,
+		/music video/i,
+		/(song|track|single|album)/i,
+	];
+
+	const isMusicVideo = musicPatterns.some(pattern => pattern.test(title));
+	
+	if (isMusicVideo) {
+		const songTitle = title
+			.replace(/official music video/gi, '')
+			.replace(/official video/gi, '')
+			.replace(/music video/gi, '')
+			.trim();
+
+		return {
+			lyrics: [
+				"[Verse 1]",
+				songTitle,
+				"",
+				"[Chorus]",
+				"(Add lyrics here)",
+				"",
+				"[Verse 2]",
+				"(Add lyrics here)",
+			],
+			source: 'title',
+			confidence: 0.5,
+		};
+	}
+
+	return {
+		lyrics: [],
+		source: 'none',
+		confidence: 0,
+	};
+}
+
+export function extractVideoId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube.com')) {
+      return u.searchParams.get('v');
+    }
+    if (u.hostname === 'youtu.be') {
+      return u.pathname.slice(1);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+

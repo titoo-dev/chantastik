@@ -31,7 +31,7 @@ export type Metadata = {
 }
 
 
-export const API_BASE_URL = import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
+export const API_BASE_URL = import.meta.env.VITE_DEV_SERVER_URL || 'http://localhost:8000/api';
 
 const lrc = `
 [ti:Love]

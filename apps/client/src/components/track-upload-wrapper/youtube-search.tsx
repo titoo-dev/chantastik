@@ -21,10 +21,10 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 	const [addingToPlaylist, setAddingToPlaylist] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [hasSearched, setHasSearched] = useState(false);
-	const [searchType, setSearchType] = useState<'general' | 'title'>('general');
+	const [searchType, setSearchType] = useState<'url' | 'title'>('url');
 
 	// Debounced search function
-	const performSearch = useCallback(async (query: string, type: 'general' | 'title') => {
+	const performSearch = useCallback(async (query: string, type: 'url' | 'title') => {
 		if (!query.trim()) {
 			setSearchResults([]);
 			setHasSearched(false);
@@ -58,11 +58,9 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 			}
 
 			// Use the real YouTube search API with search type
-			const response = await searchYouTube({
-				query: query,
-				searchType: type
-			});
+			const response = await searchYouTube(query);
 			setSearchResults(response.results);
+			console.log(response.results);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Search failed');
 			setSearchResults([]);
@@ -95,6 +93,7 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 	const handleAddToPlaylist = async (video: YouTubeSearchResult, event: React.MouseEvent) => {
 		event.stopPropagation();
 		setAddingToPlaylist(video.id);
+		console.log('video', video);
 		
 		try {
 			// Create project from YouTube video
@@ -127,28 +126,6 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				{/* Search Type Selector */}
-				<div className="space-y-2">
-					<div className="flex items-center gap-2">
-						<span className="text-sm text-muted-foreground">Search by:</span>
-						<Tabs value={searchType} onValueChange={(value) => setSearchType(value as 'general' | 'title')}>
-							<TabsList className="grid w-[200px] grid-cols-2">
-								<TabsTrigger value="general" className="text-xs">
-									General
-								</TabsTrigger>
-								<TabsTrigger value="title" className="text-xs">
-									Title Focus
-								</TabsTrigger>
-							</TabsList>
-						</Tabs>
-					</div>
-					<p className="text-xs text-muted-foreground">
-						{searchType === 'title' 
-							? 'Prioritizes videos with matching song titles - great for finding specific songs'
-							: 'Searches across all video content including descriptions and tags'
-						}
-					</p>
-				</div>
 
 				{/* Search Input */}
 				<div className="relative">
@@ -183,7 +160,7 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 				</AnimatePresence>
 
 				{/* Search Results */}
-				<div className="space-y-3">
+				<div className="space-y-3 h-[200px] overflow-y-auto">
 					<AnimatePresence>
 						{searchResults.length > 0 && (
 							<motion.div

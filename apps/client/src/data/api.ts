@@ -2,7 +2,7 @@ import { toast } from 'sonner';
 import type { AudioMeta, LyricLine } from './types';
 
 export const API_BASE_URL =
-	import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
+	import.meta.env.VITE_DEV_SERVER_URL || 'http://localhost:8000/api';
 
 const RENDERER_BASE_URL =
 	import.meta.env.VITE_DEFAULT_RENDERER_URL || 'http://localhost:3000';
@@ -30,7 +30,7 @@ type LyricsDataToUpdate = {
 // get all projects function
 export async function getAllProjects(): Promise<Project[]> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/projects`);
+		const response = await fetch(`${API_BASE_URL}/project/all`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch projects');
@@ -292,54 +292,36 @@ export type YouTubeSearchResponse = {
 
 export type YouTubeSearchOptions = {
 	query: string;
-	searchType?: 'general' | 'title';
+	searchType?: 'url' | 'title';
 	titleQuery?: string;
 };
 
 /**
  * Search YouTube for videos
  */
-export async function searchYouTube(options: string | YouTubeSearchOptions): Promise<YouTubeSearchResponse> {
-	try {
-		// Handle backward compatibility - if string is passed, treat as general search
-		const searchOptions: YouTubeSearchOptions = typeof options === 'string' 
-			? { query: options, searchType: 'general' }
-			: options;
+export async function searchYouTube(queryOrUrl: string): Promise<YouTubeSearchResponse> {
+  try {
+    const serverBaseUrl =
+      import.meta.env.VITE_DEV_SERVER_URL?.replace('/api', '') || 'http://localhost:8000';
 
-		const serverBaseUrl = import.meta.env.VITE_DEFAULT_REST_API_URL?.replace('/api', '') || 'http://localhost:8000';
-		const url = new URL(`${serverBaseUrl}/youtube/search`);
-		
-		// Set search parameters based on search type
-		if (searchOptions.searchType === 'title' || searchOptions.titleQuery) {
-			url.searchParams.set('title', searchOptions.titleQuery || searchOptions.query);
-			url.searchParams.set('type', 'title');
-		} else {
-			url.searchParams.set('q', searchOptions.query);
-			url.searchParams.set('type', 'general');
-		}
+    const url = new URL(`${serverBaseUrl}/youtube/search`);
+    url.searchParams.set('input', queryOrUrl.trim());
 
-		const response = await fetch(url.toString());
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`YouTube search failed: ${response.statusText}`);
+    }
 
-		if (!response.ok) {
-			throw new Error(`YouTube search failed: ${response.statusText}`);
-		}
-
-		const data: YouTubeSearchResponse = await response.json();
-		return data;
-	} catch (error) {
-		toast.error('YouTube search failed', {
-			description: error instanceof Error ? error.message : 'Unknown error',
-		});
-		throw error;
-	}
+    const data: YouTubeSearchResponse = await response.json();
+    return data;
+  } catch (error) {
+    toast.error('YouTube search failed', {
+      description: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
+  }
 }
 
-/**
- * Search YouTube by title specifically
- */
-export async function searchYouTubeByTitle(title: string): Promise<YouTubeSearchResponse> {
-	return searchYouTube({ query: title, searchType: 'title' });
-}
 
 /**
  * Create a project from YouTube video metadata without downloading audio
@@ -349,7 +331,7 @@ export async function createProjectFromYouTube(video: YouTubeSearchResult): Prom
 	message: string;
 }> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/project/from-youtube`, {
+		const response = await fetch(`${import.meta.env.VITE_DEV_SERVER_URL}/youtube/from-youtube`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

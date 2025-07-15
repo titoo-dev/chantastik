@@ -1,7 +1,7 @@
 import { KVNamespace, R2Bucket } from '@cloudflare/workers-types';
 
 export type Bindings = {
-	YOUTUBE_API_KEY: any;
+	YOUTUBE_API_KEY: string;
 	AUDIO_FILES: R2Bucket;
 	AUDIO_KV: KVNamespace;
 	COVER_FILES: R2Bucket;
