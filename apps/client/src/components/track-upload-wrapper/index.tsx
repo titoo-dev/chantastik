@@ -88,7 +88,6 @@ export function TrackUploadWrapper({
 									<Minimize2 className="h-4 w-4 text-primary/80 rotate-180 group-hover:scale-105 transition-transform" />
 								</Button>
 							</div>
-							<YouTubeSearch />
 							<UploadZone
 								isDragging={isDragging}
 								isUploading={isUploading}
@@ -101,6 +100,7 @@ export function TrackUploadWrapper({
 					)}
 				</motion.div>
 			)}
+			<YouTubeSearch />
 
 			{/* Player interface */}
 			{audio?.id && (
@@ -132,6 +132,7 @@ export function TrackUploadWrapper({
 							/>
 
 							<PlayerSection
+								isYoutube={audio.id.startsWith('youtube-virtual-')}
 								audio={audio}
 								audioFile={audioFile}
 								audioMetadata={audioMetadata}

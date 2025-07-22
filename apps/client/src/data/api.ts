@@ -182,7 +182,7 @@ export async function deleteProject(id: string): Promise<void> {
 // get audio metadata function
 export async function getAudioMetadata(id: string): Promise<AudioMeta> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/audio/${id}/meta`);
+		const response = await fetch(`${API_BASE_URL}/audio/${id}/meta/${id?.replace('youtube-virtual-', '')}`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch audio metadata');
@@ -206,7 +206,7 @@ export function getAudioUrl(id: string): string {
 
 // get cover art url function
 export function getCoverArtUrl(id?: string): string {
-	return `${API_BASE_URL}/audio/${id}/cover`;
+	return `${API_BASE_URL}/audio/${id}/cover/${id?.replace('youtube-virtual-', '')}`;
 }
 
 /**

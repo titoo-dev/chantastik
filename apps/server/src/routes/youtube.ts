@@ -34,6 +34,7 @@ youtube.post('/from-youtube', async (c) => {
 			metadata: {
 				tags: ['youtube', 'playlist', 'virtual'],
 				category: 'youtube-import',
+        link: url,
 			},
 		};
 
@@ -52,6 +53,7 @@ youtube.post('/from-youtube', async (c) => {
 		};
 
 		await saveProject(c.env.PROJECT_KV, project);
+    await c.env.COVER_FILES.put(`cover:${projectId}`, thumbnail || '');
 		
 		// Store YouTube metadata with special key
 		await c.env.PROJECT_KV.put(`youtube-meta:${projectId}`, JSON.stringify(youtubeMetadata));

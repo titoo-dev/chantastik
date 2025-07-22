@@ -20,6 +20,7 @@ export type Project = {
 	metadata?: {
 		tags?: string[];
 		category?: string;
+		link?: string;
 		public?: boolean;
 	};
 };

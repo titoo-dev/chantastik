@@ -32,19 +32,19 @@ audio.put('/:id', async (c) => {
         httpMetadata: { contentType: file.type },
     });
 
-	const existingMetaRaw = await existing.text();
+    const existingMetaRaw = await existing.text();
 
-	const meta: Audio = {
-		...(JSON.parse(existingMetaRaw) as Audio),
-		filename: file.name,
-		contentType: file.type,
-		size: file.size,
-		createdAt: new Date().toISOString(), // or keep original
-	};
+    const meta: Audio = {
+        ...(JSON.parse(existingMetaRaw) as Audio),
+        filename: file.name,
+        contentType: file.type,
+        size: file.size,
+        createdAt: new Date().toISOString(), // or keep original
+    };
 
-	await c.env.AUDIO_FILES.put(`audio:${id}`, JSON.stringify(meta));
+    await c.env.AUDIO_FILES.put(`audio:${id}`, JSON.stringify(meta));
 
-	return c.json({ message: 'Updated', id });
+    return c.json({ message: 'Updated', id });
 });
 
 /**
@@ -54,36 +54,38 @@ audio.put('/:id', async (c) => {
  * @returns {Object} JSON response with deletion confirmation
  */
 audio.delete('/:id', async (c) => {
-	const id = c.req.param('id');
+    const id = c.req.param('id');
 
-	await Promise.all([
-		c.env.AUDIO_FILES.delete(`${id}.mp3`),
-		c.env.AUDIO_KV.delete(`audio:${id}`),
-	]);
+    await Promise.all([
+        c.env.AUDIO_FILES.delete(`${id}.mp3`),
+        c.env.AUDIO_KV.delete(`audio:${id}`),
+    ]).catch((error) => {
+        console.error('Error deleting audio:', error);
+    });
 
-	return c.json({ message: 'Deleted', id });
+    return c.json({ message: 'Deleted', id });
 });
 
 
 audio.get('/all', async (c) => {
-	const { keys } = await c.env.AUDIO_KV.list({ prefix: 'audio:' });
+    const { keys } = await c.env.AUDIO_KV.list({ prefix: 'audio:' });
 
-	if (keys.length === 0) {
-		return c.json({ audios: [] });
-	}
+    if (keys.length === 0) {
+        return c.json({ audios: [] });
+    }
 
-	const audioMetas = await Promise.all(
-		keys.map(async ({ name }) => {
-			const raw = await c.env.AUDIO_KV.get(name);
-			if (!raw) return null;
-			return JSON.parse(raw) as Audio;
-		})
-	);
+    const audioMetas = await Promise.all(
+        keys.map(async ({ name }) => {
+            const raw = await c.env.AUDIO_KV.get(name);
+            if (!raw) return null;
+            return JSON.parse(raw) as Audio;
+        })
+    );
 
-	// Filter out any null values (in case a KV read failed)
-	const validAudios = audioMetas.filter((meta) => meta !== null);
+    // Filter out any null values (in case a KV read failed)
+    const validAudios = audioMetas.filter((meta) => meta !== null);
 
-	return c.json({ audios: validAudios });
+    return c.json({ audios: validAudios });
 });
 
 /**
@@ -93,13 +95,35 @@ audio.get('/all', async (c) => {
  * @returns {Object} JSON response with audio metadata
  * @throws {404} If audio with given ID is not found
  */
-audio.get(':id/meta', async (c) => {
-	const id = c.req.param('id');
-	const raw = await c.env.AUDIO_KV.get(`audio:${id}`);
-	if (!raw) return c.text('Not found', 404);
+audio.get('/:id/meta/:projectId', async (c) => {
+  const id = c.req.param('id');
+  const projectId = c.req.param('projectId');
 
-	return c.json(JSON.parse(raw));
+  if (id.startsWith('youtube-virtual-')) {
+    if (!projectId) return c.text('Missing projectId for YouTube project', 400);
+
+    const youtubeMetaRaw = await c.env.PROJECT_KV.get(`youtube-meta:${projectId}`);
+    if (!youtubeMetaRaw) return c.text('No YouTube metadata found', 404);
+
+    const youtubeMeta = JSON.parse(youtubeMetaRaw);
+    return c.json({
+      id,
+      title: youtubeMeta.title,
+      artist: youtubeMeta.channelTitle,
+      duration: youtubeMeta.parsedDuration,
+      thumbnail: youtubeMeta.thumbnail,
+      url: youtubeMeta.url,
+      isVirtual: true,
+    });
+  }
+
+  // 👉 Cas normal
+  const raw = await c.env.AUDIO_KV.get(`audio:${id}`);
+  if (!raw) return c.text('Not found', 404);
+
+  return c.json(JSON.parse(raw));
 });
+
 
 /**
  * Stream an audio file with range request support
@@ -109,61 +133,61 @@ audio.get(':id/meta', async (c) => {
  * @throws {404} If audio file is not found
  */
 audio.get('/:id', async (c) => {
-	const id = c.req.param('id');
-	const object = await c.env.AUDIO_FILES.get(`${id}.mp3`);
-	if (!object) return c.text('File not found', 404);
+    const id = c.req.param('id');
+    const object = await c.env.AUDIO_FILES.get(`${id}.mp3`);
+    if (!object) return c.text('File not found', 404);
 
-	const rangeHeader = c.req.header('range');
-	const contentType = object.httpMetadata?.contentType || 'audio/mpeg';
-	const size = object.size;
+    const rangeHeader = c.req.header('range');
+    const contentType = object.httpMetadata?.contentType || 'audio/mpeg';
+    const size = object.size;
 
-	// Set default headers
-	const headers: { [key: string]: string } = {
-		'Content-Type': contentType,
-		'Accept-Ranges': 'bytes',
-		'Cache-Control': 'public, max-age=3600',
-	};
+    // Set default headers
+    const headers: { [key: string]: string } = {
+        'Content-Type': contentType,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'public, max-age=3600',
+    };
 
-	// If no range is requested, return the entire file
-	if (!rangeHeader) {
-		headers['Content-Length'] = size.toString();
-		return c.body(object.body as ReadableStream<Uint8Array>, { headers });
-	}
+    // If no range is requested, return the entire file
+    if (!rangeHeader) {
+        headers['Content-Length'] = size.toString();
+        return c.body(object.body as ReadableStream<Uint8Array>, { headers });
+    }
 
-	// Parse the range header
-	const rangeParts = rangeHeader.replace(/bytes=/, '').split('-');
-	const start = parseInt(rangeParts[0], 10);
-	const end = rangeParts[1] ? parseInt(rangeParts[1], 10) : size - 1;
+    // Parse the range header
+    const rangeParts = rangeHeader.replace(/bytes=/, '').split('-');
+    const start = parseInt(rangeParts[0], 10);
+    const end = rangeParts[1] ? parseInt(rangeParts[1], 10) : size - 1;
 
-	// Check if the range is valid
-	if (isNaN(start) || isNaN(end) || start >= size || end >= size) {
-		// Return 416 Range Not Satisfiable if range is invalid
-		headers['Content-Range'] = `bytes */${size}`;
-		return c.body(null, {
-			status: 416, // Range Not Satisfiable
-			headers,
-		});
-	}
+    // Check if the range is valid
+    if (isNaN(start) || isNaN(end) || start >= size || end >= size) {
+        // Return 416 Range Not Satisfiable if range is invalid
+        headers['Content-Range'] = `bytes */${size}`;
+        return c.body(null, {
+            status: 416, // Range Not Satisfiable
+            headers,
+        });
+    }
 
-	// Calculate the chunk size
-	const chunkSize = end - start + 1;
+    // Calculate the chunk size
+    const chunkSize = end - start + 1;
 
-	// Get the requested range from R2
-	const rangeObject = await c.env.AUDIO_FILES.get(`${id}.mp3`, {
-		range: { offset: start, length: chunkSize },
-	});
+    // Get the requested range from R2
+    const rangeObject = await c.env.AUDIO_FILES.get(`${id}.mp3`, {
+        range: { offset: start, length: chunkSize },
+    });
 
-	if (!rangeObject) return c.text('Range not available', 416);
+    if (!rangeObject) return c.text('Range not available', 416);
 
-	// Set additional headers for partial content
-	headers['Content-Length'] = chunkSize.toString();
-	headers['Content-Range'] = `bytes ${start}-${end}/${size}`;
+    // Set additional headers for partial content
+    headers['Content-Length'] = chunkSize.toString();
+    headers['Content-Range'] = `bytes ${start}-${end}/${size}`;
 
-	// Return 206 Partial Content for range requests
-	return c.body(rangeObject.body as ReadableStream<Uint8Array>, {
-		status: 206, // Partial Content
-		headers,
-	});
+    // Return 206 Partial Content for range requests
+    return c.body(rangeObject.body as ReadableStream<Uint8Array>, {
+        status: 206, // Partial Content
+        headers,
+    });
 });
 
 /**
@@ -173,34 +197,54 @@ audio.get('/:id', async (c) => {
  * @returns {Stream} Cover art image stream with appropriate content-type
  * @throws {404} If cover art is not found
  */
-audio.get('/:id/cover', async (c) => {
-	const id = c.req.param('id');
+audio.get('/:id/cover/:projectId', async (c) => {
+  const id = c.req.param('id');
+  const projectId = c.req.param('projectId');
+  // 👉 Cas spécial : projet YouTube virtuel
+  if (id.startsWith('youtube-virtual-')) {
+    if (!projectId) return c.text('Missing projectId for YouTube project', 400);
 
-	// Get audio metadata to check if it has cover art
-	const raw = await c.env.AUDIO_KV.get(`audio:${id}`);
-	if (!raw) return c.text('Audio file not found', 404);
+    // On tente de récupérer l'image mise dans COVER_FILES
+    const coverObject = await c.env.COVER_FILES.get(`cover:${projectId}`);
+    if (coverObject) {
+      return c.body(coverObject.body as ReadableStream<Uint8Array>, {
+        headers: { 'Content-Type': 'image/jpeg' },
+      });
+    }
 
-	const meta = JSON.parse(raw) as Audio;
+    // Sinon, fallback : lire la metadata et rediriger vers le thumbnail youtube
+    const youtubeMetaRaw = await c.env.PROJECT_KV.get(`youtube-meta:${projectId}`);
+    if (!youtubeMetaRaw) return c.text('No YouTube metadata found', 404);
 
-	// Check if this audio file has cover art
-	if (!meta.coverArt || !meta.coverArt.id) {
-		return c.text('No cover art available for this audio', 404);
-	}
+    const youtubeMeta = JSON.parse(youtubeMetaRaw);
+    if (youtubeMeta.thumbnail) {
+      // redirige directement vers le lien du thumbnail
+      return c.redirect(youtubeMeta.thumbnail, 302);
+    }
 
-	// Construct the cover art key based on the format
-	const coverArtFormat = meta.coverArt.format.split('/')[1] || 'jpg';
-	const coverKey = `${meta.coverArt.id}.${coverArtFormat}`;
+    return c.text('No thumbnail available for this YouTube project', 404);
+  }
 
-	// Get the cover art from R2
-	const coverObject = await c.env.COVER_FILES.get(coverKey);
-	if (!coverObject) return c.text('Cover art file not found', 404);
+  const raw = await c.env.AUDIO_KV.get(`audio:${id}`);
+  if (!raw) return c.text('Audio file not found', 404);
 
-	// Return the cover art with proper content type
-	return c.body(coverObject.body as ReadableStream<Uint8Array>, {
-		headers: {
-			'Content-Type': meta.coverArt.format || 'image/jpeg',
-		},
-	});
+  const meta = JSON.parse(raw) as Audio;
+
+  if (!meta.coverArt || !meta.coverArt.id) {
+    return c.text('No cover art available for this audio', 404);
+  }
+
+  const coverArtFormat = meta.coverArt.format.split('/')[1] || 'jpg';
+  const coverKey = `${meta.coverArt.id}.${coverArtFormat}`;
+
+  const coverObject = await c.env.COVER_FILES.get(coverKey);
+  if (!coverObject) return c.text('Cover art file not found', 404);
+
+  return c.body(coverObject.body as ReadableStream<Uint8Array>, {
+    headers: {
+      'Content-Type': meta.coverArt.format || 'image/jpeg',
+    },
+  });
 });
 
 /**
@@ -269,9 +313,8 @@ audio.post('/', async (c) => {
         if (metadata.common.picture && metadata.common.picture.length > 0) {
             const coverArt = metadata.common.picture[0];
             const coverArtId = `${audioId}-cover`;
-            const coverKey = `${coverArtId}.${
-                coverArt.format.split('/')[1] || 'jpg'
-            }`;
+            const coverKey = `${coverArtId}.${coverArt.format.split('/')[1] || 'jpg'
+                }`;
 
             // Save cover art to R2
             await c.env.COVER_FILES.put(coverKey, coverArt.data, {
@@ -288,8 +331,7 @@ audio.post('/', async (c) => {
         }
     } catch (error) {
         return c.text(
-            `Error extracting metadata: ${
-                error instanceof Error ? error.message : String(error)
+            `Error extracting metadata: ${error instanceof Error ? error.message : String(error)
             }`,
             500
         );
@@ -311,13 +353,13 @@ audio.post('/', async (c) => {
         createdAt: new Date().toISOString(),
         metadata: metadata
             ? {
-                    title: metadata.common.title,
-                    artist: metadata.common.artist,
-                    album: metadata.common.album,
-                    year: metadata.common.year?.toString(),
-                    genre: metadata.common.genre,
-                    duration: metadata.format.duration,
-                }
+                title: metadata.common.title,
+                artist: metadata.common.artist,
+                album: metadata.common.album,
+                year: metadata.common.year?.toString(),
+                genre: metadata.common.genre,
+                duration: metadata.format.duration,
+            }
             : undefined,
         coverArt: coverArtInfo,
     };
@@ -330,9 +372,8 @@ audio.post('/', async (c) => {
 
     const project: Project = {
         id: projectId,
-        name: `${meta.metadata?.title || 'New Project'} - ${
-            meta.metadata?.artist || 'Unknown Artist'
-        }`,
+        name: `${meta.metadata?.title || 'New Project'} - ${meta.metadata?.artist || 'Unknown Artist'
+            }`,
         createdAt: now,
         updatedAt: now,
         audioId: audioId,
