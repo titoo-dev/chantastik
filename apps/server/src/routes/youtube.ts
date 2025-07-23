@@ -94,7 +94,7 @@ youtube.get('/search', async (c) => {
     }
 
     if (isUrl) {
-      // 🔹 Cas URL → extraire l'id et fetch directement
+      // 🔹 URL case → extract the ID and fetch directly
       const videoId = extractVideoId(input);
       if (!videoId) {
         return c.text('Invalid YouTube URL', 400);
