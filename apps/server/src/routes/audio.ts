@@ -27,6 +27,10 @@ audio.put('/:id', async (c) => {
     const file = formData.get('file') as File | null;
     if (!file) return c.text('No file provided', 400);
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+    if (file.size > MAX_FILE_SIZE) {
+        return c.text(`File size exceeds the maximum limit of ${MAX_FILE_SIZE / (1024 * 1024)} MB`, 400);
+    }
     const fileBuffer = await file.arrayBuffer();
     await c.env.AUDIO_FILES.put(`${id}.mp3`, fileBuffer, {
         httpMetadata: { contentType: file.type },
