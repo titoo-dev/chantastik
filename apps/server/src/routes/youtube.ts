@@ -128,7 +128,7 @@ youtube.get('/search', async (c) => {
       const data = await resp.json();
       let results = sanitizeYouTubeResponse(data);
 
-      // Ajouter les durées
+      // Add durations
       const videoIds = results.map(r => r.id).join(',');
       if (videoIds) {
         const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${apiKey}`;
