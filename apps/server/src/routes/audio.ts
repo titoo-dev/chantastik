@@ -200,7 +200,7 @@ audio.get('/:id', async (c) => {
 audio.get('/:id/cover/:projectId', async (c) => {
   const id = c.req.param('id');
   const projectId = c.req.param('projectId');
-  // 👉 Cas spécial : projet YouTube virtuel
+  // 👉 Special case: virtual YouTube project
   if (id.startsWith('youtube-virtual-')) {
     if (!projectId) return c.text('Missing projectId for YouTube project', 400);
 
