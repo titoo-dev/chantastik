@@ -84,7 +84,7 @@ youtube.get('/search', async (c) => {
     return c.text('Rate limit exceeded. Please try again later.', 429);
   }
 
-  // Vérifier si c'est une URL
+  // Check if it's a URL
   const isUrl = /^https?:\/\//i.test(input);
 
   try {
