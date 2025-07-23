@@ -2,7 +2,7 @@ import { toast } from 'sonner';
 import type { AudioMeta, LyricLine } from './types';
 
 export const API_BASE_URL =
-	import.meta.env.VITE_DEFAULT_REST_API_URL || 'http://localhost:8000/api';
+	import.meta.env.VITE_DEV_SERVER_URL || 'http://localhost:8000/api';
 
 const RENDERER_BASE_URL =
 	import.meta.env.VITE_DEFAULT_RENDERER_URL || 'http://localhost:3000';
@@ -30,7 +30,7 @@ type LyricsDataToUpdate = {
 // get all projects function
 export async function getAllProjects(): Promise<Project[]> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/projects`);
+		const response = await fetch(`${API_BASE_URL}/project/all`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch projects');
@@ -182,7 +182,7 @@ export async function deleteProject(id: string): Promise<void> {
 // get audio metadata function
 export async function getAudioMetadata(id: string): Promise<AudioMeta> {
 	try {
-		const response = await fetch(`${API_BASE_URL}/audio/${id}/meta`);
+		const response = await fetch(`${API_BASE_URL}/audio/${id}/meta/${id?.replace('youtube-virtual-', '')}`);
 
 		if (!response.ok) {
 			throw new Error('Failed to fetch audio metadata');
@@ -206,7 +206,7 @@ export function getAudioUrl(id: string): string {
 
 // get cover art url function
 export function getCoverArtUrl(id?: string): string {
-	return `${API_BASE_URL}/audio/${id}/cover`;
+	return `${API_BASE_URL}/audio/${id}/cover/${id?.replace('youtube-virtual-', '')}`;
 }
 
 /**
@@ -272,5 +272,135 @@ export async function downloadAudioFile(url: string): Promise<void> {
 				error instanceof Error ? error.message : 'Unknown error',
 		});
 		throw error;
+	}
+}
+
+export type YouTubeSearchResult = {
+	id: string;
+	title: string;
+	description: string;
+	thumbnail: string;
+	channelTitle: string;
+	publishedAt: string;
+	duration: string;
+	url: string;
+};
+
+export type YouTubeSearchResponse = {
+	results: YouTubeSearchResult[];
+};
+
+export type YouTubeSearchOptions = {
+	query: string;
+	searchType?: 'url' | 'title';
+	titleQuery?: string;
+};
+
+/**
+ * Search YouTube for videos
+ */
+export async function searchYouTube(queryOrUrl: string): Promise<YouTubeSearchResponse> {
+  try {
+    const serverBaseUrl =
+      import.meta.env.VITE_DEV_SERVER_URL?.replace('/api', '') || 'http://localhost:8000';
+
+    const url = new URL(`${serverBaseUrl}/youtube/search`);
+    url.searchParams.set('input', queryOrUrl.trim());
+
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`YouTube search failed: ${response.statusText}`);
+    }
+
+    const data: YouTubeSearchResponse = await response.json();
+    return data;
+  } catch (error) {
+    toast.error('YouTube search failed', {
+      description: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw error;
+  }
+}
+
+
+/**
+ * Create a project from YouTube video metadata without downloading audio
+ */
+export async function createProjectFromYouTube(video: YouTubeSearchResult): Promise<{
+	projectId: string;
+	message: string;
+}> {
+	try {
+		const response = await fetch(`${import.meta.env.VITE_DEV_SERVER_URL}/youtube/from-youtube`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				videoId: video.id,
+				title: video.title,
+				channelTitle: video.channelTitle,
+				duration: video.duration,
+				thumbnail: video.thumbnail,
+				url: video.url,
+				description: video.description,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to create project from YouTube video');
+		}
+
+		const result = await response.json();
+
+		toast.success('Project created!', {
+			description: `Added "${video.title}" to your projects`,
+		});
+
+		return result;
+	} catch (error) {
+		toast.error('Project creation failed', {
+			description:
+				error instanceof Error ? error.message : 'Unknown error',
+		});
+		throw error;
+	}
+}
+
+/**
+ * Extract lyrics from video metadata and external sources
+ */
+export async function extractLyricsFromVideo(videoId: string, title: string, channelTitle: string): Promise<{
+	lyrics: string[];
+	source: 'title' | 'description' | 'external' | 'none';
+	confidence: number;
+}> {
+	try {
+		const response = await fetch(`${API_BASE_URL}/lyrics/extract`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				videoId,
+				title,
+				channelTitle,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to extract lyrics');
+		}
+
+		const result = await response.json();
+		return result;
+	} catch (error) {
+		console.warn('Lyrics extraction failed:', error);
+		// Return empty result instead of throwing to allow project creation without lyrics
+		return {
+			lyrics: [],
+			source: 'none',
+			confidence: 0,
+		};
 	}
 }

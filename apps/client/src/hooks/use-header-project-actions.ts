@@ -27,9 +27,13 @@ export const useHeaderProjectActions = (): UseHeaderProjectActionsReturn => {
 
 	const handleProjectSelected = (project: Project) => {
 		updateProjectId(project.id);
-		setAudio({
-			id: project.audioId,
-		});
+		if (project.audioId.includes('youtube')) {
+			setAudio({
+				id: project.audioId,
+			});
+		} else {
+			setAudio({id: project.audioId});
+		}
 	};
 
 	const handleProjectDelete = (projectId: string) => {

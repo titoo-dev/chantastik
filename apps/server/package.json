@@ -1,7 +1,7 @@
 {
   "name": "@repo/server",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --config wrangler.local.jsonc",
     "deploy": "wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },

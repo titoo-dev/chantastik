@@ -6,6 +6,7 @@ import type { ComponentRef, RefObject } from 'react';
 import type { AudioMeta, LyricLine } from '@/data/types';
 import { preloadImage } from '@remotion/preload';
 import { getCoverArtUrl } from '@/data/api';
+import type { YouTubePlayer } from 'react-youtube';
 
 export type LRCData = {
 	metadata: {
@@ -25,6 +26,7 @@ type AppState = {
 	audio: AudioMeta | undefined;
 	lyricLines: LyricLine[];
 	externalLyrics: string;
+	youtubePlayer: YouTubePlayer | null;
 };
 
 type AppActions = {
@@ -51,6 +53,8 @@ type AppActions = {
 	isValidLyricLines: () => boolean;
 	generateLRC: () => LRCData;
 	handleDownload: () => void;
+	isYoutubeProject: () => boolean;
+	setYoutubePlayer: (player: YouTubePlayer | null) => void;
 };
 
 type AppStore = AppState & AppActions;
@@ -68,6 +72,7 @@ export const useAppStore = create<AppStore>()(
 				commands: [],
 				currentIndex: -1,
 			},
+			youtubePlayer: undefined,
 
 			// Basic setters
 			setTrackLoaded: (loaded) => set({ trackLoaded: loaded }),
@@ -118,11 +123,23 @@ export const useAppStore = create<AppStore>()(
 						line.text.trim() !== '' && line.timestamp !== undefined
 				);
 			},
+
+			isYoutubeProject: () => {
+				const { audio } = get();
+				return audio?.id?.includes('youtube') ?? false;
+			},
 			// Complex actions
 			jumpToLyricLine: (params) => {
 				const { id, audioRef, videoRef } = params;
-				const { lyricLines } = get();
+				const { lyricLines, youtubePlayer, isYoutubeProject } = get();
 				const line = lyricLines.find((line) => line.id === id);
+				if (isYoutubeProject()) {
+					// --- Cas YouTube ---
+					if (youtubePlayer) {
+						youtubePlayer.seekTo(line?.timestamp, true);
+						youtubePlayer.playVideo();
+					}
+				}
 				if (line?.timestamp !== undefined && audioRef?.current) {
 					audioRef.current.currentTime = line.timestamp;
 					audioRef.current
@@ -242,9 +259,11 @@ export const useAppStore = create<AppStore>()(
 					lyricLines: [],
 					externalLyrics: '',
 					projectId: undefined,
-					audio: undefined
+					audio: undefined,
+					youtubePlayer: undefined,
 				});
 			},
+			setYoutubePlayer: (player) => set({ youtubePlayer: player }),
 		}),
 		{
 			name: 'app-store',

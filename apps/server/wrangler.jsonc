@@ -6,9 +6,6 @@
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
   "kv_namespaces": [
     {
       "binding": "AUDIO_KV",
@@ -22,6 +19,10 @@
       "binding": "LYRICS_KV",
       "id": "0cee5eb6c4064edd96ac91cc50513f14",
     },
+    {
+      "binding": "YOUTUBE_KV",
+      "id": "d1d1ddec2d524feab8d2b577695f2115"
+    }
   ],
   "r2_buckets": [
     {
