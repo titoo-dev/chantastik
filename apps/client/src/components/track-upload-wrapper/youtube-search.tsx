@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Search, PlayCircle, Loader2, ExternalLink, Plus } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
-import { isValidYoutubeUrl, extractVideoId, cn, parseYouTubeDuration } from '@/lib/utils';
-import { motion, AnimatePresence } from 'motion/react';
-import { searchYouTube, createProjectFromYouTube, extractLyricsFromVideo, type YouTubeSearchResult } from '@/data/api';
+import { createProjectFromYouTube, extractLyricsFromVideo, searchYouTube, type YouTubeSearchResult } from '@/data/api';
+import { cn, extractVideoId, isValidYoutubeUrl, parseYouTubeDuration } from '@/lib/utils';
+import { ExternalLink, Loader2, PlayCircle, Plus, Search } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
 
 type YouTubeSearchProps = {
 	onVideoSelect?: (video: YouTubeSearchResult) => void;
@@ -22,10 +21,9 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 	const [addingToPlaylist, setAddingToPlaylist] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [hasSearched, setHasSearched] = useState(false);
-	const [searchType, setSearchType] = useState<'url' | 'title'>('url');
 
 	// Debounced search function
-	const performSearch = useCallback(async (query: string, type: 'url' | 'title') => {
+	const performSearch = useCallback(async (query: string) => {
 		if (!query.trim()) {
 			setSearchResults([]);
 			setHasSearched(false);
@@ -78,11 +76,11 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 		}
 
 		const debounceTimer = setTimeout(() => {
-			performSearch(searchQuery, searchType);
+			performSearch(searchQuery);
 		}, 500); // 500ms delay
 
 		return () => clearTimeout(debounceTimer);
-	}, [searchQuery, searchType, performSearch]);
+	}, [searchQuery, performSearch]);
 
 
 
@@ -96,7 +94,7 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 		
 		try {
 			// Create project from YouTube video
-			const projectResult = await createProjectFromYouTube(video);
+			await createProjectFromYouTube(video);
 
 			// Extract lyrics if available
 			try {
@@ -134,9 +132,7 @@ export function YouTubeSearch({ onVideoSelect, className }: Readonly<YouTubeSear
 				<div className="relative">
 					<Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isSearching ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
 					<Input
-						placeholder={searchType === 'title' 
-							? "Search by song title (e.g., 'Shake It Off', 'Bohemian Rhapsody')..." 
-							: "Search for songs or paste YouTube URL..."
+						placeholder={ "Search by song title (e.g., 'Shake It Off', 'Bohemian Rhapsody')..." 
 						}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
