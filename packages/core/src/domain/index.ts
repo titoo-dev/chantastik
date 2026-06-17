@@ -4,5 +4,8 @@ export * from './project/project.js';
 export * from './audio/audio.js';
 export * from './lyrics/lyrics.js';
 export * from './lyrics/lrc.js';
+export * from './lyrics/lyrics-from-title.js';
 export * from './theme/theme.js';
 export * from './render/render.js';
+export * from './youtube/search-query.js';
+export * from './youtube/video.js';

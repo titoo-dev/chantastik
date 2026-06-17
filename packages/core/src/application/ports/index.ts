@@ -29,6 +29,9 @@ export interface LyricsRepository {
 export interface AudioRepository {
 	save(audio: Audio): Promise<void>;
 	findById(id: string): Promise<Audio | null>;
+	/** Déduplication d'upload : retrouve un audio par hash de contenu. */
+	findByHash(hash: string): Promise<Audio | null>;
+	delete(id: string): Promise<void>;
 }
 
 /** Stockage d'objets binaires (R2). Découplé du repository de métadonnées. */

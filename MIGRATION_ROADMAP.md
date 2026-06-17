@@ -161,17 +161,20 @@ Pas de conteneur IoC lourd : on assemble les use cases avec leurs adapters dans 
 >
 > ℹ️ Note d'état : seuls `@repo/core` (lint + check-types + test) et `@repo/client` (test) ont des tasks. Ajouter `lint`/`check-types` à `client`/`server`/`renderer` se fera au fil de leur portage (Phases 3–5).
 
-### Phase 1 — Extraction du domaine `@repo/core` *(scaffold livré ici, voir §6)*
-- [ ] Créer `packages/core` (domaine pur, zéro dépendance runtime).
-- [ ] Définir entités & VO : `Project`, `Audio`, `Lyrics`, `LyricLine`, `Theme`, `VideoRender` + VO partagés (`Id`, `Timestamp`, `FileHash`, `AspectRatio`, `Result`).
-- [ ] **Unifier** les types divergents client/serveur → source de vérité unique.
-- [ ] Schémas Zod de validation à la frontière, colocalisés.
-- [ ] Tests unitaires du domaine (invariants, parsing LRC, synchro lyrics) — **sans aucune infra**.
+### Phase 1 — Extraction du domaine `@repo/core` 🟡 *(largement faite)*
+- [x] Créer `packages/core` (domaine pur, zéro dépendance runtime).
+- [x] Définir entités & VO : `Project`, `Audio`, `Lyrics`, `LyricLine`, `Theme`, `VideoRender` + VO partagés (ids brandés, `IsoTimestamp`, `Result`/erreurs).
+- [x] **Unifier** les types divergents client/serveur → source de vérité unique.
+- [x] Rapatrier la logique PURE noyée dans `apps/server/src/utils.ts` : validation de requête YouTube, `extractVideoId`, parsing durée ISO-8601, scoring de titre, heuristique `draftLyricsFromTitle`, parsing/sérialisation LRC.
+- [x] Schémas Zod de validation à la frontière (`application/schemas.ts`).
+- [x] Tests unitaires du domaine (LRC, youtube, heuristiques) — **sans aucune infra**.
+- [ ] Reste : VO `FileHash`/`AspectRatio` typés plus stricts, invariants supplémentaires au besoin.
 
-### Phase 2 — Couche application (use cases) & ports outbound
-- [ ] Définir les **ports outbound** (interfaces) : `ProjectRepository`, `LyricsRepository`, `AudioStorage`, `CoverStorage`, `MetadataExtractor`, `YoutubeGateway`, `VideoRenderer`, `Clock`, `IdGenerator`, `Hasher`.
-- [ ] Implémenter les **use cases** (1 par fichier) en migrant la logique des routes Hono : `createProject`, `uploadAudio`, `saveLyrics`, `getLyrics`, `listProjects`, `deleteProject`, `importYoutubeLyrics`, `requestVideoRender`.
-- [ ] Fournir des **fakes in-memory** de chaque port → suite de tests application complète, rapide, déterministe.
+### Phase 2 — Couche application (use cases) & ports outbound 🟡 *(largement faite)*
+- [x] Définir les **ports outbound** : `ProjectRepository`, `LyricsRepository`, `AudioRepository` (+ `findByHash`), `BlobStorage`, `MetadataExtractor`, `YoutubeGateway`, `VideoRenderer`, `Clock`, `IdGenerator`, `Hasher`.
+- [x] Implémenter les **use cases** (1/fichier) en migrant la logique Hono : `createProject`, `listProjects`, `getProject`, `updateProject`, `deleteProject` (cascade audio+cover), `saveLyrics`, `getLyrics`, `uploadAudio` (dédup hash → extraction → R2 → création projet auto).
+- [x] **Fakes in-memory** de chaque port (`testing/`) → suite de tests application déterministe (16 tests verts).
+- [ ] Reste : use cases `importYoutubeLyrics`, `searchYoutube`, `requestVideoRender` (dépendent des adapters infra Phase 3 / decision gate Phase 6).
 
 ### Phase 3 — Adapters secondaires (infra)
 - [ ] `@repo/infra-cloudflare` : `KvProjectRepository`, `KvLyricsRepository`, `KvAudioRepository`, `R2AudioStorage`, `R2CoverStorage` (reprend exactement les clés `project:*`, `audio:*`, `lyrics:*` → **compatibilité données**).

@@ -1,8 +1,18 @@
-import { IsoTimestamp, type Lyrics, type Project, type ProjectId } from '../domain/index.js';
+import {
+	IsoTimestamp,
+	type Audio,
+	type Lyrics,
+	type Project,
+	type ProjectId,
+} from '../domain/index.js';
 import type {
+	AudioRepository,
+	BlobStorage,
 	Clock,
+	Hasher,
 	IdGenerator,
 	LyricsRepository,
+	MetadataExtractor,
 	ProjectRepository,
 } from '../application/index.js';
 
@@ -43,6 +53,67 @@ export class InMemoryLyricsRepository implements LyricsRepository {
 			if (l.projectId === projectId) return l;
 		}
 		return null;
+	}
+}
+
+export class InMemoryAudioRepository implements AudioRepository {
+	private readonly store = new Map<string, Audio>();
+
+	async save(audio: Audio): Promise<void> {
+		this.store.set(audio.id, audio);
+	}
+	async findById(id: string): Promise<Audio | null> {
+		return this.store.get(id) ?? null;
+	}
+	async findByHash(hash: string): Promise<Audio | null> {
+		for (const a of this.store.values()) {
+			if (a.fileHash === hash) return a;
+		}
+		return null;
+	}
+	async delete(id: string): Promise<void> {
+		this.store.delete(id);
+	}
+}
+
+/** Stockage binaire en mémoire (remplace R2 en test). */
+export class InMemoryBlobStorage implements BlobStorage {
+	readonly store = new Map<string, ArrayBuffer>();
+
+	async put(key: string, data: ArrayBuffer | Uint8Array): Promise<void> {
+		const buf =
+			data instanceof Uint8Array
+				? data.buffer.slice(
+						data.byteOffset,
+						data.byteOffset + data.byteLength
+					)
+				: data;
+		this.store.set(key, buf as ArrayBuffer);
+	}
+	async get(key: string): Promise<ArrayBuffer | null> {
+		return this.store.get(key) ?? null;
+	}
+	async delete(key: string): Promise<void> {
+		this.store.delete(key);
+	}
+}
+
+/** Extracteur de métadonnées configurable (remplace music-metadata). */
+export class StubMetadataExtractor implements MetadataExtractor {
+	constructor(
+		private readonly value: Awaited<
+			ReturnType<MetadataExtractor['extract']>
+		> = {}
+	) {}
+	async extract(): ReturnType<MetadataExtractor['extract']> {
+		return this.value;
+	}
+}
+
+/** Hash déterministe basé sur la taille — suffisant pour tester la dédup. */
+export class FakeHasher implements Hasher {
+	async hash(data: ArrayBuffer): Promise<string> {
+		return `hash-${data.byteLength}`;
 	}
 }
 
