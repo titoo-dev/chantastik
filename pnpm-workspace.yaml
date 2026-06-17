@@ -1,3 +1,20 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Catalog : source de vérité unique des versions transverses (Phase 0 du
+# MIGRATION_ROADMAP). Les package.json référencent ces deps via `catalog:`
+# pour éviter toute dérive de version entre apps et packages.
+catalog:
+  # Langage & outils
+  typescript: 5.7.2
+  # Runtime UI
+  react: ^19.0.0
+  react-dom: ^19.0.0
+  "@types/react": ^19.0.0
+  "@types/react-dom": ^19.0.3
+  "@types/node": ^22.15.16
+  # Validation (garde-frontière des adapters)
+  zod: ^3.25.47
+  # Tests
+  vitest: ^3.1.4

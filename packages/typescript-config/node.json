@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node (services & adapters serveur)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["es2023"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  }
+}
